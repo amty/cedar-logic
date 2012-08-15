@@ -13,3 +13,6 @@
 
 # emacs backups
 *~
+
+# cedar executable itself
+cedar
