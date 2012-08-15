@@ -20,7 +20,7 @@ OBJS+= unix-glmem.o
 all: $(OBJS)
 
 %.o: %.cpp
-	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o$@ $^
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
 image_names=new.xpm open.xpm save.xpm undo.xpm redo.xpm copy.xpm cut.xpm
 image_names+=paste.xpm print.xpm help.xpm pause.xpm step.xpm zoomin.xpm zoomout.xpm
