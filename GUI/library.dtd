@@ -1,0 +1,28 @@
+<!ELEMENT libraries (library*)>
+<!ELEMENT library (name, (gate)*)>
+<!ELEMENT gate (name | input | output | shape | param_dlg_data | gui_type |
+	  logic_type | gui_param | logic_param | caption)*>
+<!ELEMENT input (name, (point | inverted | enable_output)*)>
+<!ELEMENT output (name, (point | inverted | enable_input)*)>
+<!ELEMENT shape (offset | line | circle)*>
+<!-- в point должен быть атрибутом, кроме того было бы, пожалуй правильно, 
+     вкладывать внутрь offset'а ещё один shape. Или даже объединить shape с
+     offset'ом во единую сущность, которая может содержать сама себя -->
+<!ELEMENT offset (point, (line | circle)*)> 
+<!ELEMENT param_dlg_data (param*)>
+<!ELEMENT param (type | label | varname | range | param)*>
+<!ELEMENT gui_type (#PCDATA)>
+<!ELEMENT logic_type (#PCDATA)>
+<!ELEMENT gui_param (#PCDATA)>
+<!ELEMENT logic_param (#PCDATA)>
+<!ELEMENT caption (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT point (#PCDATA)>
+<!ELEMENT line (#PCDATA)>
+<!ELEMENT inverted (#PCDATA)>
+<!ELEMENT circle (#PCDATA)>
+<!ELEMENT enable_input (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT label (#PCDATA)>
+<!ELEMENT varname (#PCDATA)>
+<!ELEMENT range (#PCDATA)>

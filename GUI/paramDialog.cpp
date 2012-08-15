@@ -1,0 +1,241 @@
+/*****************************************************************************
+   Project: CEDAR Logic Simulator
+   Copyright 2006 Cedarville University, Benjamin Sprague,
+                     Matt Lewellyn, and David Knierim
+   All rights reserved.
+   For license information see license.txt included with distribution.   
+
+   paramDialog: Generates and handles parameters dialog for a gate
+*****************************************************************************/
+
+#include "MainApp.h"
+#include "paramDialog.h"
+#include "wx/filedlg.h"
+#include "wx/spinctrl.h"
+#include "wx/checkbox.h"
+#include "wx/textctrl.h"
+#include "wx/valgen.h"
+#include "CircuitParse.h"
+#include "commands.h"
+#include <sstream>
+#include "str-convs.h"
+DECLARE_APP(MainApp)
+
+#define ID_TEXT 8888
+#define ID_LOAD 8889
+#define ID_SAVE 8890
+
+BEGIN_EVENT_TABLE(paramDialog, wxDialog)
+	EVT_BUTTON(wxID_OK, paramDialog::OnOK)
+	EVT_BUTTON(ID_LOAD, paramDialog::OnLoad)
+	EVT_BUTTON(ID_SAVE, paramDialog::OnSave)
+	EVT_TEXT(ID_TEXT, paramDialog::OnTextEntry)
+END_EVENT_TABLE()
+
+paramDialog::paramDialog(const wxString& title, void* gCircuit, guiGate* gGate, wxCommandProcessor* wxcmd)
+       : wxDialog(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(250,400), wxCAPTION|wxFRAME_TOOL_WINDOW|wxSTAY_ON_TOP)
+{
+	// Copy the circuit and gate pointers to this frame:
+	this->gCircuit = (GUICircuit*)gCircuit;
+	this->gGate = gGate;
+	this->wxcmd = wxcmd;
+	
+	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
+	unsigned int numParams = gateDef->dlgParams.size();
+	dlgSizer = new wxGridSizer(numParams+1, 2, 2, 2);
+	SetSizer(dlgSizer);
+	
+	for (unsigned int i = 0; i < numParams; i++) {
+		wxString str = std2wx(gateDef->dlgParams[i].textLabel);
+		paramNames.push_back(new wxStaticText(this,  wxID_ANY, str));
+		dlgSizer->Add( paramNames[paramNames.size()-1], 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 3 );
+		string initialString;
+		// Generate control from type. Type can be: STRING, INT, BOOL, FLOAT, FILE_IN, FILE_OUT.
+		if ( gateDef->dlgParams[i].type == "INT" ) {
+			// Retrieve a default integer value
+			if ( gateDef->dlgParams[i].isGui ) initialString = gGate->getGUIParam(gateDef->dlgParams[i].name);
+			else initialString = gGate->getLogicParam(gateDef->dlgParams[i].name);
+			istringstream initVal(initialString);
+			int initValInt;
+			initVal >> initValInt;
+			paramVals.push_back(
+				new wxSpinCtrl(
+					this, ID_TEXT, std2wx(initialString),
+					wxDefaultPosition, wxDefaultSize,
+					wxSP_ARROW_KEYS,
+					(int)(gateDef->dlgParams[i].Rmin),
+					(int)(gateDef->dlgParams[i].Rmax),
+					initValInt));
+//			wxGenericValidator* gv = new wxGenericValidator(wxFILTER_INCLUDE_CHAR_LIST, ((wxSpinCtrl*)(paramVals[paramVals.size()-1]))->GetValue())
+//			paramVals[paramVals.size()-1]->SetValidator(gv);
+		} else if ( gateDef->dlgParams[i].type == "STRING" ) {
+			if ( gateDef->dlgParams[i].isGui ) initialString = gGate->getGUIParam(gateDef->dlgParams[i].name);
+			else initialString = gGate->getLogicParam(gateDef->dlgParams[i].name);
+			paramVals.push_back(new wxTextCtrl(this, wxID_ANY,
+							   std2wx(initialString)));
+		} else if ( gateDef->dlgParams[i].type == "BOOL" ) {
+			paramVals.push_back(new wxCheckBox(this, wxID_ANY,
+							   std2wx("")));
+			// Retrieve the current param setting
+			if ( gateDef->dlgParams[i].isGui ) initialString = gGate->getGUIParam(gateDef->dlgParams[i].name);
+			else initialString = gGate->getLogicParam(gateDef->dlgParams[i].name);
+			if ( initialString == "true" ) ((wxCheckBox*)(paramVals[paramVals.size()-1]))->SetValue(true);
+		} else if ( gateDef->dlgParams[i].type == "FLOAT" ) {
+			if ( gateDef->dlgParams[i].isGui ) initialString = gGate->getGUIParam(gateDef->dlgParams[i].name);
+			else initialString = gGate->getLogicParam(gateDef->dlgParams[i].name);
+			paramVals.push_back(new wxTextCtrl(this, ID_TEXT,
+							   std2wx(initialString)));
+		} else if ( gateDef->dlgParams[i].type == "FILE_IN" ) {
+			paramVals.push_back(new wxButton(this, ID_LOAD,
+							 std2wx("Load File")));
+		} else if ( gateDef->dlgParams[i].type == "FILE_OUT" ) {
+			paramVals.push_back(new wxButton(this, ID_SAVE,
+							 std2wx("Save File")));			
+		}
+		dlgSizer->Add( paramVals[paramVals.size()-1], 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 3 );
+	}
+	
+	// Put in the standard dialog buttons
+	ok = new wxButton( this, wxID_OK, std2wx("&OK") );
+	dlgSizer->Add( ok, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+	cancel = new wxButton( this, wxID_CANCEL, std2wx("&Cancel") );
+	dlgSizer->Add( cancel, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+	this->SetDefaultItem(ok);
+
+	dlgSizer->Fit(this);
+	dlgSizer->SetSizeHints(this);
+}
+
+paramDialog::~paramDialog() {
+	// Delete the various objects
+	//for (unsigned int i = 0; i < paramNames.size(); i++) delete paramNames[i];
+}
+
+void paramDialog::OnLoad( wxCommandEvent &evt ) {
+	// Find the control
+	unsigned int parmID = paramVals.size()+1;
+	for (unsigned int i = 0; i < paramVals.size(); i++) {
+		if (evt.GetEventObject() == paramVals[i]) {
+			parmID = i;
+			break;
+		}
+	}
+	if (parmID == paramVals.size()+1) return;
+	string paramName = wx2std(paramNames[parmID]->GetLabel());
+	
+	wxString caption = std2wx("Open a memory file");
+	wxString wildcard = std2wx("CEDAR Memory files (*.cdm)|*.cdm");
+	wxString defaultFilename = std2wx("");
+	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxOPEN | wxFILE_MUST_EXIST);
+	
+	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
+	if (dialog.ShowModal() == wxID_OK) {
+		wxString path = dialog.GetPath();
+		string mempath = wx2std(path);
+		ostringstream oss;
+		oss << "SET GATE ID " << gGate->getID() << " PARAMETER " << gateDef->dlgParams[parmID].name << " " << mempath;
+		gCircuit->sendMessageToCore(oss.str());
+	}
+}
+
+void paramDialog::OnSave( wxCommandEvent &evt ) {
+	// Find the control
+	unsigned int parmID = paramVals.size()+1;
+	for (unsigned int i = 0; i < paramVals.size(); i++) {
+		if (evt.GetEventObject() == paramVals[i]) {
+			parmID = i;
+			break;
+		}
+	}
+	if (parmID == paramVals.size()+1) return;
+	string paramName = wx2std(paramNames[parmID]->GetLabel());
+	
+	wxString caption = std2wx("Open a memory file");
+	wxString wildcard = std2wx("CEDAR Memory files (*.cdm)|*.cdm");
+	wxString defaultFilename = std2wx("");
+	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxSAVE | wxOVERWRITE_PROMPT);
+	
+	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
+	if (dialog.ShowModal() == wxID_OK) {
+		wxString path = dialog.GetPath();
+		string mempath = wx2std(path);
+		ostringstream oss;
+		oss << "SET GATE ID " << gGate->getID() << " PARAMETER " << gateDef->dlgParams[parmID].name << " " << mempath;
+		gCircuit->sendMessageToCore(oss.str());
+	}
+}
+
+void paramDialog::OnOK( wxCommandEvent &evt ) {
+	// Are we all good?
+	wxString msg;
+	if (!validateData()) return;
+	// Set up a params map and send it off to cmdSetParams
+	map < string, string > lParamList;
+	map < string, string > gParamList;
+	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
+	for (unsigned int i = 0; i < gateDef->dlgParams.size(); i++) {
+		string pValue;
+		if ( gateDef->dlgParams[i].type == "INT" ) {
+			ostringstream oss;
+			// Check range:
+			if (((wxSpinCtrl*)(paramVals[i]))->GetValue() < (int)(gateDef->dlgParams[i].Rmin) ||
+				((wxSpinCtrl*)(paramVals[i]))->GetValue() > (int)(gateDef->dlgParams[i].Rmax)) {
+				// ERROR
+				oss << "ERROR: Parameter " << gateDef->dlgParams[i].textLabel << " is out of range.";
+				msg.Printf(std2wx(oss.str()));
+				wxMessageBox(msg, std2wx("Error"), wxOK | wxICON_ERROR, NULL);
+				return;
+			}
+			// Retrieve the integer value
+			oss << ((wxSpinCtrl*)(paramVals[i]))->GetValue();
+			pValue = oss.str();
+		} else if ( gateDef->dlgParams[i].type == "STRING") {
+			pValue = wx2std(((wxTextCtrl*)(paramVals[i]))->GetValue());
+		} else if ( gateDef->dlgParams[i].type == "FLOAT" ) {
+			ostringstream oss;
+			// Check range:
+			pValue = (char*)(((wxTextCtrl*)(paramVals[i]))->GetValue().c_str());
+			istringstream iss(pValue);
+			float fVal;
+			iss >> fVal;
+			if (fVal < gateDef->dlgParams[i].Rmin || fVal > gateDef->dlgParams[i].Rmax) {
+				// ERROR
+				oss << "ERROR: Parameter " << gateDef->dlgParams[i].textLabel << " is out of range.";
+				msg.Printf(std2wx(oss.str()));
+				wxMessageBox(msg, std2wx("Error"), wxOK | wxICON_ERROR, NULL);
+				return;
+			}
+		} else if ( gateDef->dlgParams[i].type == "BOOL" ) {
+			pValue = ( ((wxCheckBox*)(paramVals[i]))->GetValue() ? "true" : "false" );
+		}
+		if (gateDef->dlgParams[i].isGui) gParamList[gateDef->dlgParams[i].name] = pValue;
+		else lParamList[gateDef->dlgParams[i].name] = pValue;
+	}
+	// If no params are different, then don't submit a command
+	bool allParamsSame = true;
+	map < string, string >::iterator paramWalk = gParamList.begin();
+	while (paramWalk != gParamList.end() && allParamsSame) {
+		allParamsSame = (gGate->getGUIParam(paramWalk->first) == paramWalk->second);
+		paramWalk++;
+	}
+	paramWalk = lParamList.begin();
+	while (paramWalk != lParamList.end() && allParamsSame) {
+		allParamsSame = (gGate->getLogicParam(paramWalk->first) == paramWalk->second);
+		paramWalk++;
+	}
+	if (!allParamsSame) wxcmd->Submit( new cmdSetParams( gCircuit, gGate->getID(), paramSet(&gParamList, &lParamList) ) );
+	// Make me go away forever!
+	Destroy();
+}
+
+bool paramDialog::validateData() {
+	bool retVal = true;
+	// Go through and validate the items we need to validate
+	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
+	for (unsigned int i = 0; i < gateDef->dlgParams.size(); i++) {
+		if (gateDef->dlgParams[i].type == "FLOAT") {
+			
+		}
+	}
+	return retVal;
+}

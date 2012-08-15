@@ -1,0 +1,26 @@
+/*****************************************************************************
+   Project: CEDAR Logic Simulator
+   Copyright 2006 Cedarville University, Benjamin Sprague,
+                     Matt Lewellyn, and David Knierim
+   All rights reserved.
+   For license information see license.txt included with distribution.   
+
+   resources: Specifies all toolbar bitmaps
+*****************************************************************************/
+
+#include "wx/msw/wx.rc"
+
+new BITMAP "../GUI/bitmaps/new.bmp"
+open BITMAP "../GUI/bitmaps/open.bmp"
+save BITMAP "../GUI/bitmaps/save.bmp"
+undo BITMAP "../GUI/bitmaps/undo.bmp"
+redo BITMAP "../GUI/bitmaps/redo.bmp"
+copy BITMAP "../GUI/bitmaps/copy.bmp"
+cut BITMAP "../GUI/bitmaps/cut.bmp"
+paste BITMAP "../GUI/bitmaps/paste.bmp"
+print BITMAP "../GUI/bitmaps/print.bmp"
+help BITMAP "../GUI/bitmaps/help.bmp"
+pause BITMAP "../GUI/bitmaps/pause.bmp"
+step BITMAP "../GUI/bitmaps/step.bmp"
+zoomin BITMAP "../GUI/bitmaps/zoomin.bmp"
+zoomout BITMAP "../GUI/bitmaps/zoomout.bmp"
