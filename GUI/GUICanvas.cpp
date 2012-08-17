@@ -1230,7 +1230,7 @@ void GUICanvas::Update() {
 	if (minimap == NULL) return;
 
 	// In case of resize, we should update every so often
-	if (wxGetApp().appSystemTime->Time() > wxGetApp().appSettings.refreshRate) {
+	if (wxGetApp().appSystemTime && wxGetApp().appSystemTime->Time() > wxGetApp().appSettings.refreshRate) {
 		wxGetApp().appSystemTime->Pause();
 		if (gCircuit->panic) return;
 		wxCriticalSectionLocker locker(wxGetApp().m_critsect);

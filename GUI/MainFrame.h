@@ -48,6 +48,7 @@ public:
 	MainFrame(const wxString& title, wxString cmdFilename = std2wx(""));
 	~MainFrame();
 	
+	void create_toolbar();
     // event handlers (these functions should _not_ be virtual)
     void OnClose(wxCloseEvent& event);
     void OnQuit(wxCommandEvent& event);
@@ -97,7 +98,6 @@ private:
 	
 	// Instance variables
 	bool sizeChanged;
-	bool toolbarCreated;
 	bool doOpenFile;
 	wxString lastDirectory;
 	wxString openedFilename;

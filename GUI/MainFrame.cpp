@@ -129,9 +129,10 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 	LibraryParse newLib("./TestGates.lib");
 	wxGetApp().libParser = newLib;
 	
-	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0), wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
+	create_toolbar();
 	SetToolBar(toolBar);
 	toolBar->Show(true);
+	toolBar->Realize();
 
     CreateStatusBar(2);
     SetStatusText(std2wx(""));
@@ -192,10 +193,6 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 	
 	gCircuit->myOscope = new OscopeFrame(this, std2wx("O-Scope"), gCircuit);
 	
-	toolbarCreated = false;
-
-	toolBar->Realize();
-
 	// Create the print data object:
 	g_printData = new wxPrintData;
 	g_printData->SetOrientation(wxLANDSCAPE);
@@ -222,6 +219,54 @@ MainFrame::~MainFrame() {
 	delete wxGetApp().appSystemTime;
 	delete mTimer;
 	delete idleTimer;
+}
+
+void MainFrame::create_toolbar()
+{
+	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0),
+				wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
+
+	wxBitmap bmpNew(wxBITMAP(new));
+	wxBitmap bmpOpen(wxBITMAP(open));
+	wxBitmap bmpSave(wxBITMAP(save));
+	wxBitmap bmpUndo(wxBITMAP(undo));
+	wxBitmap bmpRedo(wxBITMAP(redo));
+	wxBitmap bmpCopy(wxBITMAP(copy));
+	wxBitmap bmpPaste(wxBITMAP(paste));
+	wxBitmap bmpPrint(wxBITMAP(print));
+	wxBitmap bmpAbout(wxBITMAP(help));
+	wxBitmap bmpPause(wxBITMAP(pause));
+	wxBitmap bmpStep(wxBITMAP(step));
+	wxBitmap bmpZoomIn(wxBITMAP(zoomin));
+	wxBitmap bmpZoomOut(wxBITMAP(zoomout));
+	int w = bmpNew.GetWidth(), h = bmpNew.GetHeight();
+	toolBar->SetToolBitmapSize(wxSize(w, h));
+	toolBar->AddTool(wxID_NEW, std2wx("New"), bmpNew, std2wx("New"));
+	toolBar->AddTool(wxID_OPEN, std2wx("Open"), bmpOpen, std2wx("Open"));
+	toolBar->AddTool(wxID_SAVE, std2wx("Save"), bmpSave, std2wx("Save")); 
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_PRINT, std2wx("Print"), bmpPrint, std2wx("Print"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_UNDO, std2wx("Undo"), bmpUndo, std2wx("Undo"));
+	toolBar->AddTool(wxID_REDO, std2wx("Redo"), bmpRedo, std2wx("Redo"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_COPY, std2wx("Copy"), bmpCopy, std2wx("Copy"));
+	toolBar->AddTool(wxID_PASTE, std2wx("Paste"), bmpPaste, std2wx("Paste"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(Tool_ZoomIn, std2wx("Zoom In"), bmpZoomIn, std2wx("Zoom In"));
+	toolBar->AddTool(Tool_ZoomOut, std2wx("Zoom Out"), bmpZoomOut, std2wx("Zoom Out"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(Tool_Pause, std2wx("Pause/Resume"), bmpPause, std2wx("Pause/Resume"), wxITEM_CHECK);
+	toolBar->AddTool(Tool_Step, std2wx("Step"), bmpStep, std2wx("Step"));
+	timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
+	ostringstream oss;
+	oss << wxGetApp().timeStepMod << "ms";
+	timeStepModVal = new wxStaticText(toolBar, wxID_ANY, std2wx(oss.str()), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
+	toolBar->AddControl( timeStepModSlider );
+	toolBar->AddControl( timeStepModVal );
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_ABOUT, std2wx("About"), bmpAbout, std2wx("About"));		
+	toolBar->Realize();
 }
 
 threadLogic *MainFrame::CreateThread()
@@ -449,51 +494,6 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 	wxGetApp().mexMessages.Unlock();
 
 	if (mainSizer == NULL) return;
-	if (!toolbarCreated) {
-		wxBitmap bmpNew(wxBITMAP(new));
-		wxBitmap bmpOpen(wxBITMAP(open));
-		wxBitmap bmpSave(wxBITMAP(save));
-		wxBitmap bmpUndo(wxBITMAP(undo));
-		wxBitmap bmpRedo(wxBITMAP(redo));
-		wxBitmap bmpCopy(wxBITMAP(copy));
-		wxBitmap bmpPaste(wxBITMAP(paste));
-		wxBitmap bmpPrint(wxBITMAP(print));
-		wxBitmap bmpAbout(wxBITMAP(help));
-		wxBitmap bmpPause(wxBITMAP(pause));
-		wxBitmap bmpStep(wxBITMAP(step));
-		wxBitmap bmpZoomIn(wxBITMAP(zoomin));
-		wxBitmap bmpZoomOut(wxBITMAP(zoomout));
-	    int w = bmpNew.GetWidth(),
-	        h = bmpNew.GetHeight();
-	        toolBar->SetToolBitmapSize(wxSize(w, h));
-		toolBar->AddTool(wxID_NEW, std2wx("New"), bmpNew, std2wx("New"));
-		toolBar->AddTool(wxID_OPEN, std2wx("Open"), bmpOpen, std2wx("Open"));
-		toolBar->AddTool(wxID_SAVE, std2wx("Save"), bmpSave, std2wx("Save")); 
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_PRINT, std2wx("Print"), bmpPrint, std2wx("Print"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_UNDO, std2wx("Undo"), bmpUndo, std2wx("Undo"));
-		toolBar->AddTool(wxID_REDO, std2wx("Redo"), bmpRedo, std2wx("Redo"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_COPY, std2wx("Copy"), bmpCopy, std2wx("Copy"));
-		toolBar->AddTool(wxID_PASTE, std2wx("Paste"), bmpPaste, std2wx("Paste"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(Tool_ZoomIn, std2wx("Zoom In"), bmpZoomIn, std2wx("Zoom In"));
-		toolBar->AddTool(Tool_ZoomOut, std2wx("Zoom Out"), bmpZoomOut, std2wx("Zoom Out"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(Tool_Pause, std2wx("Pause/Resume"), bmpPause, std2wx("Pause/Resume"), wxITEM_CHECK);
-		toolBar->AddTool(Tool_Step, std2wx("Step"), bmpStep, std2wx("Step"));
-		timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
-		ostringstream oss;
-		oss << wxGetApp().timeStepMod << "ms";
-		timeStepModVal = new wxStaticText(toolBar, wxID_ANY, std2wx(oss.str()), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
-		toolBar->AddControl( timeStepModSlider );
-		toolBar->AddControl( timeStepModVal );
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_ABOUT, std2wx("About"), bmpAbout, std2wx("About"));		
-		toolBar->Realize();
-		toolbarCreated = true;
-	}
 	
 	if ( doOpenFile ) {
 		doOpenFile = false;
@@ -535,7 +535,6 @@ void MainFrame::OnMaximize(wxMaximizeEvent& event) {
 }
 
 void MainFrame::OnNotebookPage(wxNotebookEvent& event) {
-	if (!toolbarCreated) return;
 	long canvasID = event.GetSelection();
 	if (canvases[canvasID] == currentCanvas) return;
 	currentCanvas = canvases[canvasID];
