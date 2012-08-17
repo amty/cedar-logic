@@ -13,7 +13,7 @@ OBJS+= commands.o guiWire.o MainFrame.o
 OBJS+= gateImage.o klsClipboard.o OscopeCanvas.o
 OBJS+= glf.o klsCollisionChecker.o  OscopeFrame.o wx-glmem.o
 OBJS+= GUICanvas.o klsGLCanvas.o PaletteCanvas.o XMLParser.o
-OBJS+= GUICircuit.o klsMiniMap.o PaletteFrame.o
+OBJS+= GUICircuit.o klsMiniMap.o PaletteFrame.o algebra.o
 
 OBJS+= unix-glmem.o
 
