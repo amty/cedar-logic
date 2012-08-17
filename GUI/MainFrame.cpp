@@ -509,7 +509,12 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 		mTimer->Stop();
 		wxGetApp().appSystemTime->Start(0);
 		wxGetApp().appSystemTime->Pause();
-		wxMessageBox(std2wx("Overloading simulator: please increase time per step and then resume simulation."), std2wx("Error - overload"), wxOK | wxICON_ERROR, NULL);
+		wxMessageBox(std2wx("Overloading simulator: "
+				    "please increase time per"
+				    " step and then resume "
+				    "simulation."),
+			     std2wx("Error - overload"),
+			     wxOK | wxICON_ERROR, NULL);
 	}
 
 	if( sizeChanged ) {	
