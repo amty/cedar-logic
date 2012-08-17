@@ -68,9 +68,9 @@ void gateImage::OnPaint(wxPaintEvent &event) {
 void gateImage::mouseCallback( wxMouseEvent& event) {
 	if (event.LeftDown()) {
 		wxGetApp().newGateToDrag = gateName;
-	} else if (event.LeftUp()) {
-		wxGetApp().newGateToDrag = "";
-	}
+	} // else if (event.LeftUp()) {
+	// 	wxGetApp().newGateToDrag = "";
+	// }
 }
 
 void gateImage::OnEraseBackground( wxEraseEvent& event ) {
