@@ -16,6 +16,7 @@
 #include "paramDialog.h"
 #include <iomanip>
 #include "str-convs.h"
+#include "algebra.h"
 DECLARE_APP(MainApp)
 
 guiGate::guiGate() : klsCollisionObject(COLL_GATE) {
@@ -57,16 +58,9 @@ void guiGate::updateBBoxes( bool noUpdateWires ) {
 	GLfloat angle;
 	iss >> angle;
 
-	glMatrixMode(GL_MODELVIEW);
-
-	// Set up the forward matrix:
-	glLoadIdentity();
-	glTranslatef(x, y, 0);
-	glRotatef( angle, 0.0, 0.0, 1.0);
-	
-	// Read the forward matrix into the member variable:
-	glGetDoublev( GL_MODELVIEW_MATRIX, mModel );
-	glLoadIdentity();
+	loadidentitym(mModel);
+	translatem(mModel, x, y);
+	rotatem(mModel, angle);
 
 	// Update all of the hotspots' world coordinates:
 	map< string, gateHotspot* >::iterator hs = hotspots.begin();
@@ -134,7 +128,6 @@ void guiGate::draw(bool color) {
 
 	// Position the gate at its x and y coordinates:
 	glLoadMatrixd(mModel);
-
 
 	if( selected && color ) {
 		// Store the old line stipple pattern:

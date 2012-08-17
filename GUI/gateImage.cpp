@@ -60,8 +60,8 @@ void gateImage::OnPaint(wxPaintEvent &event) {
 	} else {
 		dc.SetPen(wxPen(*wxWHITE, 2, wxSOLID));
 	}
-		dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
-		dc.DrawRectangle(0,0,IMAGESIZE,IMAGESIZE);
+	dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
+	dc.DrawRectangle(0,0,IMAGESIZE,IMAGESIZE);
 	//event.Skip();
 }
 
@@ -154,12 +154,10 @@ void gateImage::renderMap() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
-	glColor4f( 0, 0, 0, 1 );
-
+		
 	if (m_gate != NULL) m_gate->draw();
 }
 
 void gateImage::update() {
-	setViewport();
 	generateImage();
 }
