@@ -22,6 +22,7 @@
 #endif
 
 #include <string>
+
 using namespace std;
 
 struct GLbox {
@@ -35,6 +36,10 @@ class guiText {
 public:
 	guiText();
 	virtual ~guiText();
+	
+	// Load the font into a texture for the currently-selected GL context
+	//	Call this for each context after initialization
+	static void loadFont(string);
 	
 	// *************** Action methods *********************
 

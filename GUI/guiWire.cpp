@@ -10,7 +10,7 @@
 
 #include "guiWire.h"
 #include "MainApp.h"
-#include <math.h>
+#include <cmath>
 #include <stack>
 
 DECLARE_APP(MainApp)
@@ -108,6 +108,12 @@ guiWire::guiWire() : klsCollisionObject(COLL_WIRE) {
 	// Reset state of currentDragSeg is -1
 	currentDragSegment = -1;
 	headSegment = 0; // since the base vertical seg is 0
+	
+	// Init render info so the pointer doesn't dereference illegitimately
+	//	Basically a shape is needed before anything really shows
+/*	renderInfo.numVertices = 1;
+	renderInfo.segmentVertices = new GLfloat[1];
+	renderInfo.segmentVertices[0] = 0.0; */
 }
 
 // Add an input connection to the wire
@@ -120,6 +126,7 @@ void guiWire::addConnection( guiGate* iGate, string connection, bool openMode ) 
 	connectPoints.push_back( temp );
 	if (openMode) return; // On open, don't calc shape until the seg tree is explicity set
 	if (connectPoints.size() < 3) { setVerticalBar = true; calcShape(); return; }
+	this->deleteSubObjects(); // prevent coll checker pointers from invalidating
 	// Find the nearest segment
 	GLPoint2f hsPoint;
 	float minDistance = FLT_MAX; long closestSeg = headSegment;
@@ -166,6 +173,7 @@ void guiWire::removeConnection(guiGate* iGate, string connection) {
 		}
 	}
 	if (connectPoints.size() < 2) return;
+	this->deleteSubObjects(); // prevent coll checker pointers from invalidating
 	// Now I need to find the segment with this thing and update the tree
 	unsigned long gid = iGate->getID();
 	long segID = 0; bool found = false;
@@ -202,12 +210,11 @@ void guiWire::removeConnection(guiGate* iGate, string connection) {
 // the bboxes of the wire segments. Also,
 // add the wire segments into the subObjs list:
 void guiWire::calcBBox( void ){
-//wxGetApp().logfile << "calcbbox" << endl << flush;
-	cData.subObjs.clear();
-
+	this->deleteSubObjects();
+	
 	map < long, wireSegment >::iterator segWalk = segMap.begin();
 	while (segWalk != segMap.end()) {
-		cData.subObjs.insert( &(segWalk->second) );
+		this->insertSubObject( &(segWalk->second) );
 		segWalk++;
 	}
 	
@@ -216,16 +223,13 @@ void guiWire::calcBBox( void ){
 }
 
 void guiWire::draw(bool color) {
-//wxGetApp().logfile << "draw" << endl << flush;
 	if (connectPoints.size() < 2) return;
 
 	GLint oldStipple = 0; // The old line stipple pattern, if needed.
 	GLint oldRepeat = 0;  // The old line stipple repeat pattern, if needed.
 	GLboolean lineStipple = false; // The old line stipple enable flag, if needed.
-
-	// Position the gate at its x and y coordinates:
-	glLoadIdentity();
-
+	float degInRad;
+	
 	if( this->selected && color ) {
 		// Store the old line stipple pattern:
 		lineStipple = glIsEnabled( GL_LINE_STIPPLE );
@@ -238,9 +242,6 @@ void guiWire::draw(bool color) {
 	}
 	
 	// make color:
-	GLfloat oldColor[4];
-	glGetFloatv( GL_CURRENT_COLOR, oldColor );
-	
 	switch( state ) {
 	case ZERO:
 		glColor4f( 0.0, 0.0, 0.0, 1.0 );
@@ -249,10 +250,10 @@ void guiWire::draw(bool color) {
 		glColor4f( 1.0, 0.0, 0.0, 1.0 );
 		break;
 	case HI_Z:
-		glColor4f( 0.0, 1.0, 0.0, 1.0 );
+		glColor4f( 0.0, 0.78, 0.0, 1.0 );
 		break;
 	case UNKNOWN:
-		glColor4f( 0.0, 0.0, 1.0, 1.0 );
+		glColor4f( 0.3, 0.3, 1.0, 1.0 );
 		break;
 	case CONFLICT:
 		glColor4f( 0.0, 1.0, 1.0, 1.0 );
@@ -260,81 +261,55 @@ void guiWire::draw(bool color) {
 	}
 	if (!color) glColor4f( 0.0, 0.0, 0.0, 1.0 );
 		
-	// Draw the wire
-	stack < GLPoint2f > vertices;
-	float x, y;
-	// Where will we draw the connection points?
-	for (unsigned int i = 0; i < connectPoints.size(); i++) {
-		connectPoints[i].cGate->getHotspotCoords(connectPoints[i].connection, x, y);
-		vertices.push(GLPoint2f(x,y));
-	}
-	// Draw the segment tree
-	map < long, wireSegment >::iterator segWalk = segMap.begin();
-	while (segWalk != segMap.end()) {
-		glBegin(GL_LINES);
-			glVertex2f((segWalk->second).begin.x, (segWalk->second).begin.y);
-			glVertex2f((segWalk->second).end.x, (segWalk->second).end.y);
-		glEnd();
-		
-		// Draw the intersection points for non-elbows:
-		const float DEG2RAD = 3.14159/180;
-		float theX = 0;
-		float theY = 0;
-		float radius = WIRE_ENDPOINT_SIZE;
-		map < GLfloat, vector< long > >::iterator isectWalk = (segWalk->second).intersects.begin();
-		while (isectWalk != (segWalk->second).intersects.end()) {
-			if ((segWalk->second).isVertical()) {
-				if ( isectWalk->first == (segWalk->second).begin.y || isectWalk->first == (segWalk->second).end.y ) { isectWalk++; continue; }
-			} else {
-				if ( isectWalk->first == (segWalk->second).begin.x || isectWalk->first == (segWalk->second).end.x ) { isectWalk++; continue; }
+	// Draw the wire from the previously-saved render info
+	
+	vector< GLLine2f >* lineSegments = &(renderInfo.lineSegments);
+	glBegin(GL_LINES);
+		for (unsigned int i = 0; i < lineSegments->size(); i++) {
+			glVertex2f((*lineSegments)[i].begin.x, (*lineSegments)[i].begin.y);
+			glVertex2f((*lineSegments)[i].end.x, (*lineSegments)[i].end.y);
+		}
+	glEnd();
+
+	vector< GLPoint2f >* isectPoints = &(renderInfo.intersectPoints);
+	for (unsigned int i = 0; i < isectPoints->size(); i++) {
+		// Draw the connection point:
+		glTranslatef((*isectPoints)[i].x, (*isectPoints)[i].y, 0.0);
+		if (!wxGetApp().doingBitmapExport)
+			glCallList(CEDAR_GLLIST_CONNECTPOINT);
+		else {
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex2f(0, 0);
+	 		for (int z=0; z <= 360; z += 360/POINTS_PER_VERTEX)
+			{
+				degInRad = z*DEG2RAD;
+				glVertex2f(cos(degInRad)*wxGetApp().appSettings.wireConnRadius, sin(degInRad)*wxGetApp().appSettings.wireConnRadius);
 			}
-			for (unsigned int i = 0; i < (isectWalk->second).size(); i++) {
+			glEnd();
+		}
+		glTranslatef(-(*isectPoints)[i].x, -(*isectPoints)[i].y, 0.0);
+	} 
+	
+	if ( wxGetApp().appSettings.wireConnVisible ) {
+		vector< GLPoint2f >* vertexPoints = &(renderInfo.vertexPoints);
+		for (unsigned int i = 0; i < vertexPoints->size(); i++) {
+			// Draw the connection point:
+			glTranslatef((*vertexPoints)[i].x, (*vertexPoints)[i].y, 0.0);
+			if (!wxGetApp().doingBitmapExport)
+				glCallList(CEDAR_GLLIST_CONNECTPOINT);
+			else {
 				glBegin(GL_TRIANGLE_FAN);
-				float bX = ((segWalk->second).isVertical() ? (segWalk->second).begin.x : isectWalk->first);
-				float bY = ((segWalk->second).isVertical() ? isectWalk->first : (segWalk->second).begin.y);
-				glVertex2f(bX, bY);
-		 
-				for (int x=0; x <= 360; x += 10)
+				glVertex2f(0, 0);
+		 		for (int z=0; z <= 360; z += 360/POINTS_PER_VERTEX)
 				{
-					float degInRad = x*DEG2RAD;
-					theX = bX + cos(degInRad)*radius;
-					theY = bY + sin(degInRad)*radius;
-					glVertex2f(theX, theY);
+					degInRad = z*DEG2RAD;
+					glVertex2f(cos(degInRad)*wxGetApp().appSettings.wireConnRadius, sin(degInRad)*wxGetApp().appSettings.wireConnRadius);
 				}
-		
 				glEnd();
 			}
-			isectWalk++;
+			glTranslatef(-(*vertexPoints)[i].x, -(*vertexPoints)[i].y, 0.0);
 		} 
-		segWalk++;
 	}
-	
-	while (!(vertices.empty())) {
-		// Draw the connection point:
-		const float DEG2RAD = 3.14159/180;
-		float theX = 0;
-		float theY = 0;
-		float radius = WIRE_ENDPOINT_SIZE;
-
-		glBegin(GL_TRIANGLE_FAN);
-		glVertex2f(vertices.top().x, vertices.top().y);
- 
-		for (int x=0; x <= 360; x += 10)
-		{
-			float degInRad = x*DEG2RAD;
-			theX = vertices.top().x + cos(degInRad)*radius;
-			theY = vertices.top().y + sin(degInRad)*radius;
-			glVertex2f(theX, theY);
-		}
-
-		glEnd();
-		
-		vertices.pop();
-	}
-	
-	
-	// Set the color back to the old color:
-	glColor4f( oldColor[0], oldColor[1], oldColor[2], oldColor[3] );
 	
 	// Reset the stipple parameters:
 	if( selected ) {	
@@ -360,7 +335,7 @@ bool guiWire::hover( float cx, float cy, float delta ) {
 
 	// Check if any segments collide with the mouse:
 	if( this->overlaps( &mouse ) ) {
-		CollisionGroup cg = this->checkSubsToObj( &mouse, false );
+		CollisionGroup cg = this->checkSubsToObj( &mouse );
 		if( !cg.empty() ) {
 			hoverSegmentID = ((wireSegment*)(*(cg.begin())))->id;
 			return true;
@@ -372,7 +347,6 @@ bool guiWire::hover( float cx, float cy, float delta ) {
 
 
 bool guiWire::isWithinBox(float x1, float y1, float x2, float y2) {
-//wxGetApp().logfile << "isinbox" << endl << flush;
 	// Create the selection bounding box:
 	klsBBox selBox;
 	selBox.addPoint( GLPoint2f( x1, y1 ) );
@@ -385,13 +359,10 @@ bool guiWire::isWithinBox(float x1, float y1, float x2, float y2) {
 //	hold a delta to this so we know where to move them when the 
 //	user shifts the whole wire
 GLPoint2f guiWire::getCenter( void ) {
-//wxGetApp().logfile << "getcenter" << endl << flush;
 	return segMap[headSegment].begin;
 }
 
 void guiWire::move( GLPoint2f origin, GLPoint2f delta ) {
-wxGetApp().logfile << "move" << endl << flush;
-printme();
 	// Only move if all connections are selected, else just let the updateConnectionPos
 	//		figure it all out as various connections are moved
 	for (unsigned int i = 0; i < connectPoints.size(); i++) {
@@ -400,18 +371,12 @@ printme();
 	// Move my reference point by a certain amount
 	if (segMap[headSegment].isVertical()) {
 		segMap[headSegment].begin.x = segMap[headSegment].end.x = origin.x + delta.x;
-//		float diffY = segMap[headSegment].end.y - segMap[headSegment].begin.y;
 		segMap[headSegment].begin.y = origin.y + delta.y;
-//		segMap[headSegment].end.y = segMap[headSegment].begin.y + diffY;
 	} else {
 		segMap[headSegment].begin.y = segMap[headSegment].end.y = origin.y + delta.y;
-//		float diffX = segMap[headSegment].end.x - segMap[headSegment].begin.x;
 		segMap[headSegment].begin.x = origin.x + delta.x;
-//		segMap[headSegment].end.x = segMap[headSegment].end.x + diffX;
 	}
-//	segMap[headSegment].calcBBox();
 	map < long, wireSegment >::iterator segWalk = segMap.begin();
-//	segWalk++;
 	// Walk the list from second seg on out to move segs by differentials
 	while (segWalk != segMap.end()) {
 		(segWalk->second).begin = GLPoint2f( segMap[headSegment].begin.x+(segWalk->second).diffBegin.x, segMap[headSegment].begin.y+(segWalk->second).diffBegin.y );
@@ -427,7 +392,6 @@ printme();
 
 // Take existing segment connections and update their map keys, returns true if interesting segment is found
 bool guiWire::refreshIntersections(bool removeBadSegs) {
-//wxGetApp().logfile << "refreshintersect" << endl << flush;
 	bool retVal = false;
 	// Update the intersection maps for the new locations
 	map < long, wireSegment >::iterator segWalk = segMap.begin();
@@ -452,7 +416,6 @@ bool guiWire::refreshIntersections(bool removeBadSegs) {
 
 // Save segment tree and wire info
 void guiWire::saveWire(XMLParser* xparse) {
-//wxGetApp().logfile << "save" << endl << flush;
 	xparse->openTag("wire");
 	// Save the ID for the wire (of course)
 	xparse->openTag("ID");
@@ -517,7 +480,8 @@ void guiWire::saveWire(XMLParser* xparse) {
 
 // Calculates a default three-segment shape for the wire, from source to destination, squared halfway
 void guiWire::calcShape() {
-//wxGetApp().logfile << "calcshape" << endl << flush;
+	this->deleteSubObjects(); // prevent coll checker pointers from invalidating
+
 	// Get rid of the old shape
 	segMap.clear();
 	
@@ -654,12 +618,12 @@ fallout:
 
 //	Takes a mouse pointer and finds the segment in question, initializing the segment drag operation
 bool guiWire::startSegDrag( klsCollisionObject* mouse ) {
-//wxGetApp().logfile << "startsegdrag" << endl << flush;
 	oldSegMap = segMap; // store the initial mapping of the segment tree
 	// We should only reach this if we are hovering, so find the segment in question
-	CollisionGroup cg = this->checkSubsToObj( mouse, false );
+	CollisionGroup cg = this->checkSubsToObj( mouse );
 	// If there are no segments then we shouldn't drag one
 	if (cg.size() == 0) return false;
+	this->deleteSubObjects(); // prevent coll checker pointers from invalidating	
 	// Otherwise just grab the first one found and fix the connection points with new segments
 	CollisionGroup::iterator cgWalk = cg.begin();
 	GLPoint2f vertex;
@@ -697,25 +661,20 @@ bool guiWire::startSegDrag( klsCollisionObject* mouse ) {
 //	while the associated segments are added/modified to keep
 //	our drag segment connected in the tree
 void guiWire::updateSegDrag( klsCollisionObject* mouse ) {
-//wxGetApp().logfile << "updatesegdrag" << endl << flush;
 	if (currentDragSegment == -1) return; // break out on error, seg not set
 	klsBBox newMouseCoords = mouse->getBBox();
 	wireSegment oldSegmentPos = segMap[currentDragSegment];
 	if (segMap[currentDragSegment].isVertical()) {
 		float diff = newMouseCoords.getLeft()-mouseCoords.getLeft();
-//if (segMap[currentDragSegment].begin.x == segMap[currentDragSegment].end.x) debugStatement(7, "zerolength");
 		segMap[currentDragSegment].begin.x += diff;
 		segMap[currentDragSegment].end.x += diff;
-//if (segMap[currentDragSegment].begin.x == segMap[currentDragSegment].end.x) debugStatement(8, "zerolength");
 	} else {
 		float diff = newMouseCoords.getTop()-mouseCoords.getTop();
-//if (segMap[currentDragSegment].begin.y == segMap[currentDragSegment].end.y) debugStatement(9, "zerolength");
 		segMap[currentDragSegment].begin.y += diff;
 		segMap[currentDragSegment].end.y += diff;
-//if (segMap[currentDragSegment].begin.y == segMap[currentDragSegment].end.y) debugStatement(10, "zerolength");
 	}
 	segMap[currentDragSegment].calcBBox();
-	refreshIntersections(); // ADDED
+	refreshIntersections();
 	// Update the other segments by extending/shrinking
 	map < GLfloat, vector < long > >::iterator isectWalk = segMap[currentDragSegment].intersects.begin();
 	while (isectWalk != segMap[currentDragSegment].intersects.end()) {
@@ -736,21 +695,14 @@ void guiWire::updateSegDrag( klsCollisionObject* mouse ) {
 					hsMin = min( hsMin, hsPoint.x );
 					hsMax = max( hsMax, hsPoint.x );
 				}
-//if (ws->begin.x == ws->end.x) debugStatement(0, "zerolength");
 				map < GLfloat, vector < long > >::iterator wsLeft = ws->intersects.begin();
 				float isectLeft = (wsLeft != ws->intersects.end() ? wsLeft->first : FLT_MAX);
-//				for (unsigned int y = 0; y < (wsLeft->second).size(); y++) 
-//					if ((wsLeft->second)[y] == currentDragSegment) isectLeft = segMap[currentDragSegment].begin.x;
 				map < GLfloat, vector < long > >::reverse_iterator wsRight = ws->intersects.rbegin();
 				float isectRight = (wsRight != ws->intersects.rend() ? wsRight->first : -FLT_MAX);
-//				for (unsigned int y = 0; y < (wsRight->second).size(); y++)
-//					if ((wsRight->second)[y] == currentDragSegment) isectRight = segMap[currentDragSegment].begin.x;
-//if (ws->begin.x == ws->end.x) debugStatement(1, "zerolength");
 				ws->begin.x = min( segMap[currentDragSegment].begin.x, hsMin );
 				ws->begin.x = min( ws->begin.x, isectLeft );
 				ws->end.x = max( segMap[currentDragSegment].begin.x, hsMax );
 				ws->end.x = max( ws->end.x, isectRight );
-//if (ws->begin.x == ws->end.x) debugStatement(2, "zerolength");
 				ws->calcBBox();
 			} else {
 				// Extend/shrink the endpoints if necessary, if in the middle then no mod necessary
@@ -760,21 +712,14 @@ void guiWire::updateSegDrag( klsCollisionObject* mouse ) {
 					hsMin = min( hsMin, hsPoint.y );
 					hsMax = max( hsMax, hsPoint.y );
 				}
-//if (ws->begin.y == ws->end.y) debugStatement(3, "zerolength");
 				map < GLfloat, vector < long > >::iterator wsBottom = ws->intersects.begin();
 				float isectBottom = (wsBottom != ws->intersects.end() ? wsBottom->first : FLT_MAX);
-//				for (unsigned int y = 0; y < (wsBottom->second).size(); y++) 
-//					if ((wsBottom->second)[y] == currentDragSegment) isectBottom = segMap[currentDragSegment].begin.y;
 				map < GLfloat, vector < long > >::reverse_iterator wsTop = ws->intersects.rbegin();
 				float isectTop = (wsTop != ws->intersects.rend() ? wsTop->first : -FLT_MAX);
-//				for (unsigned int y = 0; y < (wsTop->second).size(); y++) 
-//					if ((wsTop->second)[y] == currentDragSegment) isectTop = segMap[currentDragSegment].begin.y;
-//if (ws->begin.y == ws->end.y) debugStatement(4, "zerolength");
 				ws->begin.y = min( segMap[currentDragSegment].begin.y, hsMin );
 				ws->begin.y = min( ws->begin.y, isectBottom );
 				ws->end.y = max( segMap[currentDragSegment].begin.y, hsMax );
 				ws->end.y = max( ws->end.y, isectTop );
-//if (ws->begin.y == ws->end.y) debugStatement(5, "zerolength");
 				ws->calcBBox();
 			}
 		}
@@ -792,25 +737,24 @@ void guiWire::updateSegDrag( klsCollisionObject* mouse ) {
 	
 	this->calcBBox();
 	mouseCoords = mouse->getBBox();
+	
+	generateRenderInfo();
 }
 
 //	The current dragging segment is dropped, clean up
 void guiWire::endSegDrag() {
-wxGetApp().logfile << "\t\t\tendsegdrag" << endl << flush;
+	this->deleteSubObjects(); // prevent coll checker pointers from invalidating
 	// Reset the drag segment var
 	currentDragSegment = -1;
 	// merge segments to get rid of messiness
 	mergeSegments();
-wxGetApp().logfile << "\t\t\tdone merge" << endl << flush;
 	this->calcBBox();
-wxGetApp().logfile << "\t\t\tdone endsegdrag" << endl << flush;
 }
 
 // Update the placement of a connection by extending/moving its
 //	segment.  Will set up a mouse coord from the current position
 //	and another one from the new position to pass to updateSegDrag
 void guiWire::updateConnectionPos( unsigned long gid, string connection ) {
-//wxGetApp().logfile << "updateconnpos" << endl << flush;
 	bool foundit = false;
 	GLPoint2f newLocation;
 	unsigned int connID = 0;
@@ -829,6 +773,7 @@ void guiWire::updateConnectionPos( unsigned long gid, string connection ) {
 		segWalk++;
 	}
 	if (!foundit) return;
+	this->deleteSubObjects(); // prevent coll checker pointers from invalidating
 	klsBBox origin;
 	if (!(segMap[currentDragSegment].connections[connID].cGate->isVerticalHotspot(segMap[currentDragSegment].connections[connID].connection))) {
 		// We found the segment we're looking for
@@ -925,7 +870,6 @@ void guiWire::updateConnectionPos( unsigned long gid, string connection ) {
 
 // Take existing segments and merge concurrent segments
 void guiWire::mergeSegments() {
-//wxGetApp().logfile << "merge" << endl << flush;
 	// NOTE: In removing a connection, we may have only one seg left,
 	//	but endpoints need to be trimmed.  In this case, the code is
 	//	already here, and a single pass through the loop is a small
@@ -933,8 +877,6 @@ void guiWire::mergeSegments() {
 //	if (segMap.size() == 1) return; // If there's only one seg, whom will I merge with?
 
 	removeZeroLengthSegments(); // To return from H-E-double-hockeysticks
-//wxGetApp().logfile << "begin merge" << endl << flush;
-//printme();	
 	map < long, wireSegment > newSegMap; // holds the new segment map that contains merged segments
 	map < long, long > mapIDs; // maps old ids to new ids
 	
@@ -1081,13 +1023,13 @@ void guiWire::mergeSegments() {
 	}
 
 	segMap = newSegMap;  // Assign the new tree
-//printme();	
+	
+	generateRenderInfo();
 }
 
 // Take out the flaring segments of length zero.  They are so annoying that I am dedicating (as you can see) a function to
 //	their ultimate horrible deaths.
 void guiWire::removeZeroLengthSegments() {
-//wxGetApp().logfile << "removezeros" << endl << flush;
 	map < long, wireSegment > newSegMap = segMap; // Start with a copy of the segment map; I really don't trust these buggers
 	map < long, wireSegment >::iterator segWalk = newSegMap.begin();
 	vector < long > eraseIDs; // hold a list of IDs we need to bomb
@@ -1149,6 +1091,49 @@ void guiWire::removeZeroLengthSegments() {
 	}
 }
 
+// fill out some info to avoid loss of cycles in render loop
+void guiWire::generateRenderInfo() {
+	float x, y;
+	GLLine2f glLine;
+	
+	// clear out the old information.  this function is only called when
+	//	the wire shape has changed.
+	renderInfo.vertexPoints.clear();
+	renderInfo.intersectPoints.clear();
+	renderInfo.lineSegments.clear();
+	
+	// gate connection points
+	for (unsigned int i = 0; i < connectPoints.size(); i++) {
+		connectPoints[i].cGate->getHotspotCoords(connectPoints[i].connection, x, y);
+		renderInfo.vertexPoints.push_back(GLPoint2f(x,y));
+	}
+
+	// lines and segment intersections
+	map < long, wireSegment >::iterator segWalk = segMap.begin();
+	while (segWalk != segMap.end()) {
+		glLine.begin = GLPoint2f((segWalk->second).begin.x, (segWalk->second).begin.y);
+		glLine.end = GLPoint2f((segWalk->second).end.x, (segWalk->second).end.y);
+		renderInfo.lineSegments.push_back(glLine);
+		
+		// Save the intersection points for non-elbows:
+		map < GLfloat, vector< long > >::iterator isectWalk = (segWalk->second).intersects.begin();
+		while (isectWalk != (segWalk->second).intersects.end()) {
+			if ((segWalk->second).isVertical()) {
+				if ( isectWalk->first == (segWalk->second).begin.y || isectWalk->first == (segWalk->second).end.y ) { isectWalk++; continue; }
+			} else {
+				if ( isectWalk->first == (segWalk->second).begin.x || isectWalk->first == (segWalk->second).end.x ) { isectWalk++; continue; }
+			}
+			for (unsigned int i = 0; i < (isectWalk->second).size(); i++) {
+				x = ((segWalk->second).isVertical() ? (segWalk->second).begin.x : isectWalk->first);
+				y = ((segWalk->second).isVertical() ? isectWalk->first : (segWalk->second).begin.y);
+				renderInfo.intersectPoints.push_back(GLPoint2f(x,y));
+			}
+			isectWalk++;
+		}
+		segWalk++;
+	}
+}
+
 // Pretty print routine, wires will print all their segments
 void guiWire::printme( string lineBegin ) {
 	wxGetApp().logfile << lineBegin << "Wire " << getID() << endl;
@@ -1161,5 +1146,4 @@ void guiWire::printme( string lineBegin ) {
 
 void guiWire::debugStatement( int lineBegin, string descriptor ) {
 	wxGetApp().logfile << "debug assert on " << lineBegin << " for " << descriptor << endl << flush;
-	//printme("\t\t");
 }

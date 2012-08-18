@@ -13,6 +13,7 @@
 #include "wx/wx.h"
 #include <wx/statbmp.h>
 #include "klsGLCanvas.h"
+#include "guiText.h"
 #include <fstream>
 #include "glmem.hh"
 #include "str-convs.h"
@@ -132,18 +133,31 @@ void gateImage::generateImage() {
 		setViewport();
 		// Reset the glViewport to the size of the bitmap:
 		glViewport(0, 0, GATEIMAGESIZE, GATEIMAGESIZE);
+		
 		// Set the bitmap clear color:
 		glClearColor (1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);
+		
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		
 		//TODO: Check if alpha is hardware supported, and
 		// don't enable it if not!
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
-
+		
+		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		
+		//*********************************
+		//Edit by Joshua Lansford 4/09/07
+		//anti-alis ing is nice
+		//glEnable( GL_LINE_SMOOTH );
+		//End of edit
+		
+		// Load the font texture
+		guiText::loadFont(wxGetApp().appSettings.textFontFile);
+		
 		// Do the rendering here.
 		renderMap();
-
 		// Flush the OpenGL buffer to make sure the rendering has happened:	
 		glFinish(); 
 	}

@@ -13,7 +13,7 @@
 #include "MainApp.h"
 #include "str-convs.h"
 // Included for sin and cos in <circle> tags:
-#include <math.h>
+#include <cmath>
 
 
 DECLARE_APP(MainApp)
@@ -107,11 +107,10 @@ void LibraryParse::parseShape(LibraryGate *gate, XMLElement *shape,
 		x1 += dx; y1 += dy;
 
 		// Generate a circle of the defined shape:
-		const float DEG2RAD = 3.14159/180.0;
 		float theX = 0 + x1;
 		float theY = 0 + y1;
-		float lastX = sin((double)0)*radius + x1;
-		float lastY = cos((double)0)*radius + y1;
+		float lastX = x1;//         = sin((double)0)*radius + x1;
+		float lastY = radius + y1;//= cos((double)0)*radius + y1;
 
 		float degStep = 360.0 / (float) numSegs;
 		for (float i=degStep; i <= 360; i += degStep)

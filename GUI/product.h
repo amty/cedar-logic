@@ -12,11 +12,11 @@
 #define PRODUCT_H_
 
 #include <string>
-#include <math.h>
+#include <cmath>
 using namespace std;
 string parseStringFromString(string& source);
 int parseIntFromString(string& source);
 
-#define _PRODUCTION_
+//#define _PRODUCTION_
 
 #endif /*PRODUCT_H_*/

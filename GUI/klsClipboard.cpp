@@ -9,6 +9,7 @@
 *****************************************************************************/
 
 #include "klsClipboard.h"
+#include "OscopeFrame.h"
 #include <fstream>
 #include <map>
 #include <ext/hash_map>
@@ -33,7 +34,6 @@ cmdPasteBlock* klsClipboard::pasteBlock( GUICircuit* gCircuit, GUICanvas* gCanva
 		hash_map < unsigned long, unsigned long > gateids;
 		hash_map < unsigned long, unsigned long > wireids;
     	while (getline( iss, temp, '\n' )) {
-    		wxGetApp().logfile << "executing " << temp << endl << flush;
     		klsCommand* cg = NULL;
     		if (temp.substr(0,10) == "creategate") cg = new cmdCreateGate(temp);
     		else if (temp.substr(0,9) == "setparams") cg = new cmdSetParams(temp);
@@ -58,7 +58,7 @@ cmdPasteBlock* klsClipboard::pasteBlock( GUICircuit* gCircuit, GUICanvas* gCanva
 			(*(gCircuit->getWires()))[wireWalk->second]->select();
 			wireWalk++;
 		}
-		gCircuit->myOscope->UpdateMenu();
+		gCircuit->getOscope()->UpdateMenu();
     }
 	wxTheClipboard->Close();
 	if (cmdList.size() > 0) return new cmdPasteBlock ( cmdList );
@@ -140,6 +140,4 @@ void klsClipboard::copyBlock( GUICircuit* gCircuit, GUICanvas* gCanvas, vector <
 	if (!wxTheClipboard->Open()) return;
 	wxTheClipboard->AddData(new wxTextDataObject((wxChar*)(oss.str().c_str())));
 	wxTheClipboard->Close();
-	wxGetApp().logfile << "BEGIN COPY" << endl << flush;
-	wxGetApp().logfile << oss.str() << endl << flush;
 }

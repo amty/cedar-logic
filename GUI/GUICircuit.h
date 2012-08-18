@@ -20,7 +20,8 @@ class guiGate;
 #include "MainApp.h"
 #include "guiGate.h"
 #include "GUICanvas.h"
-#include "OscopeFrame.h"
+//#include "OscopeFrame.h"
+class OscopeFrame;
 
 #ifdef __WXMAC__
 #  ifdef __DARWIN__
@@ -43,6 +44,7 @@ using namespace std;
 class GUICircuit : public wxDocument
 {
     DECLARE_DYNAMIC_CLASS(GUICircuit)
+	
 public:
     GUICircuit();
 
@@ -50,8 +52,6 @@ public:
 
 	// Reinit circuit
 	void reInitializeLogicCircuit();
-	// Clears all objects in the circuit
-	void clearCircuit();
 	// Renders the complete circuit on the current buffer
     void Render();
 	// Creates a new gate with type, position, and id; returns used id
@@ -73,20 +73,21 @@ public:
 	unsigned long getNextAvailableGateID() { nextGateID++; while (gateList.find(nextGateID) != gateList.end()) nextGateID++; return nextGateID; };
 	unsigned long getNextAvailableWireID() { nextWireID++; while (wireList.find(nextWireID) != wireList.end()) nextWireID++; return nextWireID; };
 
-	void sendMessageToCore(string message);
-	void parseMessage(string message);
+	void sendMessageToCore(klsMessage::Message message);
+	void parseMessage(klsMessage::Message message);
+	
+	void setSimulate(bool state) { simulate = state; };
+	bool getSimulate() { return simulate; };
 	
 	void printState();
 	
-	bool simulate;		// Simulation state
-	bool waitToSendMessage; // If false, then message is sent immediately
+	OscopeFrame* getOscope() { return myOscope; };
+	void setOscope(OscopeFrame* of) { myOscope = of; };
 	
-	GUICanvas* gCanvas;
-
-	// Test OscopeFrame:
-	OscopeFrame* myOscope;
-
+	void setCurrentCanvas(GUICanvas* gc) { gCanvas = gc; };
+	
 	bool panic;
+	bool pausing;
 	int lastTimeMod;
 	int lastNumSteps;
 	int lastTime;
@@ -98,7 +99,10 @@ private:
 	unsigned long nextGateID;
 	unsigned long nextWireID;
 	
-    bool   m_init;
+	OscopeFrame* myOscope;
+	GUICanvas* gCanvas;
+
+	bool   m_init;
     GLuint m_gllist;
 	double lastDragX;
 	double lastDragY;
@@ -109,13 +113,15 @@ private:
 
 	bool movingGate;
 	bool drawingWire;
-	
+	bool simulate;			// Simulation state
+	bool waitToSendMessage; // If false, then message is sent immediately
+		
     long           m_Key;
     unsigned long  m_StartTime;
     unsigned long  m_LastTime;
     unsigned long  m_LastRedraw;
  
-    vector < string > messageQueue;
+    vector < klsMessage::Message > messageQueue;
 };
 
 #endif /*GUICIRCUIT_H*/

@@ -36,7 +36,12 @@ class guiWire;
 #include "XMLParser.h"
 #include "guiText.h"
 #include "klsCollisionChecker.h"
+#include "klsMessage.h"
 #include "wx/docview.h"
+
+#include "RamPopupDialog.h"
+#include "Z80PopupDialog.h"
+#include "ADCPopupDialog.h"
 
 using namespace std;
 
@@ -80,15 +85,7 @@ protected:
 class guiGate : public klsCollisionObject {
 public:
 	guiGate();
-	virtual ~guiGate() { 
-		// Destroy the hotspots:
-		map< string, gateHotspot* >::iterator hs = hotspots.begin();
-		while( hs != hotspots.end() ) {
-			delete (hs->second);
-			hotspots.erase(hs);
-			hs = hotspots.begin();
-		}
-	};
+	virtual ~guiGate();
 	void setID(long nid) { gateID = nid; };
 	unsigned long getID() { return gateID; };
 
@@ -111,11 +108,21 @@ public:
 
 	string getLogicType();
 	string getGUIType();
+	
+	//****************************************************************
+	//Edit by Joshua Lansford 12/25/2006
+	//I made the doParamsDialog method below virtual
+	//so that the that the subclass can call its own special type
+	//of pop-up that it wants.
+	//Specifically, the Z-80 Processor can call up it's pop-up window
+	//and the ram gate can call up its own window that shows all
+	//its ram contents.
+	//*****************************************************************
 
 	// Function to show the gate's parameters dialog, takes the command
 	//	processor object to assign the setparameters command to.  gc is
 	//	a GUICircuit pointer
-	void doParamsDialog( void* gc, wxCommandProcessor* wxcmd );
+	virtual void doParamsDialog( void* gc, wxCommandProcessor* wxcmd );
 	// Set and get param virtual functions, simply assigns a string
 	virtual void setGUIParam( string paramName, string value ) {
 		gparams[paramName] = value;
@@ -149,7 +156,7 @@ public:
 	void select( void ) { selected = true; };
 	// Needed for toggles and keypads, maybe others; returns a message to be passed
 	//	from a click.
-	virtual string checkClick( GLfloat x, GLfloat y ) { return ""; };
+	virtual klsMessage::Message_SET_GATE_PARAM* checkClick( GLfloat x, GLfloat y ) { return NULL; };
 	
 	// Draw this gate as selected from now until unselect() is
 	// called, if the coordinate passed to it is within
@@ -207,6 +214,19 @@ public:
 	bool isConnectionInput(string idx) { return isInput[idx]; };
 	
 	void saveGate(XMLParser*);
+	
+	//*********************************
+	//Edit by Joshua Lansford 6/06/2007
+	//I want the ram files to save their contents to file
+	//with the circuit.  However, I don't want to send
+	//an entire page of data up to the gui each time
+	//an entry changes.
+	//This way the ram gate can intelegently save what
+	//it wants to into the file.
+	//Also any other gate that wishes too, can also
+	//save specific stuff.
+	virtual void saveGateTypeSpecifics( XMLParser* xparse ){};
+	//End of edit***********************
 
 
 	// Return the map of hotspot names to their coordinates:
@@ -248,18 +268,28 @@ public:
 	guiGateTOGGLE();
 	void draw( bool color = true );
 	
+	void setGUIParam( string paramName, string value );
+	void setLogicParam( string paramName, string value );
+
 	// Toggle the output button on and off:
 	string getState() { return getLogicParam("TOGGLE_STATE"); };
-	string checkClick( GLfloat x, GLfloat y );
+	klsMessage::Message_SET_GATE_PARAM* checkClick( GLfloat x, GLfloat y );
+
+protected:
+	int renderInfo_outputNum;
+	GLLine2f renderInfo_clickBox;
 };
 
 class guiGateKEYPAD : public guiGate {
 public:
 	guiGateKEYPAD();
 	void draw( bool color = true );
+	void setLogicParam( string paramName, string value );
 	
 	// Toggle the output button on and off:
-	string checkClick( GLfloat x, GLfloat y );
+	klsMessage::Message_SET_GATE_PARAM* checkClick( GLfloat x, GLfloat y );
+protected:
+	GLLine2f renderInfo_valueBox;
 private:
 	string keypadValue;
 };
@@ -268,6 +298,15 @@ class guiGateREGISTER : public guiGate {
 public:
 	guiGateREGISTER();
 	void draw( bool color = true );
+	void setGUIParam( string paramName, string value );
+	void setLogicParam( string paramName, string value );
+protected:
+	GLLine2f renderInfo_valueBox;
+	GLdouble renderInfo_diffx;
+	GLdouble renderInfo_diffy;
+	bool renderInfo_drawBlue;
+	int renderInfo_numDigitsToShow;
+	string renderInfo_currentValue;
 };
 
 class guiGatePULSE : public guiGate {
@@ -281,7 +320,7 @@ public:
 		setGUIParam( "PULSE_WIDTH", "1" );
 	};
 	
-	string checkClick( GLfloat x, GLfloat y );
+	klsMessage::Message_SET_GATE_PARAM* checkClick( GLfloat x, GLfloat y );
 };
 
 
@@ -289,6 +328,9 @@ class guiGateLED : public guiGate {
 public:
 	guiGateLED();
 	void draw( bool color = true );
+	void setGUIParam( string paramName, string value );
+protected:
+	GLLine2f renderInfo_ledBox;
 };
 
 
@@ -325,9 +367,10 @@ private:
 
 // ************************ TO/FROM gate *************************
 #define TO_FROM_TEXT_HEIGHT 1.5
-#define TO_BUFFER 1.5
+#define TO_BUFFER 0.4
 #define FROM_BUFFER 0.0
-#define FROM_FIX_SHIFT 1.0
+#define FROM_FIX_SHIFT 0.0
+#define FLIPPED_OFFSET 0.5
 
 class guiTO_FROM : public guiGate {
 public:
@@ -347,19 +390,119 @@ private:
 	guiText theText;
 };
 
-// ************************ COUNTER gate *************************
 
-class guiGateCOUNTER : public guiGate {
+// ************************ RAM gate ****************************
+
+//*************************************************
+//Edit by Joshua Lansford 12/25/2006
+//I am creating a guiGate for the RAM so that
+//the ram can have its own special pop-up window
+class guiGateRAM : public guiGate {
 public:
-	guiGateCOUNTER();
+	guiGateRAM();
+	
+	// Function to show the gate's parameters dialog, takes the command
+	//	processor object to assign the setparameters command to.  gc is
+	//	a GUICircuit pointer
+	virtual void doParamsDialog( void* gc, wxCommandProcessor* wxcmd );
+	
+	//Destructor for cleaning up private vars
+	virtual ~guiGateRAM();
+	
+	//Saves the ram contents to the circuit file
+	//when the circuit saves
+	virtual void saveGateTypeSpecifics( XMLParser* xparse );
+	
+	//Because the ram gui will be passed lots of data
+	//from the ram logic, we don't want it all going
+	//into the default hash of changed paramiters.
+	//Thus we catch it here
+	virtual void setLogicParam( string paramName, string value );
 
-	void draw( bool color = true );
+	//This method is used by the RamPopupDialog to
+	//learn what values are at different addresses
+	//in memory.
+	unsigned long getValueAt( unsigned long address );
+	
+	//These is used by the pop-up to determine
+	//what was the last value read and written
+	long getLastWritten();
+	long getLastRead();
 
 private:
-	guiText R;
-	guiText E;
-	guiText CNT;
+	//The pop-up dialog
+	RamPopupDialog* ramPopupDialog;
+	
+	//This data is so we can fill the pop-up with relevent
+	//information
+	unsigned long dataBits;
+	unsigned long addressBits;
+	map< unsigned long, unsigned long > memory;
+	
+	//used for highlighting the last read and
+	//written in the pop-up
+	long lastWritten;
+	long lastRead;
 };
+//End of edit
+//*************************************************
+// ************************ z80 gate ****************************
 
+//*************************************************
+//Edit by us 1/26/06
+//I am creating a guiGate for the z80 so that
+//the ram can have its own special pop-up window
+class guiGateZ80 : public guiGate {
+public:
+	guiGateZ80();
+	
+	// Function to show the gate's parameters dialog, takes the command
+	//	processor object to assign the setparameters command to.  gc is
+	//	a GUICircuit pointer
+	virtual void doParamsDialog( void* gc, wxCommandProcessor* wxcmd );
+	
+	//Destructor for cleaning up private vars
+	virtual ~guiGateZ80();
+	
+	//Because the z80 gui will be passed lots of data
+	//from the z80 logic, we don't want it all going
+	//into the default hash of changed paramiters.
+	//Thus we catch it here
+	virtual void setLogicParam( string paramName, string value );
+
+private:
+	//The pop-up dialog
+	Z80PopupDialog* z80PopupDialog;
+};
+//End of edit
+//*************************************************
+
+// ************************ ADC gate ****************************
+
+//*************************************************
+//Edit by Joshua Lansford 05/10/2007
+//I am creating a guiGate for the ADC so that
+//the ADC can have its own special pop-up window
+class guiGateADC : public guiGate {
+public:
+	guiGateADC();
+	
+	//Destructor for cleaning up private vars
+	virtual ~guiGateADC();
+	
+	// Function to show the gate's parameters dialog, takes the command
+	//	processor object to assign the setparameters command to.  gc is
+	//	a GUICircuit pointer
+	virtual void doParamsDialog( void* gc, wxCommandProcessor* wxcmd );
+	
+	//this is so we can update the pop-up about the current value
+	virtual void setLogicParam( string paramName, string value );
+
+private:
+	//The pop-up dialog
+	ADCPopupDialog* aDCPopupDialog;
+};
+//End of edit
+//*************************************************
 
 #endif /*GUIGATE_H_*/

@@ -22,15 +22,19 @@
 #include "threadLogic.h"
 #include "GUICanvas.h"
 #include "GUICircuit.h"
-#include "OscopeFrame.h"
+//#include "OscopeFrame.h"
+class OscopeFrame;
 #include "klsMiniMap.h"
 #include "str-convs.h"
 enum
 {
-	Edit_Export = 5901, // out of range of wxWidgets constants
+	Edit_Export_BW = 5901, // out of range of wxWidgets constants
+	Edit_Export_C,
 	
 	View_Oscope,
-
+	View_Gridline,
+	View_WireConn,
+	
     TIMER_ID,
     IDLETIMER_ID,
     TOOLBAR_ID,
@@ -39,7 +43,8 @@ enum
     Tool_Pause,
     Tool_Step,
     Tool_ZoomIn,
-    Tool_ZoomOut
+    Tool_ZoomOut,
+    Tool_Lock
 };
 
 class MainFrame : public wxFrame {
@@ -60,7 +65,8 @@ public:
     void OnSaveAs(wxCommandEvent& event);
 	void OnPrint(wxCommandEvent& event);
 	void OnPrintPreview(wxCommandEvent& event);
-	void OnExportBitmap(wxCommandEvent& event);
+	void OnExportBitmapBW(wxCommandEvent& event);
+	void OnExportBitmapC(wxCommandEvent& event);
 	void OnTimer(wxTimerEvent& event);
 	void OnIdle(wxTimerEvent& event);
 	void OnSize(wxSizeEvent& event);
@@ -71,13 +77,22 @@ public:
 	void OnCopy(wxCommandEvent& event);
 	void OnPaste(wxCommandEvent& event);	
 	void OnOscope(wxCommandEvent& event);
+	void OnViewGridline(wxCommandEvent& event);
+	void OnViewWireConn(wxCommandEvent& event);
 	void OnPause(wxCommandEvent& event);
 	void OnStep(wxCommandEvent& event);
 	void OnZoomIn(wxCommandEvent& event);
 	void OnZoomOut(wxCommandEvent& event);
 	void OnTimeStepModSlider(wxScrollEvent& event);
+	void OnLock(wxCommandEvent& event);
 	
 	void saveSettings( void );
+	
+	void ResumeExecution ( void );
+	
+	void PauseSim( void );
+	
+	void loadCircuitFile( string fileName );
 	
 private:
     // helper function - creates a new thread (but doesn't run it)
@@ -105,12 +120,8 @@ private:
 	wxSlider* timeStepModSlider;
 	wxStaticText* timeStepModVal;
 	PaletteFrame* gatePalette;
-//	PaletteCanvas* gatePalette;
 	
 	wxBoxSizer* mainSizer;
-	
-	// Test OscopeFrame:
-//	OscopeFrame* myOscope;
 	
     // any class wishing to process wxWidgets events must use this macro
     DECLARE_EVENT_TABLE()

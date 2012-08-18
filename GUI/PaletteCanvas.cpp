@@ -18,8 +18,6 @@ DECLARE_APP(MainApp)
 
 BEGIN_EVENT_TABLE(PaletteCanvas, wxScrolledWindow)
   EVT_PAINT(PaletteCanvas::OnPaint)
-//  EVT_ERASE_BACKGROUND(PaletteCanvas::OnEraseBackground)
-//  EVT_MOUSE_EVENTS(PaletteCanvas::OnMouseEvent)
 END_EVENT_TABLE()
 
 
@@ -34,7 +32,7 @@ PaletteCanvas::PaletteCanvas( wxWindow *parent, wxWindowID id, wxString &libName
 	gateSizer = NULL;
 	
 	init = false;
-	activate = false;
+	activate = true;
 }
 
 PaletteCanvas::~PaletteCanvas() {
@@ -73,13 +71,4 @@ void PaletteCanvas::OnPaint( wxPaintEvent &event ) {
 }
 void PaletteCanvas::Activate() {
 	activate = true;
-}
-
-void PaletteCanvas::OnEraseBackground(wxEraseEvent& event) {
-	// Do nothing, to avoid flickering.
-	// (We're using double-buffered openGL, not the normal rendering scheme.)
-}
-
-void PaletteCanvas::OnMouseEvent(wxMouseEvent& event) {
-//
 }

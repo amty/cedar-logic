@@ -128,7 +128,7 @@ protected:
 
 
 
-	// Register an output for this gate:
+	// Register an output for this gate :
 	void declareOutput( string name );
 
 	// Return true if an input has been declared. False otherwise.
@@ -260,6 +260,21 @@ protected:
 	
 	// A temporary ID used during updates, which represents this gate's ID in the Circuit.
 	IDType myID;
+	
+	//Edit by Joshua Lansford
+	//because we can not update paramiters
+	//when we are loading a file
+	//this flag is here so that we know we need to
+	//send and update next time we process
+	bool flushGuiMemory;
+	
+	
+	//This paramiter makes it so that we can
+	//send updates during non-gate processing
+	//calls.
+	//It makes flushGuiMemory obsolete, but
+	//it works, so I won't fix it.
+	vector<string> changedParamWaitingList;
 };
 
 
@@ -324,6 +339,17 @@ public:
 	void gateProcess( void );
 };
 
+// ****************** EQUIVALENCE Gate **************
+class Gate_EQUIVALENCE : public Gate_N_INPUT
+{
+public:
+	// Initialize the gate's interface:
+	Gate_EQUIVALENCE();
+	
+	// Handle gate events:
+	void gateProcess( void );
+};
+	
 
 // ******************* XOR Gate *********************
 class Gate_XOR : public Gate_N_INPUT
@@ -548,12 +574,27 @@ public:
 
 	// Read a file and load the memory data:
 	void inputMemoryFile( string fName );
+	
+//*************************************************
+//Edit by Joshua Lansford 1/22/06
+//This will make it so that the logic gate can
+//also load Intel Hex files.  This is a format
+//which is exported by the zad assembler.
+	void inputMemoryFileFromIntelHex( string fName );
+	
+	//a helper function
+	int readInHex( ifstream* fin, int numChars );
+//End of edit**************************************
 
 protected:
 	unsigned long dataBits;
 	unsigned long addressBits;
 
 	map< unsigned long, unsigned long > memory;
+	
+	//This is the last location that a read has
+	//taken place from.
+	unsigned long lastRead;
 };
 
 
@@ -683,6 +724,58 @@ private:
 	// The junctionID of the junction that this t-gate controls:
 	IDType junctionID;
 };
+
+//********************************
+//Edit by Joshua Lansford 5/10/07
+//The following is a faked ADC.
+//It is fake because there is no
+//analog input to the chip.
+//The input is provided by a slider
+//in a popup
+//********************************
+class Gate_ADC : public Gate
+{
+public:
+	// Initialize the adc:
+	Gate_ADC();
+
+	// Handle gate events:
+	void gateProcess( void );
+
+	// Set the parameters:
+	bool setParameter( string paramName, string value );
+
+	// Get the parameters:
+	string getParameter( string paramName );
+
+protected:
+	unsigned long analogValue;
+	unsigned long digitalValue;
+	int countDown;
+	bool interuptIsFlaged;
+};
+
+//***************************************************************
+//Edit by Joshua Lansford 6/5/2007
+//This edit is to create a new gate called the pauseulator.
+//This gate has one input and no outputs.  When the input of this
+//gate goes high, then it will pause the simulation.  This takes
+//avantage of the pauseing hooks that I had to create for the Z80.
+class Gate_pauseulator : public Gate
+{
+public:
+	Gate_pauseulator();
+	
+	
+	void gateProcess( void );
+
+	bool setParameter( string paramName, string value );
+
+	string getParameter( string paramName );
+};
+//End of edit****************************************************
+
+
 
 
 #endif // LOGIC_GATE_H

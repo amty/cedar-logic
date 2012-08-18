@@ -88,6 +88,7 @@ protected:
 	map < unsigned long, map < long, wireSegment > > newSegMaps;		
 	float startX, startY, endX, endY;
 	int wireMove;
+	vector < klsCommand* > proxconnects;
 public:
 	cmdMoveSelection( GUICircuit* gCircuit, vector < GateState > &preMove, vector < WireState > &preMoveWire, float startX, float startY, float endX, float endY );
 	~cmdMoveSelection( void ) { return; };
@@ -95,7 +96,7 @@ public:
 	bool Do( void );
 	bool Undo( void );
 	
-	vector < klsCommand* > proxconnects;
+	vector < klsCommand* >* getConnections() { return &proxconnects; };
 };
 
 // cmdCreateGate - creates a gate on a given canvas at position (x,y)
@@ -104,6 +105,7 @@ protected:
 	float x, y;
 	string gateType;
 	unsigned long gid;
+	vector < klsCommand* > proxconnects;
 	
 public:
 	cmdCreateGate( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long gid, string gateType, float x, float y);
@@ -115,7 +117,7 @@ public:
 	string toString();
 	void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids );
 	
-	vector < klsCommand* > proxconnects;
+	vector < klsCommand* >* getConnections() { return &proxconnects; };
 };
 
 // cmdConnectWire - connects a wire to a gate hotspot
@@ -125,6 +127,14 @@ protected:
 	unsigned long wid;
 	string hotspot;
 	bool noCalcShape;
+	
+	//edit by Joshua Lansford 10/21/06
+	//a hotspotPal is an input that is on top of a output
+	//or viseversa.  They make one bydirectional pin while
+	//remaining two seperate hotspots.
+	//we store the information here so that if we undo
+	//we can remember who we conned into getting connected with us.
+	string hotspotPal;
 	
 public:
 	cmdConnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape = false );
@@ -143,11 +153,10 @@ protected:
 	unsigned long wid;
 	cmdConnectWire* conn1;
 	cmdConnectWire* conn2;
-	
 public:
 	cmdCreateWire( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long wid, cmdConnectWire* conn1, cmdConnectWire* conn2 );
 	cmdCreateWire( string def );
-	~cmdCreateWire( void ) { return; };
+	~cmdCreateWire( void );
 	
 	bool Do( void );
 	bool Undo( void );
@@ -182,7 +191,7 @@ protected:
 	
 public:
 	cmdMergeWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid1, unsigned long wid2, GLPoint2f mc );
-	~cmdMergeWire( void ) { return; };
+	~cmdMergeWire( void );
 	
 	bool Do( void );
 	bool Undo( void );
@@ -196,7 +205,7 @@ protected:
 	
 public:
 	cmdDeleteWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid);
-	~cmdDeleteWire( void ) { return; };
+	~cmdDeleteWire( void );
 	
 	bool Do( void );
 	bool Undo( void );
@@ -211,7 +220,7 @@ protected:
 	
 public:
 	cmdDeleteGate( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long gid);
-	~cmdDeleteGate( void ) { return; };
+	~cmdDeleteGate( void );
 	
 	bool Do( void );
 	bool Undo( void );
@@ -226,7 +235,7 @@ protected:
 	
 public:
 	cmdDeleteSelection( GUICircuit* gCircuit, GUICanvas* gCanvas, vector < unsigned long > &gates, vector < unsigned long > &wires);
-	~cmdDeleteSelection( void ) { return; };
+	~cmdDeleteSelection( void );
 	
 	bool Do( void );
 	bool Undo( void );

@@ -38,15 +38,16 @@ OscopeCanvas::OscopeCanvas(wxWindow *parent, GUICircuit* gCircuit, wxWindowID id
 	parentFrame = (OscopeFrame*) parent;
 }
 
-OscopeCanvas::~OscopeCanvas() {
+OscopeCanvas::~OscopeCanvas(){ 
 //	scrollTimer->Stop();
 	return;
 }
 
-void OscopeCanvas::OnRender() {
+void OscopeCanvas::OnRender(){ 
+	
 	//Gets number of wires to render
 	//unsigned int numberOfWires = stateValues.size();
-	unsigned int numberOfWires = parentFrame->comboBoxVector.size();
+	unsigned int numberOfWires = parentFrame->numberOfFeeds(); //<-Josh Edit using access method
 	unsigned int wireNum = 0;
 	
 	//clear window 
@@ -106,10 +107,10 @@ void OscopeCanvas::OnRender() {
 	glEnd();
 
 	for (unsigned int i = 0; i < numberOfWires; i++) {
-		if (parentFrame->comboBoxVector[i]->GetValue().c_str()
-		    == std2wx("[None]")) { wireNum++; continue; }
+		if (parentFrame->getFeedName(i) == std2wx(NONE_STR)) //<-Josh Edit using access method
+			wireNum++; continue;
 
-		map< string, deque< StateType > >::iterator thisWire = stateValues.find(wx2std(parentFrame->comboBoxVector[i]->GetValue()));
+		map< string, deque< StateType > >::iterator thisWire = stateValues.find(wx2std(parentFrame->getFeedName(i)));  //<-Josh Edit using access method
 		if (thisWire == stateValues.end()) { wireNum++; continue; }
 		deque< StateType >::reverse_iterator wireVal = (thisWire->second).rbegin();
 		GLdouble horizLoc = OSCOPE_HORIZONTAL;
@@ -142,11 +143,11 @@ void OscopeCanvas::OnRender() {
 				y = 0.0 + wireNum * 1.5;
 				break;
 			case HI_Z:
-				glColor4f( 0.0, 1.0, 0.0, 1.0 );
+				glColor4f( 0.0, 0.78, 0.0, 1.0 );
 				y = 0.5 + wireNum * 1.5;
 				break;
 			case UNKNOWN:
-				glColor4f( 0.0, 0.0, 1.0, 1.0 );
+				glColor4f( 0.3, 0.3, 1.0, 1.0 );
 				y = 0.75 + wireNum * 1.5;
 				solid = true;
 				break;
@@ -183,7 +184,7 @@ void OscopeCanvas::OnRender() {
 	} // for
 }
 
-void OscopeCanvas::OnPaint(wxPaintEvent& event) {
+void OscopeCanvas::OnPaint(wxPaintEvent& event){ 
 	wxPaintDC dc(this);
 #ifndef __WXMOTIF__
 	if (!GetContext()) return;
@@ -198,6 +199,12 @@ void OscopeCanvas::OnPaint(wxPaintEvent& event) {
 		glClearColor (1.0, 1.0, 1.0, 0.0);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
+		
+		//*********************************
+		//Edit by Joshua Lansford 4/09/07
+		//anti-alis ing is nice
+		glEnable( GL_LINE_SMOOTH );
+		//End of edit
 
 	}
 
@@ -224,7 +231,8 @@ void OscopeCanvas::OnSize(wxSizeEvent& event)
 }
 
 
-void OscopeCanvas::UpdateData(void) {
+void OscopeCanvas::UpdateData(void){ 	
+	
 	//Declaration of variables
 	deque<StateType> temp;
 
@@ -234,7 +242,7 @@ void OscopeCanvas::UpdateData(void) {
 	
 	set< string > liveTOs;
 	vector < guiGate* > toGates;
-	if (parentFrame->comboBoxVector.size() > 1) {
+	if (parentFrame->numberOfFeeds() > 1) {
 		// Set up a list of TO gates so I only search the whole gate list once.
 		theGate = gateList->begin();
 		while (theGate != gateList->end()) {
@@ -244,14 +252,14 @@ void OscopeCanvas::UpdateData(void) {
 	}
 	
 	//Check to see if wire has already been added to OSCOPE
-	map< string, bool > stringBool; 
+	map< string, bool > hasBeenAdded; 
 	
-	for (unsigned int i = 0; i < parentFrame->comboBoxVector.size()-1; i++) {
-		string junctionName = wx2std(parentFrame->comboBoxVector[i]->GetValue());
-		if (junctionName == "[None]" || junctionName == "[Remove]" || junctionName == "") continue;	
-			
-		if(stringBool.find(junctionName) == stringBool.end()) {
-			stringBool[junctionName] = true;
+	for (unsigned int i = 0; i < parentFrame->numberOfFeeds()-1; i++) {
+		string junctionName = wx2std(parentFrame->getFeedName(i));
+		if (junctionName == NONE_STR || junctionName == RMOVE_STR || junctionName == "")
+			continue;	
+		if(hasBeenAdded.find(junctionName) == hasBeenAdded.end()) {
+			hasBeenAdded[junctionName] = true;
 			// Keep track of all junction names that are still valid.
 			// If a gate disappears or changes junction names, then
 			// we want to remove it from our data structure.
@@ -281,7 +289,8 @@ void OscopeCanvas::UpdateData(void) {
 			}
 			if (currentGate == NULL) { // Just in case of error
 				stateValues.erase(junctionName);
-				parentFrame->comboBoxVector[i]->SetValue(wxT("[None]"));
+				parentFrame->cancelFeed(i);
+				//parentFrame->comboBoxVector[i]->SetValue(wxT("[None]"));
 				continue;
 			}
 			
@@ -333,16 +342,61 @@ void OscopeCanvas::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
 
 void OscopeCanvas::UpdateMenu()
 {
+	//*******************************
+	//Edit by Joshua Lansford 3/11/07
+	//This edit is to retrofit this
+	//method so that all it does is genrate
+	//a list of possable feeds and then
+	//passes it back up to its parent.
+	//This way it does not mess directly
+	//with the values in the combo boxes
+	//which are some reason not remembering
+	//what value they should be currently holding
+	//The edit ends with the end of this function
+	
+	hash_map< unsigned long, guiGate* >* gateList = gCircuit->getGates();
+	
+	vector< string > namesOfPossableFeeds;
+	
+	map< string, bool > alreadyAdded;
+	
+	//iterate over all gates
+	for( hash_map< unsigned long, guiGate* >::iterator 
+	       gateIterator = gateList->begin(); 
+	       gateIterator != gateList->end(); 
+	       gateIterator++ ){
+	   guiGate* aGate = gateIterator->second;
+	   //select out the gates which are TOs
+	   if( aGate->getGUIType() == "TO" ){
+	   		string feedName;        
+	   		feedName = aGate->getLogicParam("JUNCTION_ID");
+	   		
+	   		//check if it has already been added
+	   		if( alreadyAdded.find( feedName ) == alreadyAdded.end() ){
+	   			
+	   			//add name to list
+	   			namesOfPossableFeeds.push_back( feedName );
+	   			alreadyAdded[ feedName ] = true;
+	   		}
+	   }
+	}
+	
+	parentFrame->updatePossableFeeds( &namesOfPossableFeeds );
+	
+	/*
+	
 	//Sets variables
 	hash_map< unsigned long, guiGate* >* gateList = gCircuit->getGates();
 	hash_map< unsigned long, guiGate* >::iterator theGate = gateList->begin();
 	
 	//Sets size
-	unsigned int size = (parentFrame->comboBoxVector).size();
+	//unsigned int size = (parentFrame->comboBoxVector).size();
+	unsigned int size = parentFrame->numberOfFeeds();
 	
 	for(unsigned int x = 0; x < size; x++)
 	{
-		wxString oldVal = (parentFrame->comboBoxVector[x])->GetValue();
+		//wxString oldVal = (parentFrame->comboBoxVector[x])->GetValue();
+		string oldVal = parentFrame->getFeedName( x );
 		//Update Combo Box Data
 		(parentFrame->comboBoxVector[x])->Clear();
 	
@@ -368,15 +422,37 @@ void OscopeCanvas::UpdateMenu()
 		(parentFrame->comboBoxVector[x])->Append(std2wx("[None]"));
 		(parentFrame->comboBoxVector[x])->Append(std2wx("[Remove]"));
 		
-		if ((parentFrame->comboBoxVector[x])->FindString(oldVal) != -1 ) {
+		// *******************************************
+		//Edit by Joshua Lansford 2/22/07
+		//FindString is insensitive.  Therefore just
+		//because it finds something doesn't mean that
+		//our old value  is still valid.  Therefore
+		//we must search manually
+		
+		//if ((parentFrame->comboBoxVector[x])->FindString(oldVal) != -1 ) {
+		
+		bool foundIt = false;
+		for( int search = 0; 
+		     search < (parentFrame->comboBoxVector[x])->GetCount() && !foundIt;
+		     ++search ){
+			if( oldVal == (parentFrame->comboBoxVector[x])->GetString( search ) ){
+				foundIt = true;
+			}
+		}
+		if( foundIt ){
+		//End of Edit************************************************
+		
+		
 			(parentFrame->comboBoxVector[x])->SetValue(oldVal);
 		} else {
 			(parentFrame->comboBoxVector[x])->SetValue(wxT("[None]"));
 		}
 	}
+	*/
 }
 
 // Print the canvas contents to a bitmap:
+
 wxImage OscopeCanvas::generateImage()
 {
 	wxSize sz = GetClientSize();
@@ -387,10 +463,17 @@ wxImage OscopeCanvas::generateImage()
 		glClearColor (1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);
 		
+<<<<<<< HEAD
 		//TODO: Check if alpha is hardware supported, and
 		// don't enable it if not!
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
+
+		//*********************************
+		//Edit by Joshua Lansford 4/09/07
+		//anti-alis ing is nice
+		glEnable( GL_LINE_SMOOTH );
+		//End of edit
 		
 		// Do the rendering here.
 		OnRender();

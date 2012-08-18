@@ -29,6 +29,7 @@ enum klsCollisionObjectType {
 	COLL_WIRE,
 	COLL_WIRE_SEG,
 
+	// PLACE OBJECT TYPES THAT ARE ALWAYS CHECKED AFTER THIS POINT
 	COLL_SELBOX,
 	COLL_VIEWPORT,
 	
@@ -52,6 +53,11 @@ public:
 		setType( theType );
 		cData.bboxChanged = true; // The object is new, so mark it as having changed!
 	};
+	
+	~klsCollisionObject() {
+		deleteSubObjects();
+		deleteCollisionObject();
+	}
 
 	// Get and set the bounding box for this collision object:
 	// Always use setBBox() in order to flag the object as changed whenever it's
@@ -115,6 +121,11 @@ private: // Only accessed by constructor:
 	void setType( klsCollisionObjectType newType ) { cData.objType = newType; };
 
 protected:
+	void insertSubObject( klsCollisionObject* klsc );
+	void deleteSubObjects();
+	void deleteCollisionObject();
+	
+private:
 	// Functions only to be used by klsCollisionChecker or the object itself:
 	// Flag the bbox as having changed:
 	void setBBoxChanged( void ) {
@@ -177,7 +188,7 @@ protected:
 		return badOverlaps;
 	};
 
-protected:
+private:
 	// Data for the collision object:
 	struct {
 		klsBBox bbox; // The object's world-space bounding box.
@@ -195,145 +206,12 @@ protected:
 	} cData;
 };
 
-// Min and Max axis sort objects:
-class klsMinSortObj {
-public:
-	klsMinSortObj( klsCollisionObject* newObj, bool newIsHoriz ) : theObj(newObj), isHoriz(newIsHoriz) {};
-
-protected:
-	klsCollisionObject* theObj;
-	bool isHoriz;
-
-public:
-friend bool operator< (const klsMinSortObj& a, const klsMinSortObj& b);
-friend class klsBBoxAxisList;
-};
-
-class klsMaxSortObj {
-public:
-	klsMaxSortObj( klsCollisionObject* newObj, bool newIsHoriz ) : theObj(newObj), isHoriz(newIsHoriz) {};
-
-protected:
-	klsCollisionObject* theObj;
-	bool isHoriz;
-
-public:
-friend bool operator> (const klsMaxSortObj& a, const klsMaxSortObj& b);
-friend class klsBBoxAxisList;
-};
-
-// An axis (x, y) that will allow you to sort bboxes 
-class klsBBoxAxisList {
-public:
-	klsBBoxAxisList( bool newIsHoriz ) : isHorizontal( newIsHoriz ) {};
-
-	// Insert an object into the axis list:
-	void insert( klsCollisionObject *newObj ) {
-		minList.insert( klsMinSortObj( newObj, isHorizontal ) );
-		maxList.insert( klsMaxSortObj( newObj, isHorizontal ) );
-	};
-
-	// Remove an object into the axis list:
-	void erase( klsCollisionObject *oldObj ) {
-		minList.erase( klsMinSortObj( oldObj, isHorizontal ) );
-		maxList.erase( klsMaxSortObj( oldObj, isHorizontal ) );
-	};
-
-	// Move the object to its proper location, using an insert sort "shift".
-	// Return the new collisions of this object on this axis.
-//	CollisionGroup updateObject( klsCollisionObject *theObj, long minLoc = 0 ) {
-//	};
-
-	// Return all of the collisions of this object on this axis:
-	CollisionGroup getCollisions( klsCollisionObject *theObj ) {
-		CollisionGroup theCollisions;
-
-		// Re-sort the sets:
-		set< klsMinSortObj > backStart;
-		backStart.insert( minList.begin(), minList.end() );
-		minList.clear();
-		minList = backStart;
-
-		set< klsMinSortObj >::iterator boxStart = minList.find( klsMinSortObj( theObj, isHorizontal ) );
-		assert( boxStart != minList.end() );
-		set< klsMaxSortObj >::iterator boxEnd = maxList.find( klsMaxSortObj( theObj, isHorizontal ) );
-		assert( boxEnd != maxList.end() );
-		GLfloat boxMaxEdge, boxMinEdge;
-		if( isHorizontal ) {
-			boxMaxEdge = ((*boxEnd).theObj->getBBox()).getRight();
-			boxMinEdge = ((*boxStart).theObj->getBBox()).getLeft();
-		} else {
-			boxMaxEdge = ((*boxEnd).theObj->getBBox()).getTop();
-			boxMinEdge = ((*boxStart).theObj->getBBox()).getBottom();
-		}
-
-		boxStart++;
-		GLfloat testEdge = 0;
-		if( boxStart != minList.end() ) {
-			if( isHorizontal ) {
-				testEdge = ((*boxStart).theObj->getBBox()).getLeft();
-			} else {
-				testEdge = ((*boxStart).theObj->getBBox()).getBottom();
-			}
-		}
-		while( (boxStart != minList.end()) && (testEdge <= boxMaxEdge) ) {
-			theCollisions.insert( boxStart->theObj );
-
-			// Move on to the next one:
-			boxStart++;
-			if( boxStart != minList.end() ) {
-				if( isHorizontal ) {
-					testEdge = ((*boxStart).theObj->getBBox()).getLeft();
-				} else {
-					testEdge = ((*boxStart).theObj->getBBox()).getBottom();
-				}
-			}
-		}
-
-		boxEnd++;
-		if( boxEnd != maxList.end() ) {
-			if( isHorizontal ) {
-				testEdge = ((*boxEnd).theObj->getBBox()).getRight();
-			} else {
-				testEdge = ((*boxEnd).theObj->getBBox()).getTop();
-			}
-		}
-		while( (boxEnd != maxList.end()) && (testEdge >= boxMinEdge) ) {
-			theCollisions.insert( boxEnd->theObj );
-
-			// Move on to the next one:
-			boxEnd++;
-			if( boxEnd != maxList.end() ) {
-				if( isHorizontal ) {
-					testEdge = ((*boxEnd).theObj->getBBox()).getRight();
-				} else {
-					testEdge = ((*boxEnd).theObj->getBBox()).getTop();
-				}
-			}
-		}
-		
-		return theCollisions;
-	};
-
-protected:
-	bool isHorizontal; // Horiz or Vert axis.
-
-	// A list of the minimum and maximum values for each bbox object:
-	set< klsMinSortObj > minList;
-	set< klsMaxSortObj, greater< klsMaxSortObj > > maxList;
-};
-
-
 class klsCollisionChecker {
 public:
 	klsCollisionChecker() {
-		xList = new klsBBoxAxisList( true );
-		yList = new klsBBoxAxisList( false );
 	};
 
 	~klsCollisionChecker() {
-		delete xList;
-		delete yList;
 	};
 	
 	// Check the overlaps of all of the collision objects stored in this checker,
@@ -354,26 +232,12 @@ public:
 	// if you tell it to remove it. "Removing" just takes it out of this checker's list.)
 	void addObject( klsCollisionObject* newObj ) {
 		collisionObjects.insert( newObj );
-		xList->insert( newObj );
-		yList->insert( newObj );
 		newObj->bboxHasChanged();
 		newObj->clearOverlaps();
 		newObj->clearSubsOverlaps();
 	};
 
-	void removeObject( klsCollisionObject* oldObj ) {
-		collisionObjects.erase( oldObj );
-		xList->erase( oldObj );
-		yList->erase( oldObj );
-		
-		// Need to remove this object from all other object's collision maps:
-		CollisionGroup badOverlaps = oldObj->getOverlaps();
-		CollisionGroup::iterator remOver = badOverlaps.begin();
-		while( remOver != badOverlaps.end() ) {
-			(*remOver)->removeOverlap( oldObj );
-			remOver++;
-		}
-	};
+	void removeObject( klsCollisionObject* oldObj );
 
 	// The overlapped objects from the last call to update(), mapped by klsCollisionObjectType:
 	map< klsCollisionObjectType, CollisionGroup > overlaps;
@@ -382,8 +246,6 @@ public:
 	
 private:
 	CollisionGroup collisionObjects;
-	klsBBoxAxisList *xList;
-	klsBBoxAxisList *yList;
 };
 
 #endif /*KLSCOLLISIONCHECKER_H_*/

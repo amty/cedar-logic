@@ -124,17 +124,17 @@ void paramDialog::OnLoad( wxCommandEvent &evt ) {
 	string paramName = wx2std(paramNames[parmID]->GetLabel());
 	
 	wxString caption = std2wx("Open a memory file");
-	wxString wildcard = std2wx("CEDAR Memory files (*.cdm)|*.cdm");
+	//Edit by Joshua Lansford 1/24/06  Added the option to select Intel-hex files
+	wxString wildcard = wxT("CEDAR Memory files (*.cdm)|*.cdm"
+				"|INTEL-HEX (*.hex)|*.hex");
 	wxString defaultFilename = std2wx("");
-	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxOPEN | wxFILE_MUST_EXIST);
+	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	
 	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
 	if (dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
 		string mempath = wx2std(path);
-		ostringstream oss;
-		oss << "SET GATE ID " << gGate->getID() << " PARAMETER " << gateDef->dlgParams[parmID].name << " " << mempath;
-		gCircuit->sendMessageToCore(oss.str());
+		gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(gGate->getID(), gateDef->dlgParams[parmID].name, mempath)));
 	}
 }
 
@@ -153,15 +153,13 @@ void paramDialog::OnSave( wxCommandEvent &evt ) {
 	wxString caption = std2wx("Open a memory file");
 	wxString wildcard = std2wx("CEDAR Memory files (*.cdm)|*.cdm");
 	wxString defaultFilename = std2wx("");
-	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxSAVE | wxOVERWRITE_PROMPT);
+	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	
 	LibraryGate* gateDef = &(wxGetApp().libraries[gGate->getLibraryName()][gGate->getLibraryGateName()]);
 	if (dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
 		string mempath = wx2std(path);
-		ostringstream oss;
-		oss << "SET GATE ID " << gGate->getID() << " PARAMETER " << gateDef->dlgParams[parmID].name << " " << mempath;
-		gCircuit->sendMessageToCore(oss.str());
+		gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(gGate->getID(), gateDef->dlgParams[parmID].name, mempath)));
 	}
 }
 
@@ -225,7 +223,7 @@ void paramDialog::OnOK( wxCommandEvent &evt ) {
 	}
 	if (!allParamsSame) wxcmd->Submit( new cmdSetParams( gCircuit, gGate->getID(), paramSet(&gParamList, &lParamList) ) );
 	// Make me go away forever!
-	Destroy();
+	this->EndModal(wxID_OK);
 }
 
 bool paramDialog::validateData() {

@@ -3,18 +3,20 @@
 
 [Setup]
 AppName=CEDAR Logic Simulator
-AppVerName=CEDARLS 1.0
+AppVerName=CEDARLS 1.5 beta
 AppPublisher=Cedarville University
-AppPublisherURL=http://www.cedarville.edu
-AppSupportURL=http://www.cedarville.edu
-AppUpdatesURL=http://www.cedarville.edu
+AppPublisherURL=http://cedarlogic.sourceforge.net
+AppSupportURL=http://cedarlogic.sourceforge.net
+AppUpdatesURL=http://cedarlogic.sourceforge.net
 DefaultDirName={pf}\CEDAR Logic
 DefaultGroupName=CEDAR Logic
 AllowNoIcons=yes
-OutputDir=C:\proj\projects\wxWidgetsBasePrj\setup
+OutputDir=.\setup
 OutputBaseFilename=cedarlssetup
 Compression=lzma
 SolidCompression=yes
+ChangesAssociations=yes
+PrivilegesRequired=none
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -24,11 +26,12 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\proj\projects\wxWidgetsBasePrj\Release\cedarls.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\proj\projects\wxWidgetsBasePrj\GUI\TestGates.lib"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\proj\projects\wxWidgetsBasePrj\GUI\times_new1.glf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\proj\projects\wxWidgetsBasePrj\GUI\license.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\proj\projects\wxWidgetsBasePrj\KLS_Logic.chm"; DestDir: "{app}"; Flags: ignoreversion
+;Josh Edit(8/7/2007): changed files to relative paths so that I could work in cunjunction with the svn checkout
+Source: ".\Release\cedarls.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\GUI\cl_gatedefs.lib"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\GUI\GLFont\arial.glf"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\GUI\license.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\KLS_Logic.chm"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -40,4 +43,11 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\CEDAR Logic"; File
 
 [Run]
 Filename: "{app}\cedarls.exe"; Description: "{cm:LaunchProgram,CEDAR Logic}"; Flags: nowait postinstall skipifsilent
+
+[Registry]
+Root: HKCR; Subkey: ".cdl"; ValueType: string; ValueName: ""; ValueData: "CEDARLogicCircuit"; Flags: uninsdeletevalue
+Root: HKCR; Subkey: "CEDARLogicCircuit"; ValueType: string; ValueName: ""; ValueData: "CEDAR Logic Circuit File"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "CEDARLogicCircuit\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\cedarls.exe,0"
+Root: HKCR; Subkey: "CEDARLogicCircuit\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\cedarls.exe"" ""%1"""
+
 

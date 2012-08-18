@@ -13,29 +13,6 @@
 #include "MainApp.h"
 DECLARE_APP(MainApp)
 
-// ************************* klsMinSortObj *****************************
-bool operator< (const klsMinSortObj& a, const klsMinSortObj& b) {
-	klsBBox aBox = a.theObj->getBBox();
-	klsBBox bBox = b.theObj->getBBox();
-	if( a.isHoriz ) {
-		return ( aBox.getLeft() < bBox.getLeft() );
-	} else {
-		return ( aBox.getBottom() < bBox.getBottom() );
-	}
-}
-
-// ************************* klsMaxSortObj *****************************
-bool operator> (const klsMaxSortObj& a, const klsMaxSortObj& b) {
-	klsBBox aBox = a.theObj->getBBox();
-	klsBBox bBox = b.theObj->getBBox();
-	if( a.isHoriz ) {
-		return ( aBox.getRight() > bBox.getRight() );
-	} else {
-		return ( aBox.getTop() > bBox.getTop() );
-	}
-}
-
-
 // ************************* klsCollisionObject *****************************
 
 // Check this object's subobjects against another obj's bbox:
@@ -52,8 +29,32 @@ CollisionGroup klsCollisionObject::checkSubsToSubs( klsCollisionObject* objB, bo
 	return klsCollisionChecker::checkGroupCollisions( this->getSubObjects(), objB->getSubObjects(), resetOverlaps );
 }
 
+void klsCollisionObject::insertSubObject(klsCollisionObject* klsc) {
+	cData.subObjs.insert( klsc );
+}
 
+void klsCollisionObject::deleteSubObjects() {
+	CollisionGroup::iterator sub = cData.subObjs.begin();
+	while( sub != cData.subObjs.end() ) {
+		(*sub)->deleteCollisionObject();
+		sub++;
+	}
+	cData.subObjs.clear();
+}
 
+void klsCollisionObject::deleteCollisionObject() {
+	CollisionGroup badOverlaps = this->getOverlaps();
+	CollisionGroup::iterator remOver = badOverlaps.begin();
+	while( remOver != badOverlaps.end() ) {
+		(*remOver)->removeOverlap( this );
+		remOver++;
+	}
+	this->clearOverlaps();	
+
+	// NOT a good idea: (Will cause recursive loop!)
+	// this->deleteSubObjects()
+	// (Yes, include this comment in the code!)
+}
 // ************************* klsCollisionChecker *****************************
 
 // Check the overlaps of all of the collision objects stored in this checker,
@@ -65,16 +66,18 @@ void klsCollisionChecker::update( void ) {
 	// an N by N comparison that is order N^2.
 	//NOTE: I made the algorithm more efficient by only updating bboxes that have changed
 	// since the last call to update. So, it is now order S*N, where S is the number
-	// of things that have changed.
+	// of things that have changed.  Also, moving items are now only checked against
+	// stationary ones, and if S < N/2, then the groups are switched.
 
 	// Clear out the old collisions:
 	overlaps.clear();
 
 	// Loop through all collision objects, and identify those that have changed:
-	CollisionGroup changedObjs;
+	CollisionGroup changedObjs, stationaryObjs;
 	CollisionGroup::iterator thisObj = collisionObjects.begin();
 	while( thisObj != collisionObjects.end() ) {
-		if( (*thisObj)->bboxHasChanged() ) {
+		// Changed objects and special-type objects (view box, sel box, mouse, etc)
+		if( (*thisObj)->bboxHasChanged() || (*thisObj)->getType() > COLL_WIRE_SEG) {
 			// Add it to the update list.
 			changedObjs.insert( *thisObj );
 
@@ -84,6 +87,8 @@ void klsCollisionChecker::update( void ) {
 
 			// Tell it that we've fixed the problem:
 			(*thisObj)->setBBoxUpdated();
+		} else {
+			stationaryObjs.insert( *thisObj );
 		}
 		
 		// Add all of the overlaps of this object into the main overlaps object:
@@ -97,17 +102,21 @@ void klsCollisionChecker::update( void ) {
 		thisObj++;
 	}
 
+	// Now, the question is, which group has more objects?
+	CollisionGroup* relChanged = &(changedObjs.size() < stationaryObjs.size() ? changedObjs : stationaryObjs);
+	CollisionGroup* relStatic = &(changedObjs.size() >= stationaryObjs.size() ? changedObjs : stationaryObjs);
+
 	// With the objects that have changed their bounding boxes, update their
 	// collision information:
 	unsigned long long numCompares = 0;
-	CollisionGroup::iterator changedObj = changedObjs.begin();
-	while( changedObj != changedObjs.end() ) {
+	CollisionGroup::iterator changedObj = relChanged->begin();
+	while( changedObj != relChanged->end() ) {
 		// Check this object against all of the other objects, to add potential
 		// new overlaps:
 //* Slow collision checking system:
 		CollisionGroup groupA, groupB;
 		groupA.insert( *changedObj );
-		groupB.insert( collisionObjects.begin(), collisionObjects.end() );
+		groupB.insert( relStatic->begin(), relStatic->end() );
 		groupB.erase( *changedObj );
 
 		// Check the collisions of object A with the rest of the group,
@@ -117,13 +126,6 @@ void klsCollisionChecker::update( void ) {
 		numCompares += groupB.size();
 /**/
 
-/* Experimental collision checking system:
-		CollisionGroup hits, xHits, yHits;
-		xHits = xList->getCollisions( *changedObj );
-		yHits = yList->getCollisions( *changedObj );
-		set_intersection( xHits.begin(), xHits.end(), yHits.begin(), yHits.end(),
-							inserter(hits, hits.begin()) );
-*/
 		// Sort the hits into the main map object:
 		CollisionGroup::iterator thisHit = hits.begin();
 		while( thisHit != hits.end() ) {
@@ -134,53 +136,6 @@ void klsCollisionChecker::update( void ) {
 		// Check the next changed object:
 		changedObj++;
 	}
-	wxGetApp().logfile << "Collision checker just checked like " << numCompares << " freakin pairs for collisions!" << endl;
-
-	// Clear out the old collision information:
-/*	CollisionGroup::iterator thisObj = collisionObjects.begin();
-	while( thisObj != collisionObjects.end() ) {
-		(*thisObj)->clearOverlaps();
-		thisObj++;
-	}
-
-	thisObj = collisionObjects.begin();
-	
-	// The two collision groups:
-	// groupA is always the current object. groupB starts out as
-	// all of the objects, and gets the current object removed from it
-	// as we go. All pairs get checked only once that way.
-	CollisionGroup groupA, groupB;
-	groupB.insert( collisionObjects.begin(), collisionObjects.end() );
-
-	// Keep track of all collisions and sort them into the main map:
-	CollisionGroup hits;
-
-	// Clear out the old collisions:
-	overlaps.clear();
-	unsigned long long numCompares = 0;
-
-	while( thisObj != collisionObjects.end() ) {
-		groupA.clear();
-		groupA.insert( *thisObj );
-		groupB.erase( *thisObj );
-
-		// Check the collisions of object A with the rest of the group,
-		// while not resetting the other object's overlap information:
-		hits.clear();
-		hits = checkGroupCollisions( groupA, groupB, false );
-		numCompares += groupB.size();
-		
-		// Sort the hits into the main map object:
-		CollisionGroup::iterator thisHit = hits.begin();
-		while( thisHit != hits.end() ) {
-			overlaps[(*thisHit)->getType()].insert(*thisHit);
-			thisHit++;
-		}
-
-		thisObj++;
-	}
-	wxGetApp().logfile << "Collision checker just checked like " << numCompares << " freakin pairs for collisions!" << endl;
-*/
 }
 
 // Check a specific overlap group against another:
@@ -233,5 +188,11 @@ CollisionGroup klsCollisionChecker::checkGroupCollisions( CollisionGroup groupA,
 	}
 
 	return collidedObjects;
+}
+
+void klsCollisionChecker::removeObject( klsCollisionObject* oldObj ) {
+	collisionObjects.erase( oldObj );
+	oldObj->deleteSubObjects();
+	oldObj->deleteCollisionObject();
 }
 

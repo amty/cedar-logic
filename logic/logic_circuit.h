@@ -47,6 +47,18 @@ public:
 	// return a set of all the changed wires to the calling function.
 	void step(  ID_SET< IDType > *changedWires = NULL );
 	
+	//***************************************
+	//Edit by Joshua Lansford 3/27/07
+	//purpose of edit: The ram gate needs to
+	//update its pop-up right after it loads
+	//even if it is paused.  Thus this method
+	//is created, so that the pop-ups
+	//can request that the core proces
+	//thegateUpdateList without advanceing
+	//the system time
+	void stepOnlyGates();
+	//End of Edit***************************
+	
 	// Create a new gate, and return its ID:
 	// NOTE: There should also be some way to pass
 	// parameters back and forth to gates that use them.
