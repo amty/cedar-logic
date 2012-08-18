@@ -13,7 +13,7 @@
 #define LOGIC_DEFAULTS_H
 
 #include "../GUI/product.h"
-
+#include <limits.h>
 // Warning message macro:
 #ifndef _PRODUCTION_
 #define WARNING(message) \

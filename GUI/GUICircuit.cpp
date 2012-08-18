@@ -212,7 +212,13 @@ wxGetApp().logfile << logicTime << " " << lastTime << endl << flush;
 }
 
 void GUICircuit::sendMessageToCore(string message) {
-	wxMutexLocker lock(wxGetApp().mexMessages);
+	/* wxMutexLocker lock(wxGetApp().mexMessages); deadlock here with lock in OnIdle */
+
+	/* below is debug condition. Just for sure. */
+	wxMutexError lock_result = wxGetApp().mexMessages.TryLock();
+	if(lock_result != wxMUTEX_BUSY) {
+		wxGetApp().logfile << "WARNING: mexMessages is unlocked in sendMessageToCore!" << endl << flush;
+	}
 #ifndef _PRODUCTION_ 
 	if ((simulate || !waitToSendMessage) && message != "STEPSIM") wxGetApp().logfile << "sending " << message << endl << flush;
 #endif
@@ -221,6 +227,8 @@ void GUICircuit::sendMessageToCore(string message) {
 			wxGetApp().dGUItoLOGIC.push_back(message);
 		} else messageQueue.push_back(message);
 	} else wxGetApp().dGUItoLOGIC.push_back(message);
+	if(lock_result == wxMUTEX_NO_ERROR)
+		wxGetApp().mexMessages.Unlock();
 }
 
 void GUICircuit::setWireState( long wid, long state ) {

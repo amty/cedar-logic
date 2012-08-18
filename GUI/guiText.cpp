@@ -13,7 +13,7 @@
 // Include the glf font library:
 #include "glf.h"
 #include "MainApp.h"
-
+#include "str-convs.h"
 DECLARE_APP(MainApp)
 
 #define GLF_TEXT_SCALE_FACTOR 3.0 / 4.0
@@ -35,8 +35,8 @@ guiText::guiText() {
 			wxString msg;
 			ostringstream ossError;
 			ossError << "The font file times_new1.glf does not exist.";
-			msg.Printf( _T(ossError.str().c_str()));
-			wxMessageBox(msg, _T("Error - Missing File"), wxOK | wxICON_ERROR, NULL);
+			msg.Printf(std2wx(ossError.str().c_str()));
+			wxMessageBox(msg, std2wx("Error - Missing File"), wxOK | wxICON_ERROR, NULL);
 		}
 		fontIsLoaded = true;
 	}

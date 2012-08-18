@@ -21,6 +21,7 @@ class Circuit;
 
 #include <string>
 #include <sstream>
+#include <assert.h>
 using namespace std;
 
 #if _MSC_VER > 1000

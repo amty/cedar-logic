@@ -10,7 +10,7 @@
 
 #include "PaletteFrame.h"
 #include "wx/listbox.h"
-
+#include "str-convs.h"
 using namespace std;
 
 DECLARE_APP(MainApp)
@@ -26,10 +26,10 @@ PaletteFrame::PaletteFrame( wxWindow *parent, wxWindowID id, const wxPoint &pos,
 	paletteSizer = new wxBoxSizer( wxVERTICAL );
 	map < string, map < string, LibraryGate > >::iterator libWalk = wxGetApp().libraries.begin();
 	while (libWalk != wxGetApp().libraries.end()) {
-		strings.Add((wxString)((libWalk->first).c_str()));
+		strings.Add(std2wx(libWalk->first));
 		libWalk++;
 	}
-	listBox = new wxListBox(this, ID_LISTBOX, wxDefaultPosition, wxSize(0,strings.GetCount()*14), strings, wxLB_SINGLE);
+	listBox = new wxListBox(this, ID_LISTBOX, wxDefaultPosition, wxSize(0,strings.GetCount()*32), strings, wxLB_SINGLE);
 	paletteSizer->Add( listBox, wxSizerFlags(0).Expand().Border(wxALL, 0) );
 	paletteSizer->Show( listBox );
 	for (unsigned int i = 0; i < strings.GetCount(); i++) {
@@ -40,7 +40,7 @@ PaletteFrame::PaletteFrame( wxWindow *parent, wxWindowID id, const wxPoint &pos,
 	}
 	listBox->SetFirstItem(0);
 	currentPalette = pcanvases.begin()->second;
-	paletteSizer->Show( currentPalette );
+	paletteSizer->Show(currentPalette);
 	this->SetSizer( paletteSizer );
 }
 

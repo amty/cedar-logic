@@ -29,7 +29,7 @@ class klsGLCanvas;
 #include <string>
 #include <deque>
 using namespace std;
-
+using namespace __gnu_cxx;
 #define MIN_ZOOM 1.0/120.0
 #define MAX_ZOOM 1.0*1.0
 #define DEFAULT_ZOOM 1.0/10.0

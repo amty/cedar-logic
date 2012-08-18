@@ -20,7 +20,7 @@
 #include <string>
 #include <fstream>
 #include <map>
-#include <hash_map.h>
+#include <ext/hash_map>
 
 using namespace std;
 

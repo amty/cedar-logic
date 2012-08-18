@@ -11,7 +11,7 @@
 #ifndef LIBRARYPARSE_H_
 #define LIBRARYPARSE_H_
 
-#include "XMLParser.h"
+#include <tinyxml2.h>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -69,9 +69,7 @@ public:
 	
 	void parseFile();
 
-	// Parse the shape object from the mParse file, adding an offset if needed:
-	bool parseShapeObject( string type, LibraryGate* newGate, double offX = 0.0, double offY = 0.0 );
-	
+
 	// Returns a gate from the library in lgGate.  If the gate does not
 	//	exist in the library, returns false, otherwise true.
 	bool getGate(string gateName, LibraryGate &lgGate);
@@ -87,7 +85,14 @@ public:
 	map < string, map < string, LibraryGate > >* getGateDefs() { return &gates; };
 
 private:
-	XMLParser* mParse;
+	void parseShape(LibraryGate *gate, tinyxml2::XMLElement *elems,
+			float dx = 0, float dy = 0);
+	void parseOffset(LibraryGate *gate, tinyxml2::XMLElement *shape);
+	void parseGate(const string &lib_name, tinyxml2::XMLElement *g);
+
+	lgHotspot parseHotspot(tinyxml2::XMLElement *node);
+	
+	/*XMLParser* mParse;*/
 	string fileName;
 	string libName;
 	

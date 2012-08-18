@@ -20,9 +20,9 @@ class klsMiniMap;
 #include "guiGate.h"
 #include "guiWire.h"
 #include "klsGLCanvas.h"
-#include <hash_map.h>
+#include <ext/hash_map>
 using namespace std;
-
+using namespace __gnu_cxx;
 class klsMiniMap : public wxPanel {
 public:
 	klsMiniMap(wxWindow *parent, wxWindowID id = wxID_ANY,

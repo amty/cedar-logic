@@ -287,7 +287,7 @@ void GUICanvas::mouseLeftDown(wxMouseEvent& event) {
 	bool handled = false;
 	// If I am in a paste operation then mouse-up is all I am concerned with
 	if (isWithinPaste) return;
-	
+	if(currentDragState == DRAG_NEWGATE) return;
 	// Do a collision detection on all first-level objects.
 	// The map collisionChecker.overlaps now contains
 	// all of the objects involved in any collisions.
@@ -468,7 +468,7 @@ void GUICanvas::OnMouseMove( GLdouble glX, GLdouble glY, bool ShiftDown, bool Ct
 			wxGetApp().dLOGICtoGUI.pop_front();
 		}
 		wxGetApp().mexMessages.Unlock();
-wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "ms" << endl;
+		wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "ms" << endl;
 		if (gCircuit->panic) return;
 		// Do function of number of milliseconds that passed since last step
 		ostringstream oss;
@@ -509,12 +509,12 @@ wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "
 	dBox.addPoint( dStart );
 	dBox.addPoint( m );
 	dragselectbox->setBBox( dBox );
-wxStopWatch collCheckWatch;
+	wxStopWatch collCheckWatch;
 	// Do a collision detection on all first-level objects.
 	// The map collisionChecker.overlaps now contains
 	// all of the objects involved in any collisions.
 	collisionChecker.update();
-wxGetApp().logfile << "profile time a: " << collCheckWatch.Time() << endl;
+	wxGetApp().logfile << "profile time a: " << collCheckWatch.Time() << endl;
 	// Update a newly-dragged gate's position
 	if (currentDragState == DRAG_NEWGATE) {
 		shouldRender = true;
@@ -812,12 +812,21 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 					//	{ hit++; continue; }
 					if (drawWireHover) { // Target is wire
 						if (!(hitGate->isConnected(startHS))) // source is not connected, so connect
-							gCircuit->GetCommandProcessor()->Submit( (wxCommand*)(new cmdConnectWire ( gCircuit, wireHoverID, hitGate->getID(), startHS )) );
+							gCircuit->GetCommandProcessor()->Submit(
+								(wxCommand*)(new cmdConnectWire(
+										     gCircuit, wireHoverID,
+										     hitGate->getID(), startHS)));
 						else 								  // source is connected, so merge
-							if (hitGate->getConnection(startHS)->getID() != wireHoverID) gCircuit->GetCommandProcessor()->Submit( (wxCommand*)(new cmdMergeWire ( gCircuit, this, hitGate->getConnection(startHS)->getID(), wireHoverID, getSnappedPoint( m ) )) );
+							if (hitGate->getConnection(startHS)->getID() != wireHoverID)
+								gCircuit->GetCommandProcessor()->Submit(
+									(wxCommand*)(new cmdMergeWire(
+											     gCircuit, this,
+											     hitGate->getConnection(startHS)->getID(),
+											     wireHoverID, getSnappedPoint(m))));
 						handled = true;
 					}
-					else if (!drawWireHover && startHS.size() > 0 && !(startHS == targetConnection && hitGate->getID() == targetGate)) {	 // Target is hotspot
+					else if (!drawWireHover && startHS.size() > 0
+						 && !(startHS == targetConnection && hitGate->getID() == targetGate)) {	 // Target is hotspot
 						if (!(hitGate->isConnected(startHS)) && !(gateList[targetGate]->isConnected(targetConnection))) { // Neither connected, so create wire
 							long newWID = gCircuit->getNextAvailableWireID();
 							cmdConnectWire* connectwire = new cmdConnectWire( gCircuit, newWID, hitGate->getID(), startHS );
@@ -825,11 +834,25 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 							gCircuit->GetCommandProcessor()->Submit( (wxCommand*)(new cmdCreateWire ( this, gCircuit, newWID, connectwire, connectwire2 )) );
 						}
 						else if ((hitGate->isConnected(startHS)) && (gateList[targetGate]->isConnected(targetConnection))) { // Both connected, merge the wires
-							if (hitGate->getConnection(startHS)->getID() != gateList[targetGate]->getConnection(targetConnection)->getID()) gCircuit->GetCommandProcessor()->Submit( (wxCommand*)(new cmdMergeWire ( gCircuit, this, hitGate->getConnection(startHS)->getID(), gateList[targetGate]->getConnection(targetConnection)->getID(), getSnappedPoint( m ) )) );
+							if (hitGate->getConnection(startHS)->getID() != gateList[targetGate]->getConnection(targetConnection)->getID())
+								gCircuit->GetCommandProcessor()->Submit(
+									(wxCommand*)(new cmdMergeWire(
+											     gCircuit, this,
+											     hitGate->getConnection(startHS)->getID(),
+											     gateList[targetGate]->getConnection(targetConnection)->getID(),
+											     getSnappedPoint(m))));
 						} else if ((hitGate->isConnected(startHS))) { // source is connected, so connect target to source's wire
-							gCircuit->GetCommandProcessor()->Submit( (wxCommand*)(new cmdConnectWire ( gCircuit, hitGate->getConnection(startHS)->getID(), targetGate, targetConnection )) );
+							gCircuit->GetCommandProcessor()->Submit(
+								(wxCommand*)(new cmdConnectWire(
+										     gCircuit,
+										     hitGate->getConnection(startHS)->getID(),
+										     targetGate, targetConnection)));
 						} else if ((gateList[targetGate]->isConnected(targetConnection))) {
-							gCircuit->GetCommandProcessor()->Submit( (wxCommand*)(new cmdConnectWire ( gCircuit, gateList[targetGate]->getConnection(targetConnection)->getID(), hitGate->getID(), startHS )) );						
+							gCircuit->GetCommandProcessor()->Submit(
+								(wxCommand*)(new cmdConnectWire(
+										     gCircuit,
+										     gateList[targetGate]->getConnection(targetConnection)->getID(),
+										     hitGate->getID(), startHS)));						
 						}
 						handled = true;
 					}
@@ -856,42 +879,55 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 		collisionChecker.update();
 	}
 
-	if ((currentDragState == DRAG_NEWGATE || currentDragState == DRAG_SELECTION) && (potentialConnectionHotspots.size() > 0)) {
+	if ((currentDragState == DRAG_NEWGATE || currentDragState == DRAG_SELECTION)
+	    && (potentialConnectionHotspots.size() > 0)) {
 		// Check potential hotspot connections (on gate/gate collisions)
 		CollisionGroup ovrList = collisionChecker.overlaps[COLL_GATE];
 		CollisionGroup::iterator obj = ovrList.begin();
-		while( obj != ovrList.end() ) {
+		while(obj != ovrList.end()) { /* for each overlap */
 			CollisionGroup hitThings = (*obj)->getOverlaps();
 			CollisionGroup::iterator hit = hitThings.begin();
-			while( hit != hitThings.end() ) {
+			while(hit != hitThings.end()) { /* for each hit thing */
 				// Only check gate collisions
 				if ((*hit)->getType() != COLL_GATE) { hit++; continue; };
 				// obj and hit are two overlapping gates
 				//  get overlapping hotspots of obj in another group
 				CollisionGroup hotspotOverlaps = (*obj)->checkSubsToSubs(*hit);
 				CollisionGroup::iterator hotspotCollide = hotspotOverlaps.begin();
-				while (hotspotCollide != hotspotOverlaps.end()) {
+				while (hotspotCollide != hotspotOverlaps.end()) { /* for each hotspot */
 					// hotspotCollide is in obj; hsWalk is in hit
 					CollisionGroup hshits = (*hotspotCollide)->getOverlaps();
 					CollisionGroup::iterator hsWalk = hshits.begin();
+
+					guiGate *gate = (guiGate*)(*obj);
+					guiGate *hitgate = (guiGate*)(*hit);
+					gateHotspot *hpcoll = (gateHotspot*)(*hotspotCollide);
+					gateHotspot *hpwalk = (gateHotspot*)(*hsWalk);
 					while (hsWalk != hshits.end()) {
-						if ( !(((guiGate*)(*obj))->isConnected(((gateHotspot*)(*hotspotCollide))->name)) && !(((guiGate*)(*hit))->isConnected(((gateHotspot*)(*hsWalk))->name)) &&
-							(((guiGate*)(*obj))->isSelected() || ((guiGate*)(*hit))->isSelected())) {
+						if(!(gate->isConnected(hpcoll->name)) && !(hitgate->isConnected(hpwalk->name)) &&
+						   (gate->isSelected() || hitgate->isSelected())) {
 							// potential connection found, so hook it up
 							long newWID = gCircuit->getNextAvailableWireID();
-							cmdConnectWire* connectwire = new cmdConnectWire( gCircuit, newWID, ((guiGate*)(*obj))->getID(), ((gateHotspot*)(*hotspotCollide))->name );
-							cmdConnectWire* connectwire2 = new cmdConnectWire(gCircuit, newWID, ((guiGate*)(*hit))->getID(), ((gateHotspot*)(*hsWalk))->name);
-							cmdCreateWire* createwire = new cmdCreateWire( this, gCircuit, newWID, connectwire, connectwire2 );
+							cmdConnectWire* connectwire = new cmdConnectWire(
+								gCircuit, newWID, gate->getID(),
+								hpcoll->name);
+							cmdConnectWire* connectwire2 = new cmdConnectWire(
+								gCircuit, newWID, hitgate->getID(),
+								hpwalk->name);
+							cmdCreateWire* createwire = new cmdCreateWire(
+								this, gCircuit, newWID, connectwire, connectwire2);
 							createwire->Do();
 							//collisionChecker.update();
 							if (currentDragState == DRAG_SELECTION) {
 								if (movecommand == NULL) {
 									movecommand = new cmdMoveSelection( gCircuit, preMove, preMoveWire, 0, 0, 0, 0 );
-									if (!isWithinPaste) gCircuit->GetCommandProcessor()->Submit( (wxCommand*)movecommand );
+									if (!isWithinPaste)
+										gCircuit->GetCommandProcessor()->Submit((wxCommand*)movecommand);
 								}
 								movecommand->proxconnects.push_back(createwire);
 							}
-							else if (currentDragState == DRAG_NEWGATE) creategatecommand->proxconnects.push_back(createwire);
+							else if (currentDragState == DRAG_NEWGATE)
+								creategatecommand->proxconnects.push_back(createwire);
 							else delete createwire;
 						}
 						hsWalk++;
@@ -926,17 +962,17 @@ void GUICanvas::OnMouseEnter(wxMouseEvent& event) {
 	//collisionChecker.update();
 
 	wxGetApp().showDragImage = false;
-	if (event.LeftIsDown() && wxGetApp().newGateToDrag.size() > 0 && currentDragState == DRAG_NONE) {
+	if (wxGetApp().newGateToDrag.size() > 0 && currentDragState == DRAG_NONE) {
 		newDragGate = gCircuit->createGate(wxGetApp().newGateToDrag, -1);
 		if (newDragGate == NULL) { wxGetApp().newGateToDrag = ""; return; }
 		newDragGate->setGLcoords(m.x, m.y);
 		//wxGetApp().logfile << m.x << " " << (panY-(y*viewZoom)) << endl << flush;
 		currentDragState = DRAG_NEWGATE;
 		wxGetApp().newGateToDrag = "";
-		beginDrag( BUTTON_LEFT );
+		beginDrag(BUTTON_LEFT);
 		unselectAllGates();
 		newDragGate->select();
-		collisionChecker.addObject( newDragGate );
+		collisionChecker.addObject(newDragGate);
 	} else wxGetApp().newGateToDrag = "";
 }
 
@@ -1194,7 +1230,7 @@ void GUICanvas::Update() {
 	if (minimap == NULL) return;
 
 	// In case of resize, we should update every so often
-	if (wxGetApp().appSystemTime->Time() > wxGetApp().appSettings.refreshRate) {
+	if (wxGetApp().appSystemTime && wxGetApp().appSystemTime->Time() > wxGetApp().appSettings.refreshRate) {
 		wxGetApp().appSystemTime->Pause();
 		if (gCircuit->panic) return;
 		wxCriticalSectionLocker locker(wxGetApp().m_critsect);

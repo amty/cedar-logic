@@ -10,7 +10,7 @@
 
 #include "PaletteCanvas.h"
 #include "../logic/logic_defaults.h"
-
+#include "str-convs.h"
 using namespace std;
 
 DECLARE_APP(MainApp)
@@ -30,7 +30,7 @@ PaletteCanvas::PaletteCanvas( wxWindow *parent, wxWindowID id, wxString &libName
     SetCursor(wxCursor(wxCURSOR_ARROW));
 	SetBackgroundColour(* wxWHITE);
 
-	libraryName = (string)(libName.c_str());
+	libraryName = wx2std(libName);
 	gateSizer = NULL;
 	
 	init = false;

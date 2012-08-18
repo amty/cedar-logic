@@ -1,59 +1,58 @@
-#*****************************************************************************
-#   Project: CEDAR Logic Simulator
-#   Copyright 2006 Cedarville University, Benjamin Sprague,
-#                     Matt Lewellyn, and David Knierim
-#   All rights reserved.
-#   For license information see license.txt included with distribution.   
-#
-#   TestGates.lib: Contains all XML definitions for gates
-#*****************************************************************************
-#
-<library> <name>1 - Basic Gates</name>
-	<gate> <name>AA_AND2</name>
-		<caption>2-input AND</caption>
-		<input> <name>IN_0</name>
-		          <point>-3.00,1</point> 
-		</input>
-		<input> <name>IN_1</name>
-		          <point>-3.00,-1</point> 
-		</input>
-		<output> <name>OUT</name>
-		          <point>3.00,0</point> 
-		</output>
-		<shape>
-			<line>-2,1,-3.00,1</line>
-			<line>-2,-1,-3.00,-1</line>
-			<line>-2,2,-2,-2</line>
-			<line>-2,2,0,2</line>
-			<line>-2,-2,0,-2</line>
-			<line>0,2,0.31,1.98</line>
-			<line>0.31,1.98,0.62,1.9</line>
-			<line>0.62,1.9,0.91,1.78</line>
-			<line>0.91,1.78,1.18,1.62</line>
-			<line>1.18,1.62,1.41,1.41</line>
-			<line>1.41,1.41,1.62,1.18</line>
-			<line>1.62,1.18,1.78,0.91</line>
-			<line>1.78,0.91,1.9,0.62</line>
-			<line>1.9,0.62,1.98,0.31</line>
-			<line>1.98,0.31,2,0</line>
-			<line>2,0,1.98,-0.31</line>
-			<line>1.98,-0.31,1.9,-0.62</line>
-			<line>1.9,-0.62,1.78,-0.91</line>
-			<line>1.78,-0.91,1.62,-1.18</line>
-			<line>1.62,-1.18,1.41,-1.41</line>
-			<line>1.41,-1.41,1.18,-1.62</line>
-			<line>1.18,-1.62,0.91,-1.78</line>
-			<line>0.91,-1.78,0.62,-1.9</line>
-			<line>0.62,-1.9,0.31,-1.98</line>
-			<line>0.31,-1.98,0,-2</line>
-			<line>2,0,3.00,0</line>
-			<line>2.2,0,3.00,0</line>
-		</shape>
-		<logic_type>AND</logic_type>
-		<logic_param>INPUT_BITS 2</logic_param>
-	</gate>
-	<gate> <name>AA_AND3</name>
-		<caption>3-input AND</caption>
+<?xml version="1.0"?>
+<!DOCTYPE libraries SYSTEM "library.dtd">
+<!-- #***************************************************************************** -->
+<!-- #   Project: CEDAR Logic Simulator -->
+<!-- #   Copyright 2006 Cedarville University, Benjamin Sprague, -->
+<!-- #                     Matt Lewellyn, and David Knierim -->
+<!-- #   All rights reserved. -->
+<!-- #   For license information see license.txt included with distribution.    -->
+<!-- # -->
+<!-- #   TestGates.lib: Contains all XML definitions for gates -->
+<!-- #***************************************************************************** -->
+<!-- # -->
+<libraries>
+<library>
+  <name>1 - Basic Gates</name>
+  <gate>
+    <name>AA_AND2</name>
+    <caption>2-input AND</caption>
+    <input> <name>IN_0</name> <point>-3.00,1</point> </input>
+    <input> <name>IN_1</name> <point>-3.00,-1</point> </input>
+    <output> <name>OUT</name> <point>3.00,0</point> </output>
+    <shape>
+      <line>-2,1,-3.00,1</line>
+      <line>-2,-1,-3.00,-1</line>
+      <line>-2,2,-2,-2</line>
+      <line>-2,2,0,2</line>
+      <line>-2,-2,0,-2</line>
+      <line>0,2,0.31,1.98</line>
+      <line>0.31,1.98,0.62,1.9</line>
+      <line>0.62,1.9,0.91,1.78</line>
+      <line>0.91,1.78,1.18,1.62</line>
+      <line>1.18,1.62,1.41,1.41</line>
+      <line>1.41,1.41,1.62,1.18</line>
+      <line>1.62,1.18,1.78,0.91</line>
+      <line>1.78,0.91,1.9,0.62</line>
+      <line>1.9,0.62,1.98,0.31</line>
+      <line>1.98,0.31,2,0</line>
+      <line>2,0,1.98,-0.31</line>
+      <line>1.98,-0.31,1.9,-0.62</line>
+      <line>1.9,-0.62,1.78,-0.91</line>
+      <line>1.78,-0.91,1.62,-1.18</line>
+      <line>1.62,-1.18,1.41,-1.41</line>
+      <line>1.41,-1.41,1.18,-1.62</line>
+      <line>1.18,-1.62,0.91,-1.78</line>
+      <line>0.91,-1.78,0.62,-1.9</line>
+      <line>0.62,-1.9,0.31,-1.98</line>
+      <line>0.31,-1.98,0,-2</line>
+      <line>2,0,3.00,0</line>
+      <line>2.2,0,3.00,0</line>
+    </shape>
+    <logic_type>AND</logic_type>
+    <logic_param>INPUT_BITS 2</logic_param>
+  </gate>
+  <gate> <name>AA_AND3</name>
+    <caption>3-input AND</caption>
 		<input> <name>IN_0</name>
 		          <point>-3.00,2</point> 
 		</input>
@@ -326,7 +325,7 @@
 			<line>-3,1,-2.12,1</line>
 			<line>-3,-1,-2.12,-1</line>
 
-# Back of OR gate:
+<!-- # Back of OR gate: -->
 			<line>-2,-2,-1.7,-1.31</line>
 			<line>-1.7,-1.31,-1.62,-1</line>
 			<line>-1.62,-1,-1.54,-0.66</line>
@@ -336,7 +335,7 @@
 			<line>-1.62,1,-1.7,1.31</line>
 			<line>-1.7,1.31,-2,2</line>
 
-# Back of XOR gate:
+<!-- # Back of XOR gate: -->
 			<offset> <point>-0.5,0</point>
 			<line>-2,-2,-1.7,-1.31</line>
 			<line>-1.7,-1.31,-1.62,-1</line>
@@ -532,7 +531,7 @@
 			<line>-3,1,-2.12,1</line>
 			<line>-3,-1,-2.12,-1</line>
 
-# Back of OR gate:
+<!-- # Back of OR gate: -->
 			<line>-2,-2,-1.7,-1.31</line>
 			<line>-1.7,-1.31,-1.62,-1</line>
 			<line>-1.62,-1,-1.54,-0.66</line>
@@ -542,7 +541,7 @@
 			<line>-1.62,1,-1.7,1.31</line>
 			<line>-1.7,1.31,-2,2</line>
 
-# Back of XOR gate:
+<!-- # Back of XOR gate: -->
 			<offset> <point>-0.5,0</point>
 			<line>-2,-2,-1.7,-1.31</line>
 			<line>-1.7,-1.31,-1.62,-1</line>
@@ -1338,24 +1337,24 @@
 			<inverted>true</inverted>
 		</output>
 		<shape>
-# Top rear input:
+<!-- # Top rear input: -->
 			<offset> <point>-3.00,1</point>
 				<line>0,0,0.3,0</line>
 				<circle>0.65,0,0.35,24</circle>
 			</offset>
 
-# Bottom rear input:
+<!-- # Bottom rear input: -->
 			<offset> <point>-3.00,-1</point>
 				<line>0,0,0.3,0</line>
 				<circle>0.65,0,0.35,24</circle>
 			</offset>
 
-# Sides:
+<!-- # Sides: -->
 			<line>-2,2,-2,-2</line>
 			<line>-2,2,0,2</line>
 			<line>-2,-2,0,-2</line>
 
-# Front arc:
+<!-- # Front arc: -->
 			<line>0,2,0.31,1.98</line>
 			<line>0.31,1.98,0.62,1.9</line>
 			<line>0.62,1.9,0.91,1.78</line>
@@ -1377,7 +1376,7 @@
 			<line>0.62,-1.9,0.31,-1.98</line>
 			<line>0.31,-1.98,0,-2</line>
 
-# Output pin:
+<!-- # Output pin: -->
 			<line>2,0,3.00,0</line>
 		</shape>
 	</gate>
@@ -2056,7 +2055,7 @@
 		</shape>
 	</gate>
 </library>
-<library> <name>2 - Invert & Connect</name>
+<library> <name>2 - Invert &amp; Connect</name>
 	<gate> <name>AA_INVERTER</name>
 		<caption>Inverter</caption>
 		<logic_type>BUFFER</logic_type>
@@ -2426,7 +2425,7 @@
 			<line>-2,-1.5,-1,-1.5</line>
 			<line>-2,-0.5,-1,-0.5</line>
 			<line>-2,0.5,-1,0.5</line>
-			<line>-2,1.5,-1,1.5</line>>
+			<line>-2,1.5,-1,1.5</line>
 			<line>-2,2.5,-1,2.5</line>
 			<line>-2,3.5,-1,3.5</line>
 
@@ -2842,7 +2841,7 @@
 		</shape>
 	</gate>
 	<gate> <name>CA_SMALL_TGATE</name>
-#NOTE: Needs a large t-gate shape?
+<!-- #NOTE: Needs a large t-gate shape? -->
 		<caption>T-Gate</caption>
 		<input> <name>T_in</name>
 		          <point>-2,0</point> 
@@ -2871,9 +2870,9 @@
 		<logic_type>TGATE</logic_type>
 		<logic_param>DEFAULT_DELAY 1</logic_param>
 	</gate>
-#	<gate> <name>CE_SMALL_TGATE_LOW</name>
-#		<caption>T-Gate - Low Active Enable (TODO)</caption>
-#	</gate>
+<!-- #	<gate> <name>CE_SMALL_TGATE_LOW</name> -->
+<!-- #		<caption>T-Gate - Low Active Enable (TODO)</caption> -->
+<!-- #	</gate> -->
 	<gate> <name>DA_FROM</name>
 		<caption>"From" Named Link</caption>
 		<gui_type>FROM</gui_type>
@@ -2883,7 +2882,7 @@
 			<param>
 				<type>STRING</type>
 				<label>Label</label>
-# Specify the type (LOGIC or GUI) and the param's name:
+<!-- # Specify the type (LOGIC or GUI) and the param's name: -->
 				<varname>LOGIC JUNCTION_ID</varname>
 			</param>
 		</param_dlg_data>
@@ -2905,7 +2904,7 @@
 			<param>
 				<type>STRING</type>
 				<label>Label</label>
-# Specify the type (LOGIC or GUI) and the param's name:
+<!-- # Specify the type (LOGIC or GUI) and the param's name: -->
 				<varname>LOGIC JUNCTION_ID</varname>
 			</param>
 		</param_dlg_data>
@@ -3053,9 +3052,9 @@
 			<param>
 				<type>INT</type>
 				<label>Half-period</label>
-# Specify the type (LOGIC or GUI) and the param's name:
+<!-- # Specify the type (LOGIC or GUI) and the param's name: -->
 				<varname>LOGIC HALF_CYCLE</varname>
-# range tags list min,max:
+<!-- # range tags list min,max: -->
 				<range>1,5000000</range>
 			</param>
 		</param_dlg_data>
@@ -3101,13 +3100,13 @@
 			<line>1,-1,2,0</line>
 			</offset>
 
-# The button outline:
+<!-- # The button outline: -->
 			<line>-0.76,-0.76,-0.76,0.76</line>
 			<line>-0.76,0.76,0.76,0.76</line>
 			<line>0.76,0.76,0.76,-0.76</line>
 			<line>0.76,-0.76,-0.76,-0.76</line>
 
-# The clock pulse shape:
+<!-- # The clock pulse shape: -->
 			<line>-0.5,-0.5,-0.1,-0.5</line>
 			<line>-0.1,-0.5,-0.1,0.5</line>
 			<line>-0.1,0.5,0.1,0.5</line>
@@ -3121,7 +3120,7 @@
 		<logic_param>OUTPUT_BITS 4</logic_param>
 		<logic_param>OUTPUT_NUM 0</logic_param>
 		<gui_type>KEYPAD</gui_type>
-#KEYPAD_BOX params.  One for each val, format "minx,miny,maxx,maxy"
+<!-- #KEYPAD_BOX params.  One for each val, format "minx,miny,maxx,maxy" -->
 		<gui_param>KEYPAD_BOX_0 -3.65,3.05,-2.05,5.65</gui_param>
 		<gui_param>KEYPAD_BOX_1 -1.76,3.05,-0.16,5.65</gui_param>
 		<gui_param>KEYPAD_BOX_2 0.15,3.05,1.75,5.65</gui_param>
@@ -3153,7 +3152,7 @@
 		</output>
 
 		<shape>
-#0
+<!-- #0 -->
 			<offset> <point>-3.65,3.05</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,0.3,1.3,0.3</line>
@@ -3164,13 +3163,13 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#1
+<!-- #1 -->
 			<offset> <point>-1.76,3.05</point>
 			<line>1.3,0.3,1.3,1.3</line>
 			<line>1.3,1.3,1.3,2.3</line>
 			</offset>
 
-#2
+<!-- #2 -->
 			<offset> <point>0.15,3.05</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3180,7 +3179,7 @@
 			<line>0.3,0.3,0.3,1.3</line>
 			</offset>
 
-#3
+<!-- #3 -->
 			<offset> <point>2.05,3.05</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3190,7 +3189,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#4
+<!-- #4 -->
 			<offset> <point>-3.65,0.15</point>
 			<line>0.3,1.3,1.3,1.3</line>
 			
@@ -3199,7 +3198,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#5
+<!-- #5 -->
 			<offset> <point>-1.76,0.15</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3209,7 +3208,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#6
+<!-- #6 -->
 			<offset> <point>0.15,0.15</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3220,7 +3219,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#7
+<!-- #7 -->
 			<offset> <point>2.05,0.15</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			
@@ -3228,7 +3227,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#8
+<!-- #8 -->
 			<offset> <point>-3.65,-2.75</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3240,7 +3239,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#9
+<!-- #9 -->
 			<offset> <point>-1.76,-2.75</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3250,7 +3249,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#A
+<!-- #A -->
 			<offset> <point>0.15,-2.75</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3261,7 +3260,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#B
+<!-- #B -->
 			<offset> <point>2.05,-2.75</point>
 			<line>0.3,1.3,1.3,1.3</line>
 			<line>0.3,0.3,1.3,0.3</line>
@@ -3271,7 +3270,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#C
+<!-- #C -->
 			<offset> <point>-3.65,-5.65</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,0.3,1.3,0.3</line>
@@ -3280,7 +3279,7 @@
 			<line>0.3,0.3,0.3,1.3</line>
 			</offset>
 
-#D
+<!-- #D -->
 			<offset> <point>-1.76,-5.65</point>
 			<line>0.3,1.3,1.3,1.3</line>
 			<line>0.3,0.3,1.3,0.3</line>
@@ -3290,7 +3289,7 @@
 			<line>1.3,0.3,1.3,1.3</line>
 			</offset>
 
-#E
+<!-- #E -->
 			<offset> <point>0.15,-5.65</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3300,7 +3299,7 @@
 			<line>0.3,0.3,0.3,1.3</line>
 			</offset>
 
-#F
+<!-- #F -->
 			<offset> <point>2.05,-5.65</point>
 			<line>0.3,2.3,1.3,2.3</line>
 			<line>0.3,1.3,1.3,1.3</line>
@@ -3309,13 +3308,13 @@
 			<line>0.3,0.3,0.3,1.3</line>
 			</offset>
 
-#lines for outer box
+<!-- #lines for outer box -->
 			<line>-3.95,6.00,-3.95,-6.00</line>
 			<line>-3.95,-6.00,3.88,-6.00</line>
 			<line>3.88,-6.00,3.88,6.00</line>
 			<line>3.88,6.00,-3.95,6.00</line>
 
-#lines to hotspots
+<!-- #lines to hotspots -->
 			<line>3.88,-3.00,5.00,-3.00</line>
 			<line>3.88,-1.00,5.00,-1.00</line>
 			<line>3.88,1.00,5.00,1.00</line>
@@ -3373,10 +3372,10 @@
 		          <point>0,1</point> 
 		</input>
 		<shape>
-#			<line>-1,1,1,1</line>
-#			<line>1,1,1,-1</line>
-#			<line>1,-1,-1,-1</line>
-#			<line>-1,-1,-1,1</line>
+<!-- #			<line>-1,1,1,1</line> -->
+<!-- #			<line>1,1,1,-1</line> -->
+<!-- #			<line>1,-1,-1,-1</line> -->
+<!-- #			<line>-1,-1,-1,1</line> -->
 
 			<line>-1,-1,-1,-0.2</line>
 			<line>-1,0.2,-1,1</line>
@@ -3403,7 +3402,7 @@
 		<gui_type>REGISTER</gui_type>
 		<gui_param>VALUE_BOX -1.9,-2.9,1.9,3.9</gui_param>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-3,-1</point> 
 		</input>
@@ -3420,40 +3419,40 @@
 		          <point>-3,2</point> 
 		</input>
 
-#		BUS OUT
-#		<output> <name>OUT_0</name>
-#		          <point>3,-1</point> 
-#		</output>
+<!-- #		BUS OUT -->
+<!-- #		<output> <name>OUT_0</name> -->
+<!-- #		          <point>3,-1</point>  -->
+<!-- #		</output> -->
 
-#		<output> <name>OUT_1</name>
-#		          <point>3,0</point> 
-#		</output>
+<!-- #		<output> <name>OUT_1</name> -->
+<!-- #		          <point>3,0</point>  -->
+<!-- #		</output> -->
 
-#		<output> <name>OUT_2</name>
-#		          <point>3,1</point> 
-#		</output>
+<!-- #		<output> <name>OUT_2</name> -->
+<!-- #		          <point>3,1</point>  -->
+<!-- #		</output> -->
 
-#		<output> <name>OUT_3</name>
-#		          <point>3,2</point> 
-#		</output>
+<!-- #		<output> <name>OUT_3</name> -->
+<!-- #		          <point>3,2</point>  -->
+<!-- #		</output> -->
 
 		<shape>
-# Border box:
+<!-- # Border box: -->
 			<line>-2,4,2,4</line>
 			<line>2,4,2,-3</line>
 			<line>2,-3,-2,-3</line>
 			<line>-2,-3,-2,4</line>
 
-# Input Lines:
+<!-- # Input Lines: -->
 			<line>-2,2,-3,2</line>
 			<line>-2,1,-3,1</line>
 			<line>-2,0,-3,0</line>			
 			<line>-2,-1,-3,-1</line>
 			
-#			<line>2,2,3,2</line>
-#			<line>2,1,3,1</line>
-#			<line>2,0,3,0</line>			
-#			<line>2,-1,3,-1</line>
+<!-- #			<line>2,2,3,2</line> -->
+<!-- #			<line>2,1,3,1</line> -->
+<!-- #			<line>2,0,3,0</line>			 -->
+<!-- #			<line>2,-1,3,-1</line> -->
 
 		</shape>
 	</gate>
@@ -3466,7 +3465,7 @@
 		<gui_type>REGISTER</gui_type>
 		<gui_param>VALUE_BOX -1.9,-2.9,1.9,3.9</gui_param>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-3,-1</point> 
 		</input>
@@ -3483,7 +3482,7 @@
 		          <point>-3,2</point> 
 		</input>
 
-#		BUS OUT
+<!-- #		BUS OUT -->
 		<output> <name>OUT_0</name>
 		          <point>1.5,-4</point> 
 		</output>
@@ -3501,19 +3500,19 @@
 		</output>
 
 		<shape>
-# Border box:
+<!-- # Border box: -->
 			<line>-2,4,2,4</line>
 			<line>2,4,2,-3</line>
 			<line>2,-3,-2,-3</line>
 			<line>-2,-3,-2,4</line>
 
-# Input Lines:
+<!-- # Input Lines: -->
 			<line>-2,2,-3,2</line>
 			<line>-2,1,-3,1</line>
 			<line>-2,0,-3,0</line>			
 			<line>-2,-1,-3,-1</line>
 
-# Output Lines:
+<!-- # Output Lines: -->
 			<line>-1.5,-3,-1.5,-4</line>
 			<line>-0.5,-3,-0.5,-4</line>
 			<line>0.5,-3,0.5,-4</line>
@@ -3529,7 +3528,7 @@
 		<gui_type>REGISTER</gui_type>
 		<gui_param>VALUE_BOX -3.9,-3.9,3.9,4.9</gui_param>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-5,-3</point> 
 		</input>
@@ -3555,31 +3554,31 @@
 		          <point>-5,4</point> 
 		</input>
 
-#		BUS OUT
-#		<output> <name>OUT_0</name>
-#		          <point>3,-1</point> 
-#		</output>
+<!-- #		BUS OUT -->
+<!-- #		<output> <name>OUT_0</name> -->
+<!-- #		          <point>3,-1</point>  -->
+<!-- #		</output> -->
 
-#		<output> <name>OUT_1</name>
-#		          <point>3,0</point> 
-#		</output>
+<!-- #		<output> <name>OUT_1</name> -->
+<!-- #		          <point>3,0</point>  -->
+<!-- #		</output> -->
 
-#		<output> <name>OUT_2</name>
-#		          <point>3,1</point> 
-#		</output>
+<!-- #		<output> <name>OUT_2</name> -->
+<!-- #		          <point>3,1</point>  -->
+<!-- #		</output> -->
 
-#		<output> <name>OUT_3</name>
-#		          <point>3,2</point> 
-#		</output>
+<!-- #		<output> <name>OUT_3</name> -->
+<!-- #		          <point>3,2</point>  -->
+<!-- #		</output> -->
 
 		<shape>
-# Border box:
+<!-- # Border box: -->
 			<line>-4,5,4,5</line>
 			<line>4,5,4,-4</line>
 			<line>4,-4,-4,-4</line>
 			<line>-4,-4,-4,5</line>
 
-# Input Lines:
+<!-- # Input Lines: -->
 			<line>-4,-3,-5,-3</line>
 			<line>-4,-2,-5,-2</line>
 			<line>-4,-1,-5,-1</line>
@@ -3589,10 +3588,10 @@
 			<line>-4,3,-5,3</line>
 			<line>-4,4,-5,4</line>
 			
-#			<line>2,2,3,2</line>
-#			<line>2,1,3,1</line>
-#			<line>2,0,3,0</line>			
-#			<line>2,-1,3,-1</line>
+<!-- #			<line>2,2,3,2</line> -->
+<!-- #			<line>2,1,3,1</line> -->
+<!-- #			<line>2,0,3,0</line>			 -->
+<!-- #			<line>2,-1,3,-1</line> -->
 
 		</shape>
 	</gate>
@@ -3628,37 +3627,37 @@
 		</param_dlg_data>
 
 
-#		L
+<!-- #		L -->
 		<input> <name>load</name>
 		          <point>-1,5</point> 
 		</input>
 
-#		C
+<!-- #		C -->
 		<input> <name>count_enable</name>
 		          <point>0,5</point> 
 		</input>
 
-#		U
+<!-- #		U -->
 		<input> <name>count_up</name>
 		          <point>1,5</point> 
 		</input>
 
-#		Cy
+<!-- #		Cy -->
 		<output> <name>carry_out</name>
 		          <point>2,5</point> 
 		</output>
 
-#		CLOCK
+<!-- #		CLOCK -->
 		<input> <name>clock</name>
 		          <point>-1,-4</point> 
 		</input>
 
-#		R
+<!-- #		R -->
 		<input> <name>clear</name>
 		          <point>1,-4</point> 
 		</input>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-4,-1</point> 
 		</input>
@@ -3675,7 +3674,7 @@
 		          <point>-4,2</point> 
 		</input>
 
-#		BUS OUT
+<!-- #		BUS OUT -->
 		<output> <name>OUT_0</name>
 		          <point>4,-1</point> 
 		</output>
@@ -3703,7 +3702,7 @@
 			<line>1,4,1,5</line>
 			<line>2,4,2,5</line>
 
-# Input Bus
+<!-- # Input Bus -->
 			<line>-3,2,-4,2</line>
 			<line>-3,1,-4,1</line>
 			<line>-3,0,-4,0</line>			
@@ -3712,17 +3711,17 @@
 			<line>-1,-3,-1,-4</line>			
 			<line>1,-3,1,-4</line>
 
-# Output Bus
+<!-- # Output Bus -->
 			<line>3,2,4,2</line>
 			<line>3,1,4,1</line>
 			<line>3,0,4,0</line>			
 			<line>3,-1,4,-1</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-0.5,-3,-1,-2</line>
 			<line>-1.5,-3,-1,-2</line>
 
-#			R
+<!-- #			R -->
 			<offset><point>0.8,-1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -3732,34 +3731,34 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			L
+<!-- #			L -->
 			<offset><point>-1.2,3.7</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>-0.2,3.7</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			U
+<!-- #			U -->
 			<offset><point>0.8,3.7</point>
 			<line>0.4,0,0.4,-0.8</line>
 			<line>0.4,-0.8,0,-0.8</line>
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>1.6,3.7</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>2.1,3.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -3767,7 +3766,7 @@
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>2.3,-0.6</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -3777,7 +3776,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-2.7,-0.6</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -3819,37 +3818,37 @@
 		</param_dlg_data>
 
 
-#		L
+<!-- #		L -->
 		<input> <name>load</name>
 		          <point>-1,6</point> 
 		</input>
 
-#		C
+<!-- #		C -->
 		<input> <name>count_enable</name>
 		          <point>0,6</point> 
 		</input>
 
-#		U
+<!-- #		U -->
 		<input> <name>count_up</name>
 		          <point>1,6</point> 
 		</input>
 
-#		Cy
+<!-- #		Cy -->
 		<output> <name>carry_out</name>
 		          <point>2,6</point> 
 		</output>
 
-#		CLOCK
+<!-- #		CLOCK -->
 		<input> <name>clock</name>
 		          <point>-1,-5</point> 
 		</input>
 
-#		R
+<!-- #		R -->
 		<input> <name>clear</name>
 		          <point>1,-5</point> 
 		</input>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-4,-3</point> 
 		</input>
@@ -3875,7 +3874,7 @@
 		          <point>-4,4</point> 
 		</input>
 
-#		BUS OUT
+<!-- #		BUS OUT -->
 		<output> <name>OUT_0</name>
 		          <point>4,-3</point> 
 		</output>
@@ -3902,7 +3901,7 @@
 		</output>
 
 		<shape>
-# Box:
+<!-- # Box: -->
 			<line>-3,5,3,5</line>
 			<line>3,5,3,-4</line>
 			<line>3,-4,-3,-4</line>
@@ -3916,7 +3915,7 @@
 			<line>-1,-4,-1,-5</line>			
 			<line>1,-4,1,-5</line>
 
-# Input Bus:
+<!-- # Input Bus: -->
 			<offset> <point>-3,4</point>
 			<line>-1,0,0,0</line>
 			<line>-1,-1,0,-1</line>
@@ -3930,7 +3929,7 @@
 			<line>-1,-3,0,-3</line>
 			</offset>
 
-# Output Bus:
+<!-- # Output Bus: -->
 			<offset> <point>4,4</point>
 			<line>-1,0,0,0</line>
 			<line>-1,-1,0,-1</line>
@@ -3944,11 +3943,11 @@
 			<line>-1,-3,0,-3</line>
 			</offset>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-0.5,-4,-1,-3</line>
 			<line>-1.5,-4,-1,-3</line>
 
-#			R
+<!-- #			R -->
 			<offset><point>0.8,-2.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -3958,34 +3957,34 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			L
+<!-- #			L -->
 			<offset><point>-1.2,4.7</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>-0.2,4.7</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			U
+<!-- #			U -->
 			<offset><point>0.8,4.7</point>
 			<line>0.4,0,0.4,-0.8</line>
 			<line>0.4,-0.8,0,-0.8</line>
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>1.6,4.7</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>2.1,4.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -3993,7 +3992,7 @@
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-2.7,-2.6</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4003,7 +4002,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>2.3,-2.6</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4045,37 +4044,37 @@
 		</param_dlg_data>
 
 
-#		L
+<!-- #		L -->
 		<input> <name>load</name>
 		          <point>-1,7.5</point> 
 		</input>
 
-#		C
+<!-- #		C -->
 		<input> <name>count_enable</name>
 		          <point>0,7.5</point> 
 		</input>
 
-#		U
+<!-- #		U -->
 		<input> <name>count_up</name>
 		          <point>1,7.5</point> 
 		</input>
 
-#		Cy
+<!-- #		Cy -->
 		<output> <name>carry_out</name>
 		          <point>3,7.5</point> 
 		</output>
 
-#		CLOCK
+<!-- #		CLOCK -->
 		<input> <name>clock</name>
 		          <point>-1,-7.5</point> 
 		</input>
 
-#		R
+<!-- #		R -->
 		<input> <name>clear</name>
 		          <point>1,-7.5</point> 
 		</input>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-5,-5.5</point> 
 		</input>
@@ -4122,7 +4121,7 @@
 		          <point>-5,5.5</point> 
 		</input>
 
-#		BUS OUT
+<!-- #		BUS OUT -->
 
 		<output> <name>OUT_0</name>
 		          <point>5,-5.5</point> 
@@ -4177,17 +4176,17 @@
 			<line>4,-6.5,-4,-6.5</line>
 			<line>-4,-6.5,-4,6.5</line>
 
-#			Top Inputs
+<!-- #			Top Inputs -->
 			<line>-1,6.5,-1,7.5</line>
 			<line>0,6.5,0,7.5</line>
 			<line>1,6.5,1,7.5</line>
 			<line>3,6.5,3,7.5</line>
 			
-#			Bottom Inputs
+<!-- #			Bottom Inputs -->
 			<line>-1,-6.5,-1,-7.5</line>			
 			<line>1,-6.5,1,-7.5</line>
 
-#			Outputs
+<!-- #			Outputs -->
 			<line>4,-5.5,5,-5.5</line>
 			<line>4,-4.5,5,-4.5</line>
 			<line>4,-3.5,5,-3.5</line>
@@ -4201,7 +4200,7 @@
 			<line>4,4.5,5,4.5</line>
 			<line>4,5.5,5,5.5</line>
 
-#			Inputs
+<!-- #			Inputs -->
 			<offset><point>-9,0</point>
 			<line>4,-5.5,5,-5.5</line>
 			<line>4,-4.5,5,-4.5</line>
@@ -4218,11 +4217,11 @@
 			</offset>
 
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-0.5,-6.5,-1,-5.5</line>
 			<line>-1.5,-6.5,-1,-5.5</line>
 
-#			R
+<!-- #			R -->
 			<offset><point>0.8,-5.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4232,34 +4231,34 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			L
+<!-- #			L -->
 			<offset><point>-1.2,6.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>-0.2,6.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			U
+<!-- #			U -->
 			<offset><point>0.8,6.2</point>
 			<line>0.4,0,0.4,-0.8</line>
 			<line>0.4,-0.8,0,-0.8</line>
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>2.6,6.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>3.1,6.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -4267,7 +4266,7 @@
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.7,-5.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4277,7 +4276,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>3.3,-5.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4318,37 +4317,37 @@
 		</param_dlg_data>
 
 
-#		L
+<!-- #		L -->
 		<input> <name>load</name>
 		          <point>-1,9.5</point> 
 		</input>
 
-#		C
+<!-- #		C -->
 		<input> <name>count_enable</name>
 		          <point>0,9.5</point> 
 		</input>
 
-#		U
+<!-- #		U -->
 		<input> <name>count_up</name>
 		          <point>1,9.5</point> 
 		</input>
 
-#		Cy
+<!-- #		Cy -->
 		<output> <name>carry_out</name>
 		          <point>3,9.5</point> 
 		</output>
 
-#		CLOCK
+<!-- #		CLOCK -->
 		<input> <name>clock</name>
 		          <point>-1,-9.5</point> 
 		</input>
 
-#		R
+<!-- #		R -->
 		<input> <name>clear</name>
 		          <point>1,-9.5</point> 
 		</input>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>-5,-7.5</point> 
 		</input>
@@ -4410,7 +4409,7 @@
 		          <point>-5,7.5</point> 
 		</input>
 
-#		BUS OUT
+<!-- #		BUS OUT -->
 		<output> <name>OUT_0</name>
 		          <point>5,-7.5</point> 
 		</output>
@@ -4481,17 +4480,17 @@
 			<line>4,-8.5,-4,-8.5</line>
 			<line>-4,-8.5,-4,8.5</line>
 
-#			Top Inputs
+<!-- #			Top Inputs -->
 			<line>-1,8.5,-1,9.5</line>
 			<line>0,8.5,0,9.5</line>
 			<line>1,8.5,1,9.5</line>
 			<line>3,8.5,3,9.5</line>
 			
-#			Bottom Inputs
+<!-- #			Bottom Inputs -->
 			<line>-1,-8.5,-1,-9.5</line>			
 			<line>1,-8.5,1,-9.5</line>
 
-#			Outputs
+<!-- #			Outputs -->
 			<line>4,-7.5,5,-7.5</line>
 			<line>4,-6.5,5,-6.5</line>
 			<line>4,-5.5,5,-5.5</line>
@@ -4509,7 +4508,7 @@
 			<line>4,6.5,5,6.5</line>
 			<line>4,7.5,5,7.5</line>
 
-#			Inputs
+<!-- #			Inputs -->
 			<offset><point>-9,0</point>
 			<line>4,-7.5,5,-7.5</line>
 			<line>4,-6.5,5,-6.5</line>
@@ -4529,11 +4528,11 @@
 			<line>4,7.5,5,7.5</line>
 			</offset>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-0.5,-8.5,-1,-7.5</line>
 			<line>-1.5,-8.5,-1,-7.5</line>
 
-#			R
+<!-- #			R -->
 			<offset><point>0.8,-7.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4543,34 +4542,34 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			L
+<!-- #			L -->
 			<offset><point>-1.2,8.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>-0.2,8.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			U
+<!-- #			U -->
 			<offset><point>0.8,8.2</point>
 			<line>0.4,0,0.4,-0.8</line>
 			<line>0.4,-0.8,0,-0.8</line>
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>2.6,8.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			<line>0,0,0.4,0</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>3.1,8.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -4578,7 +4577,7 @@
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>3.3,-7.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4588,7 +4587,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.6,-7.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4623,42 +4622,42 @@
 			</param>
 		</param_dlg_data>
 
-#		R
+<!-- #		R -->
 		<input> <name>clear</name>
 		          <point>-5,0</point> 
 		</input>
 
-#		S
+<!-- #		S -->
 		<input> <name>shift_enable</name>
 		          <point>5,0</point> 
 		</input>
 
-#		L
+<!-- #		L -->
 		<input> <name>load</name>
 		          <point>5,-1</point> 
 		</input>
 
-#		Arrow
+<!-- #		Arrow -->
 		<input> <name>shift_left</name>
 		          <point>5,-2</point> 
 		</input>
 
-#		CLOCK
+<!-- #		CLOCK -->
 		<input> <name>clock</name>
 		          <point>-5,-1</point> 
 		</input>
 
-#		SI
+<!-- #		SI -->
 		<input> <name>carry_in</name>
 		          <point>5,1.5</point> 
 		</input>
 
-#		SO
+<!-- #		SO -->
 		<output> <name>carry_out</name>
 		          <point>-5,1.5</point> 
 		</output>
 
-#		BUS IN
+<!-- #		BUS IN -->
 		<input> <name>IN_0</name>
 		          <point>1.5,3.5</point> 
 		</input>
@@ -4675,7 +4674,7 @@
 		          <point>-1.5,3.5</point> 
 		</input>
 
-#		BUS OUT
+<!-- #		BUS OUT -->
 		<output> <name>OUT_0</name>
 		          <point>1.5,-3.5</point> 
 		</output>
@@ -4698,36 +4697,36 @@
 			<line>4,-2.5,-4,-2.5</line>
 			<line>-4,-2.5,-4,2.5</line>
 
-#			SR IN
+<!-- #			SR IN -->
 			<line>-1.5,2.5,-1.5,3.5</line>
 			<line>-0.5,2.5,-0.5,3.5</line>
 			<line>0.5,2.5,0.5,3.5</line>
 			<line>1.5,2.5,1.5,3.5</line>
 
-#			SR OUT
+<!-- #			SR OUT -->
 			<line>-1.5,-2.5,-1.5,-3.5</line>
 			<line>-0.5,-2.5,-0.5,-3.5</line>
 			<line>0.5,-2.5,0.5,-3.5</line>
 			<line>1.5,-2.5,1.5,-3.5</line>		
 
-#			Carry In & Carry Out
+<!-- #			Carry In &amp; Carry Out -->
 			<line>4,1.5,5,1.5</line>
 			<line>-4,1.5,-5,1.5</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-4,-0.5,-3,-1</line>
 			<line>-4,-1.5,-3,-1</line>
 
-#			Right Inputs
+<!-- #			Right Inputs -->
 			<line>5,0,4,0</line>
 			<line>5,-1,4,-1</line>
 			<line>5,-2,4,-2</line>
 
-#			Left Inputs
+<!-- #			Left Inputs -->
 			<line>-4,0,-5,0</line>
 			<line>-4,-1,-5,-1</line>
 			
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-1.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4737,7 +4736,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,2.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -4745,7 +4744,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,2.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4755,7 +4754,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,-1.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -4763,7 +4762,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-3.7,0.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4773,7 +4772,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			S
+<!-- #			S -->
 			<offset><point>3.3,0.4</point>
 			<line>0.4,0,0.1,0</line>
 			<line>0,-0.1,0.1,0</line>
@@ -4785,21 +4784,21 @@
 			<line>0.3,-0.8,0,-0.8</line>
 			</offset>
 
-#			L
+<!-- #			L -->
 			<offset><point>3.3,-0.6</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
 
-#			Arrow
+<!-- #			Arrow -->
 			<offset><point>3.3,-2</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0.2,-0.2</line>
 			<line>0,0,0.2,0.2</line>
 			</offset>
 
-#			S
+<!-- #			S -->
 			<offset><point>-3.7,1.9</point>
 			<line>0.4,0,0.1,0</line>
 			<line>0,-0.1,0.1,0</line>
@@ -4811,7 +4810,7 @@
 			<line>0.3,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.2,1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4821,7 +4820,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			S
+<!-- #			S -->
 			<offset><point>2.8,1.9</point>
 			<line>0.4,0,0.1,0</line>
 			<line>0,-0.1,0.1,0</line>
@@ -4833,7 +4832,7 @@
 			<line>0.3,-0.8,0,-0.8</line>
 			</offset>
 
-#			I
+<!-- #			I -->
 			<offset><point>3.3,1.9</point>
 			<line>0.2,0,0.2,-0.8</line>
 			<line>0,0,0.4,0</line>
@@ -4842,18 +4841,18 @@
 
 		</shape>
 	</gate>
-#	<gate> <name>BA_SHIFT_REGISTER_8</name>
-#NOTE: Need to make the 8-bit shift register shape.
-#		<caption>8-Bit Shift Register (TODO)</caption>
-#	</gate>
-#	<gate> <name>BI_SHIFT_REGISTER_12</name>
-#NOTE: Need to make the 12-bit shift register shape.
-#		<caption>12-Bit Shift Register (TODO)</caption>
-#	</gate>
-#	<gate> <name>BM_SHIFT_REGISTER_16</name>
-#NOTE: Need to make the 16-bit shift register shape.
-#		<caption>16-Bit Shift Register (TODO)</caption>
-#	</gate>
+<!-- #	<gate> <name>BA_SHIFT_REGISTER_8</name> -->
+<!-- #NOTE: Need to make the 8-bit shift register shape. -->
+<!-- #		<caption>8-Bit Shift Register (TODO)</caption> -->
+<!-- #	</gate> -->
+<!-- #	<gate> <name>BI_SHIFT_REGISTER_12</name> -->
+<!-- #NOTE: Need to make the 12-bit shift register shape. -->
+<!-- #		<caption>12-Bit Shift Register (TODO)</caption> -->
+<!-- #	</gate> -->
+<!-- #	<gate> <name>BM_SHIFT_REGISTER_16</name> -->
+<!-- #NOTE: Need to make the 16-bit shift register shape. -->
+<!-- #		<caption>16-Bit Shift Register (TODO)</caption> -->
+<!-- #	</gate> -->
 </library>
 <library> <name>5 - MUX and Decoder</name>
 	<gate> <name>AA_MUX_2x1</name>
@@ -4888,7 +4887,7 @@
 
 			<line>0,1.5,0,2.5</line>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-0.7,-0.6</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -4939,7 +4938,7 @@
 			<line>0,3.5,0,5</line>
 			<line>1,3.25,1,5</line>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-1.7,-2.6</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5019,7 +5018,7 @@
 			<line>0,4.0,0,5.5</line>
 			<line>1,3.75,1,5.5</line>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-1.7,-3.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5139,7 +5138,7 @@
 			<line>0.5,7.9,0.5,9.5</line>
 			<line>1.5,7.6,1.5,9.5</line>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-1.7,-7.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5186,20 +5185,20 @@
 			<line>2,-2.5,-2,-2.5</line>
 			<line>-2,-2.5,-2,2.5</line>
 
-#		      Lines for offset in other decoders
+<!-- #		      Lines for offset in other decoders -->
 			<line>2,1.5,3,1.5</line>
 			<line>2,0.5,3,0.5</line>
 			<line>2,-0.5,3,-0.5</line>
 			<line>2,-1.5,3,-1.5</line>
 
-#			Decoder Input Lines
+<!-- #			Decoder Input Lines -->
 			<line>-2,-1.5,-3,-1.5</line>
 			<line>-2,-0.5,-3,-0.5</line>
 
-#			Enable
+<!-- #			Enable -->
 			<line>-2,1.5,-3,1.5</line>
 			
-#			E
+<!-- #			E -->
 			<offset><point>-1.7,1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -5208,7 +5207,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-1.7,-1.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5218,7 +5217,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-1.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5228,7 +5227,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>1.3,1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -5304,7 +5303,7 @@
 			<line>2,3.5,3,3.5</line>
 			<line>2,3.5,3,3.5</line>
 
-#			E
+<!-- #			E -->
 			<offset><point>-1.7,3.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -5313,7 +5312,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			2
+<!-- #			2 -->
 			<offset><point>-1.7,-1.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5322,7 +5321,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-1.7,-3.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5332,7 +5331,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-3.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5342,7 +5341,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			7
+<!-- #			7 -->
 			<offset><point>1.3,3.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5440,7 +5439,7 @@
 			<line>-2,-8.5,-2,8.5</line>
 			<line>-2,8.5,2,8.5</line>
 
-#		      Lines for offset in other decoders
+<!-- #		      Lines for offset in other decoders -->
 			<line>2,1.5,3,1.5</line>
 			<line>2,0.5,3,0.5</line>
 			<line>2,-0.5,3,-0.5</line>
@@ -5460,15 +5459,15 @@
 			<line>2,-1.5,3,-1.5</line>
 			</offset>
 
-#			Top Half
+<!-- #			Top Half -->
 			<line>2,7.5,3,7.5</line>
 			<line>2,6.5,3,6.5</line>
 
-#			Bottom Half
+<!-- #			Bottom Half -->
 			<line>2,-6.5,3,-6.5</line>
 			<line>2,-7.5,3,-7.5</line>
 
-#			Select Line Pins
+<!-- #			Select Line Pins -->
 		      <offset><point>-5,-6</point>
 			<line>2,1.5,3,1.5</line>
 			<line>2,0.5,3,0.5</line>
@@ -5476,10 +5475,10 @@
 			<line>2,-1.5,3,-1.5</line>
 			</offset>
 
-#			Enable	
+<!-- #			Enable	 -->
 			<line>-2,7.5,-3,7.5</line>	
 
-#			E
+<!-- #			E -->
 			<offset><point>-1.7,7.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -5488,7 +5487,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,-4.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0.4,0</line>
@@ -5497,7 +5496,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-1.7,-7.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5507,7 +5506,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-7.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -5517,12 +5516,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>1.1,7.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>1.3,7.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -5556,31 +5555,31 @@
 			</param>
 		</param_dlg_data>
 
-#		D
+<!-- #		D -->
 		<input> <name>IN_0</name>
 		          <point>-3,2</point> 
 		</input>
 
-#		Clock
+<!-- #		Clock -->
 		<input> <name>clock</name>
 		          <point>-3,-1</point> 
 		</input>
 
-#		SET
+<!-- #		SET -->
 		<input> <name>set</name>
 		          <point>0,4</point> 
 		</input>
 
-#		RESET
+<!-- #		RESET -->
 		<input> <name>clear</name>
 		          <point>0,-4</point> 
 		</input>
-#		Q
+<!-- #		Q -->
 		<output> <name>OUT_0</name>
 		          <point>3,2</point> 
 		</output>
 
-#		QNOT
+<!-- #		QNOT -->
 		<output> <name>OUTINV_0</name>
 		          <point>3,-1</point> 
 		</output>
@@ -5593,7 +5592,7 @@
 			<line>2,-3,2,3</line>
 			<line>-2,2,-3,2</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-2,-0.5,-1,-1</line>
 			<line>-2,-1.5,-1,-1</line>
 
@@ -5603,7 +5602,7 @@
 			<line>0,3,0,4</line>
 			<line>0,-3,0,-4</line>
 
-#			D
+<!-- #			D -->
 			<offset><point>-1.7,2.4</point>
 			<line>0,0,0.4,-0.1</line>
 			<line>0.4,-0.1,0.4,-0.7</line>
@@ -5611,7 +5610,7 @@
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			Q
+<!-- #			Q -->
 			<offset><point>1.3,2.4</point>
 			<line>0.1,0,0,-0.1</line>
 			<line>0,-0.1,0,-0.7</line>
@@ -5624,7 +5623,7 @@
 			<line>0.4,-0.8,0.2,-0.6</line>
 			</offset>
 
-#			Q NOT
+<!-- #			Q NOT -->
 			<offset><point>1.3,-0.6</point>
 			<line>0,0.1,0.4,0.1</line>
 			<line>0.1,0,0,-0.1</line>
@@ -5661,33 +5660,33 @@
 			</param>
 		</param_dlg_data>
 
-#		D
+<!-- #		D -->
 		<input> <name>IN_0</name>
 		          <point>-3,2</point> 
 		</input>
 
-#		Clock
+<!-- #		Clock -->
 		<input> <name>clock</name>
 		          <point>-3,-1</point> 
 		</input>
 
-#		SET
+<!-- #		SET -->
 		<input> <name>set</name>
 		          <point>0,4</point> 
 			<inverted>true</inverted>
 		</input>
 
-#		RESET
+<!-- #		RESET -->
 		<input> <name>clear</name>
 		          <point>0,-4</point> 
 			<inverted>true</inverted>
 		</input>
-#		Q
+<!-- #		Q -->
 		<output> <name>OUT_0</name>
 		          <point>3,2</point> 
 		</output>
 
-#		QNOT
+<!-- #		QNOT -->
 		<output> <name>OUTINV_0</name>
 		          <point>3,-1</point> 
 		</output>
@@ -5700,7 +5699,7 @@
 			<line>2,-3,2,3</line>
 			<line>-2,2,-3,2</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-2,-0.5,-1,-1</line>
 			<line>-2,-1.5,-1,-1</line>
 
@@ -5710,7 +5709,7 @@
 			<line>0,3.7,0,4</line>
 			<line>0,-3.7,0,-4</line>
 
-#			D
+<!-- #			D -->
 			<offset><point>-1.7,2.4</point>
 			<line>0,0,0.4,-0.1</line>
 			<line>0.4,-0.1,0.4,-0.7</line>
@@ -5718,7 +5717,7 @@
 			<line>0,-0.8,0,0</line>
 			</offset>
 
-#			Q
+<!-- #			Q -->
 			<offset><point>1.3,2.4</point>
 			<line>0.1,0,0,-0.1</line>
 			<line>0,-0.1,0,-0.7</line>
@@ -5731,7 +5730,7 @@
 			<line>0.4,-0.8,0.2,-0.6</line>
 			</offset>
 
-#			Q NOT
+<!-- #			Q NOT -->
 			<offset><point>1.3,-0.6</point>
 			<line>0,0.1,0.4,0.1</line>
 			<line>0.1,0,0,-0.1</line>
@@ -5745,7 +5744,7 @@
 			<line>0.4,-0.8,0.2,-0.6</line>
 			</offset>
 
-#			Low Active Portion
+<!-- #			Low Active Portion -->
 			<circle>0,3.35,0.35,24</circle>
 			<circle>0,-3.35,0.35,24</circle>
 
@@ -5770,38 +5769,38 @@
 		</param_dlg_data>
 
 
-#		J
+<!-- #		J -->
 		<input> <name>J</name>
 		          <point>-3,2</point> 
 		</input>
 
-#		K
+<!-- #		K -->
 		<input> <name>K</name>
 		          <point>-3,-2</point> 
 		</input>
 
 
-#		Clock
+<!-- #		Clock -->
 		<input> <name>clock</name>
 		          <point>-3,0</point> 
 		</input>
 
-#		SET
+<!-- #		SET -->
 		<input> <name>set</name>
 		          <point>0,4</point> 
 		</input>
 
-#		RESET
+<!-- #		RESET -->
 		<input> <name>clear</name>
 		          <point>0,-4</point> 
 		</input>
 
-#		Q
+<!-- #		Q -->
 		<output> <name>Q</name>
 		          <point>3,2</point> 
 		</output>
 
-#		QNOT
+<!-- #		QNOT -->
 		<output> <name>nQ</name>
 		          <point>3,-2</point> 
 		</output>
@@ -5814,7 +5813,7 @@
 			<line>2,-3,2,3</line>
 			<line>-2,2,-3,2</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-2,0.5,-1,0</line>
 			<line>-2,-0.5,-1,0</line>
 
@@ -5825,7 +5824,7 @@
 			<line>0,3,0,4</line>
 			<line>0,-3,0,-4</line>
 
-#			J
+<!-- #			J -->
 			<offset><point>-1.7,2.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.2,0,0.2,-0.7</line>
@@ -5833,14 +5832,14 @@
 			<line>0.1,-0.8,0,-0.7</line>
 			</offset>
 
-#			K
+<!-- #			K -->
 			<offset><point>-1.7,-1.6</point>
 			<line>0,0,0,-0.8</line>
 			<line>0.4,0,0,-0.4</line>
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			Q
+<!-- #			Q -->
 			<offset><point>1.3,2.4</point>
 			<line>0.1,0,0,-0.1</line>
 			<line>0,-0.1,0,-0.7</line>
@@ -5853,7 +5852,7 @@
 			<line>0.4,-0.8,0.2,-0.6</line>
 			</offset>
 
-#			Q NOT
+<!-- #			Q NOT -->
 			<offset><point>1.3,-1.6</point>
 			<line>0,0.1,0.4,0.1</line>
 			<line>0.1,0,0,-0.1</line>
@@ -5888,40 +5887,40 @@
 		</param_dlg_data>
 
 
-#		J
+<!-- #		J -->
 		<input> <name>J</name>
 		          <point>-3,2</point> 
 		</input>
 
-#		K
+<!-- #		K -->
 		<input> <name>K</name>
 		          <point>-3,-2</point> 
 		</input>
 
 
-#		Clock
+<!-- #		Clock -->
 		<input> <name>clock</name>
 		          <point>-3,0</point> 
 		</input>
 
-#		SET
+<!-- #		SET -->
 		<input> <name>set</name>
 		          <point>0,4</point> 
 			<inverted>true</inverted>
 		</input>
 
-#		RESET
+<!-- #		RESET -->
 		<input> <name>clear</name>
 		          <point>0,-4</point>
 			<inverted>true</inverted>
 		</input>
 
-#		Q
+<!-- #		Q -->
 		<output> <name>Q</name>
 		          <point>3,2</point> 
 		</output>
 
-#		QNOT
+<!-- #		QNOT -->
 		<output> <name>nQ</name>
 		          <point>3,-2</point> 
 		</output>
@@ -5933,7 +5932,7 @@
 			<line>2,-3,2,3</line>
 			<line>-2,2,-3,2</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>-2,0.5,-1,0</line>
 			<line>-2,-0.5,-1,0</line>
 
@@ -5944,7 +5943,7 @@
 			<line>0,3.7,0,4</line>
 			<line>0,-3.7,0,-4</line>
 
-#			J
+<!-- #			J -->
 			<offset><point>-1.7,2.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.2,0,0.2,-0.7</line>
@@ -5952,14 +5951,14 @@
 			<line>0.1,-0.8,0,-0.7</line>
 			</offset>
 
-#			K
+<!-- #			K -->
 			<offset><point>-1.7,-1.6</point>
 			<line>0,0,0,-0.8</line>
 			<line>0.4,0,0,-0.4</line>
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			Q
+<!-- #			Q -->
 			<offset><point>1.3,2.4</point>
 			<line>0.1,0,0,-0.1</line>
 			<line>0,-0.1,0,-0.7</line>
@@ -5972,7 +5971,7 @@
 			<line>0.4,-0.8,0.2,-0.6</line>
 			</offset>
 
-#			Q NOT
+<!-- #			Q NOT -->
 			<offset><point>1.3,-1.6</point>
 			<line>0,0.1,0.4,0.1</line>
 			<line>0.1,0,0,-0.1</line>
@@ -5986,7 +5985,7 @@
 			<line>0.4,-0.8,0.2,-0.6</line>
 			</offset>
 
-#			Low Active Portion
+<!-- #			Low Active Portion -->
 			<circle>0,3.35,0.35,24</circle>
 			<circle>0,-3.35,0.35,24</circle>
 
@@ -6013,7 +6012,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Box Inputs
+<!-- #		Box Inputs -->
 		<input> <name>DATA_IN_0</name>
 		          <point>1.5,5</point> 
 		</input>
@@ -6027,7 +6026,7 @@
 		          <point>-1.5,5</point> 
 		</input>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 		<input> <name>ADDRESS_0</name>
 		          <point>-5,-1.5</point> 
 		</input>
@@ -6041,7 +6040,7 @@
 		          <point>-5,1.5</point> 
 		</input>
 		
-#		Misc Inputs CL,W,OE
+<!-- #		Misc Inputs CL,W,OE -->
 		<input> <name>write_clock</name>
 		          <point>5,1.5</point> 
 		</input>
@@ -6052,7 +6051,7 @@
 		          <point>5,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>1.5,-5</point> 
 			<enable_input>ENABLE_0</enable_input>
@@ -6071,40 +6070,40 @@
 		</output>
 		
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-4,4,4,4</line>
 			<line>4,4,4,-4</line>
 			<line>4,-4,-4,-4</line>
 			<line>-4,-4,-4,4</line>
 
-#			Data IN
+<!-- #			Data IN -->
 			<line>-1.5,4,-1.5,5</line>
 			<line>-0.5,4,-0.5,5</line>
 			<line>0.5,4,0.5,5</line>
 			<line>1.5,4,1.5,5</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-5,1.5,-4,1.5</line>
 			<line>-5,0.5,-4,0.5</line>
 			<line>-5,-0.5,-4,-0.5</line>
 			<line>-5,-1.5,-4,-1.5</line>
 
-#			Data Out
+<!-- #			Data Out -->
 			<line>1.5,-4,1.5,-5</line>
 			<line>0.5,-4,0.5,-5</line>
 			<line>-0.5,-4,-0.5,-5</line>
 			<line>-1.5,-4,-1.5,-5</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>5,1.5,4,1.5</line>
 			<line>5,0.5,4,0.5</line>
 			<line>5,-0.5,4,-0.5</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>4,2,3,1.5</line>
 			<line>4,1,3,1.5</line>
 
-#			W
+<!-- #			W -->
 			<offset><point>3.3,0.9</point>
 			<line>0,0,0.1,-0.8</line>
 			<line>0.1,-0.8,0.2,-0.4</line>
@@ -6112,7 +6111,7 @@
 			<line>0.4,0,0.3,-0.8</line>
 			</offset>
 
-#			E
+<!-- #			E -->
 			<offset><point>3.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -6121,7 +6120,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>2.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6131,7 +6130,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6141,7 +6140,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			A
+<!-- #			A -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
@@ -6150,7 +6149,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -6158,7 +6157,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,3.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6168,7 +6167,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.7,-1.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6178,7 +6177,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-2.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6188,7 +6187,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,3.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -6196,7 +6195,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-3.7,1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -6204,7 +6203,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,-2.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -6232,7 +6231,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Box Inputs
+<!-- #		Box Inputs -->
 		<input> <name>DATA_IN_0</name>
 		          <point>3.5,7</point> 
 		</input>
@@ -6258,7 +6257,7 @@
 		          <point>-3.5,7</point> 
 		</input>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 		<input> <name>ADDRESS_0</name>
 		          <point>-5,-3.5</point> 
 		</input>
@@ -6284,7 +6283,7 @@
 		          <point>-5,3.5</point> 
 		</input>
 
-#		Misc Inputs CL,W,OE
+<!-- #		Misc Inputs CL,W,OE -->
 		<input> <name>write_clock</name>
 		          <point>5,1.5</point> 
 		</input>
@@ -6295,7 +6294,7 @@
 		          <point>5,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>3.5,-7</point>
 				<enable_input>ENABLE_0</enable_input>
@@ -6330,13 +6329,13 @@
 		</output>
 
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-4,6,4,6</line>
 			<line>4,6,4,-6</line>
 			<line>4,-6,-4,-6</line>
 			<line>-4,-6,-4,6</line>
 
-#			Data IN
+<!-- #			Data IN -->
 			<line>-3.5,6,-3.5,7</line>
 			<line>-2.5,6,-2.5,7</line>
 			<line>-1.5,6,-1.5,7</line>
@@ -6346,7 +6345,7 @@
 			<line>2.5,6,2.5,7</line>
 			<line>3.5,6,3.5,7</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-4,3.5,-5,3.5</line>
 			<line>-4,2.5,-5,2.5</line>
 			<line>-4,1.5,-5,1.5</line>
@@ -6356,7 +6355,7 @@
 			<line>-4,-2.5,-5,-2.5</line>
 			<line>-4,-3.5,-5,-3.5</line>
 
-#			Data Out
+<!-- #			Data Out -->
 			<line>-3.5,-6,-3.5,-7</line>
 			<line>-2.5,-6,-2.5,-7</line>
 			<line>-1.5,-6,-1.5,-7</line>
@@ -6366,16 +6365,16 @@
 			<line>2.5,-6,2.5,-7</line>
 			<line>3.5,-6,3.5,-7</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>5,1.5,4,1.5</line>
 			<line>5,0.5,4,0.5</line>
 			<line>5,-0.5,4,-0.5</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>4,2,3,1.5</line>
 			<line>4,1,3,1.5</line>
 
-#			W
+<!-- #			W -->
 			<offset><point>3.3,0.9</point>
 			<line>0,0,0.1,-0.8</line>
 			<line>0.1,-0.8,0.2,-0.4</line>
@@ -6383,7 +6382,7 @@
 			<line>0.4,0,0.3,-0.8</line>
 			</offset>
 
-#			E
+<!-- #			E -->
 			<offset><point>3.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -6392,7 +6391,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>2.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6402,7 +6401,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6412,7 +6411,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			A
+<!-- #			A -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
@@ -6421,7 +6420,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -6429,7 +6428,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>3.3,5.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6439,7 +6438,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.7,-3.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6449,7 +6448,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>3.3,-4.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6459,21 +6458,21 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			7
+<!-- #			7 -->
 			<offset><point>-3.7,5.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
 			<line>0.4,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			7
+<!-- #			7 -->
 			<offset><point>-3.7,3.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
 			<line>0.4,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			7
+<!-- #			7 -->
 			<offset><point>-3.7,-4.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6500,7 +6499,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Data Inputs
+<!-- #		Data Inputs -->
 		<input> <name>DATA_IN_0</name>
 		          <point>7.5,11</point> 
 		</input>
@@ -6550,7 +6549,7 @@
 		          <point>-7.5,11</point> 
 		</input>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 
 		<input> <name>ADDRESS_0</name>
 		          <point>-9,-5.5</point> 
@@ -6590,7 +6589,7 @@
 		</input>
 
 
-#		Misc Inputs CL,W,OE
+<!-- #		Misc Inputs CL,W,OE -->
 		<input> <name>write_clock</name>
 		          <point>9,1.5</point> 
 		</input>
@@ -6601,7 +6600,7 @@
 		          <point>9,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>7.5,-11</point> 
 			<enable_input>ENABLE_0</enable_input>
@@ -6668,13 +6667,13 @@
 		</output>
 
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-8,10,8,10</line>
 			<line>8,10,8,-10</line>
 			<line>8,-10,-8,-10</line>
 			<line>-8,-10,-8,10</line>
 
-#			Data IN
+<!-- #			Data IN -->
 			<line>7.5,10,7.5,11</line>
 			<line>6.5,10,6.5,11</line>
 			<line>5.5,10,5.5,11</line>
@@ -6692,7 +6691,7 @@
 			<line>-1.5,10,-1.5,11</line>
 			<line>-0.5,10,-0.5,11</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-8,-5.5,-9,-5.5</line>
 			<line>-8,-4.5,-9,-4.5</line>
 			<line>-8,-3.5,-9,-3.5</line>
@@ -6706,7 +6705,7 @@
 			<line>-8,1.5,-9,1.5</line>
 			<line>-8,0.5,-9,0.5</line>
 			
-#			Data Out
+<!-- #			Data Out -->
 			<line>7.5,-10,7.5,-11</line>
 			<line>6.5,-10,6.5,-11</line>
 			<line>5.5,-10,5.5,-11</line>
@@ -6724,16 +6723,16 @@
 			<line>-1.5,-10,-1.5,-11</line>
 			<line>-0.5,-10,-0.5,-11</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>8,1.5,9,1.5</line>
 			<line>8,0.5,9,0.5</line>
 			<line>8,-0.5,9,-0.5</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>8,2,7,1.5</line>
 			<line>8,1,7,1.5</line>
 
-#			W
+<!-- #			W -->
 			<offset><point>7.3,0.9</point>
 			<line>0,0,0.1,-0.8</line>
 			<line>0.1,-0.8,0.2,-0.4</line>
@@ -6741,7 +6740,7 @@
 			<line>0.4,0,0.3,-0.8</line>
 			</offset>
 
-#			E
+<!-- #			E -->
 			<offset><point>7.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -6750,7 +6749,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>6.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6760,7 +6759,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6770,7 +6769,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			A
+<!-- #			A -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
@@ -6779,7 +6778,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -6787,7 +6786,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-7.7,-5.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6797,17 +6796,17 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,5.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.4,5.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>7.3,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6817,12 +6816,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,-8.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -6832,7 +6831,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>7.3,9.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -6842,12 +6841,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,9.7</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,9.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -6877,7 +6876,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Data Inputs
+<!-- #		Data Inputs -->
 		<input> <name>DATA_IN_0</name>
 		          <point>7.5,11</point> 
 		</input>
@@ -6927,7 +6926,7 @@
 		          <point>-7.5,11</point> 
 		</input>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 		<input> <name>ADDRESS_0</name>
 		          <point>-9,-7.5</point> 
 		</input>
@@ -6977,7 +6976,7 @@
 		          <point>-9,7.5</point> 
 		</input>
 
-#		Misc Inputs CL,W,OE
+<!-- #		Misc Inputs CL,W,OE -->
 		<input> <name>write_clock</name>
 		          <point>9,1.5</point> 
 		</input>
@@ -6988,7 +6987,7 @@
 		          <point>9,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>7.5,-11</point>
 			<enable_input>ENABLE_0</enable_input>
@@ -7055,13 +7054,13 @@
 		</output>
 
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-8,10,8,10</line>
 			<line>8,10,8,-10</line>
 			<line>8,-10,-8,-10</line>
 			<line>-8,-10,-8,10</line>
 
-#			Data IN
+<!-- #			Data IN -->
 			<line>7.5,10,7.5,11</line>
 			<line>6.5,10,6.5,11</line>
 			<line>5.5,10,5.5,11</line>
@@ -7079,7 +7078,7 @@
 			<line>-1.5,10,-1.5,11</line>
 			<line>-0.5,10,-0.5,11</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-8,-7.5,-9,-7.5</line>
 			<line>-8,-6.5,-9,-6.5</line>
 			<line>-8,-5.5,-9,-5.5</line>
@@ -7097,7 +7096,7 @@
 			<line>-8,1.5,-9,1.5</line>
 			<line>-8,0.5,-9,0.5</line>
 
-#			Data Out
+<!-- #			Data Out -->
 			<line>7.5,-10,7.5,-11</line>
 			<line>6.5,-10,6.5,-11</line>
 			<line>5.5,-10,5.5,-11</line>
@@ -7115,16 +7114,16 @@
 			<line>-1.5,-10,-1.5,-11</line>
 			<line>-0.5,-10,-0.5,-11</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>8,1.5,9,1.5</line>
 			<line>8,0.5,9,0.5</line>
 			<line>8,-0.5,9,-0.5</line>
 
-#			CLOCK
+<!-- #			CLOCK -->
 			<line>8,2,7,1.5</line>
 			<line>8,1,7,1.5</line>
 
-#			W
+<!-- #			W -->
 			<offset><point>7.3,0.9</point>
 			<line>0,0,0.1,-0.8</line>
 			<line>0.1,-0.8,0.2,-0.4</line>
@@ -7132,7 +7131,7 @@
 			<line>0.4,0,0.3,-0.8</line>
 			</offset>
 
-#			E
+<!-- #			E -->
 			<offset><point>7.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -7141,7 +7140,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>6.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7151,7 +7150,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7161,7 +7160,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			A
+<!-- #			A -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
@@ -7170,7 +7169,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -7178,7 +7177,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-7.7,-7.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7188,12 +7187,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,7.8</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,7.8</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -7203,7 +7202,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>7.3,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7213,12 +7212,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,-8.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -7228,7 +7227,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>7.3,9.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7238,12 +7237,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,9.7</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,9.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -7273,7 +7272,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 		<input> <name>ADDRESS_0</name>
 		          <point>-5,-1.5</point> 
 		</input>
@@ -7287,12 +7286,12 @@
 		          <point>-5,1.5</point> 
 		</input>
 		
-#		Misc Inputs OE
+<!-- #		Misc Inputs OE -->
 		<input> <name>ENABLE_0</name>
 		          <point>5,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>1.5,-5</point> 
 			<enable_input>ENABLE_0</enable_input>
@@ -7311,28 +7310,28 @@
 		</output>
 		
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-4,4,4,4</line>
 			<line>4,4,4,-4</line>
 			<line>4,-4,-4,-4</line>
 			<line>-4,-4,-4,4</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-5,1.5,-4,1.5</line>
 			<line>-5,0.5,-4,0.5</line>
 			<line>-5,-0.5,-4,-0.5</line>
 			<line>-5,-1.5,-4,-1.5</line>
 
-#			Data Out
+<!-- #			Data Out -->
 			<line>1.5,-4,1.5,-5</line>
 			<line>0.5,-4,0.5,-5</line>
 			<line>-0.5,-4,-0.5,-5</line>
 			<line>-1.5,-4,-1.5,-5</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>5,-0.5,4,-0.5</line>
 
-#			E
+<!-- #			E -->
 			<offset><point>3.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -7341,7 +7340,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>2.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7351,7 +7350,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7361,7 +7360,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -7369,7 +7368,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -7377,7 +7376,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.7,-1.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7387,7 +7386,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-2.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7397,7 +7396,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-3.7,1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -7405,7 +7404,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,-2.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -7433,7 +7432,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 		<input> <name>ADDRESS_0</name>
 		          <point>-5,-3.5</point> 
 		</input>
@@ -7459,12 +7458,12 @@
 		          <point>-5,3.5</point> 
 		</input>
 
-#		Misc Inputs OE
+<!-- #		Misc Inputs OE -->
 		<input> <name>ENABLE_0</name>
 		          <point>5,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>3.5,-7</point>
 				<enable_input>ENABLE_0</enable_input>
@@ -7499,13 +7498,13 @@
 		</output>
 
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-4,6,4,6</line>
 			<line>4,6,4,-6</line>
 			<line>4,-6,-4,-6</line>
 			<line>-4,-6,-4,6</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-4,3.5,-5,3.5</line>
 			<line>-4,2.5,-5,2.5</line>
 			<line>-4,1.5,-5,1.5</line>
@@ -7515,7 +7514,7 @@
 			<line>-4,-2.5,-5,-2.5</line>
 			<line>-4,-3.5,-5,-3.5</line>
 
-#			Data Out
+<!-- #			Data Out -->
 			<line>-3.5,-6,-3.5,-7</line>
 			<line>-2.5,-6,-2.5,-7</line>
 			<line>-1.5,-6,-1.5,-7</line>
@@ -7525,10 +7524,10 @@
 			<line>2.5,-6,2.5,-7</line>
 			<line>3.5,-6,3.5,-7</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>5,-0.5,4,-0.5</line>
 
-#			E
+<!-- #			E -->
 			<offset><point>3.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -7537,7 +7536,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>2.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7547,7 +7546,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7557,7 +7556,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -7565,7 +7564,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -7573,7 +7572,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-3.7,-3.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7583,7 +7582,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>3.3,-4.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7593,14 +7592,14 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			7
+<!-- #			7 -->
 			<offset><point>-3.7,3.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
 			<line>0.4,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			7
+<!-- #			7 -->
 			<offset><point>-3.7,-4.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7627,9 +7626,9 @@
 			</param>
 		</param_dlg_data>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 
 		<input> <name>ADDRESS_0</name>
 		          <point>-9,-5.5</point> 
@@ -7669,12 +7668,12 @@
 		</input>
 
 
-#		Misc Inputs OE
+<!-- #		Misc Inputs OE -->
 		<input> <name>ENABLE_0</name>
 		          <point>9,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>7.5,-11</point> 
 			<enable_input>ENABLE_0</enable_input>
@@ -7741,13 +7740,13 @@
 		</output>
 
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-8,10,8,10</line>
 			<line>8,10,8,-10</line>
 			<line>8,-10,-8,-10</line>
 			<line>-8,-10,-8,10</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-8,-5.5,-9,-5.5</line>
 			<line>-8,-4.5,-9,-4.5</line>
 			<line>-8,-3.5,-9,-3.5</line>
@@ -7761,7 +7760,7 @@
 			<line>-8,1.5,-9,1.5</line>
 			<line>-8,0.5,-9,0.5</line>
 			
-#			Data Out
+<!-- #			Data Out -->
 			<line>7.5,-10,7.5,-11</line>
 			<line>6.5,-10,6.5,-11</line>
 			<line>5.5,-10,5.5,-11</line>
@@ -7779,10 +7778,10 @@
 			<line>-1.5,-10,-1.5,-11</line>
 			<line>-0.5,-10,-0.5,-11</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>8,-0.5,9,-0.5</line>
 
-#			E
+<!-- #			E -->
 			<offset><point>7.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -7791,7 +7790,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>6.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7801,7 +7800,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7811,7 +7810,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -7819,7 +7818,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -7827,7 +7826,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-7.7,-5.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7837,17 +7836,17 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,5.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.4,5.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>7.3,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -7857,12 +7856,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,-8.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -7892,7 +7891,7 @@
 			</param>
 		</param_dlg_data>
 
-#		Address Inputs
+<!-- #		Address Inputs -->
 		<input> <name>ADDRESS_0</name>
 		          <point>-9,-7.5</point> 
 		</input>
@@ -7942,12 +7941,12 @@
 		          <point>-9,7.5</point> 
 		</input>
 
-#		Misc Inputs OE
+<!-- #		Misc Inputs OE -->
 		<input> <name>ENABLE_0</name>
 		          <point>9,-0.5</point> 
 		</input>
 
-#		Data Out
+<!-- #		Data Out -->
 		<output> <name>DATA_OUT_0</name>
 		          <point>7.5,-11</point>
 			<enable_input>ENABLE_0</enable_input>
@@ -8014,13 +8013,13 @@
 		</output>
 
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-8,10,8,10</line>
 			<line>8,10,8,-10</line>
 			<line>8,-10,-8,-10</line>
 			<line>-8,-10,-8,10</line>
 
-#			Address		
+<!-- #			Address		 -->
 			<line>-8,-7.5,-9,-7.5</line>
 			<line>-8,-6.5,-9,-6.5</line>
 			<line>-8,-5.5,-9,-5.5</line>
@@ -8038,7 +8037,7 @@
 			<line>-8,1.5,-9,1.5</line>
 			<line>-8,0.5,-9,0.5</line>
 
-#			Data Out
+<!-- #			Data Out -->
 			<line>7.5,-10,7.5,-11</line>
 			<line>6.5,-10,6.5,-11</line>
 			<line>5.5,-10,5.5,-11</line>
@@ -8056,10 +8055,10 @@
 			<line>-1.5,-10,-1.5,-11</line>
 			<line>-0.5,-10,-0.5,-11</line>
 
-#			Other Inputs
+<!-- #			Other Inputs -->
 			<line>8,-0.5,9,-0.5</line>
 
-#			E
+<!-- #			E -->
 			<offset><point>7.3,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,-0.8,0,-0.8</line>
@@ -8068,7 +8067,7 @@
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>6.7,-0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8078,7 +8077,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			R
+<!-- #			R -->
 			<offset><point>-.6,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8088,7 +8087,7 @@
 			<line>0,-0.4,0.4,-0.8</line>
 			</offset>
 
-#			O
+<!-- #			O -->
 			<offset><point>0,0.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -8096,7 +8095,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			M
+<!-- #			M -->
 			<offset><point>.6,0.2</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.2,-0.4</line>
@@ -8104,7 +8103,7 @@
 			<line>0.4,0,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-7.7,-7.2</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8114,12 +8113,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,7.8</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,7.8</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -8129,7 +8128,7 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>7.3,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8139,12 +8138,12 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			1
+<!-- #			1 -->
 			<offset><point>-7.7,-8.9</point>
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			5
+<!-- #			5 -->
 			<offset><point>-7.5,-8.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.4</line>
@@ -8156,13 +8155,13 @@
 		</shape>
 	</gate>
 </library>
-<library> <name>6 - Add & Compare</name>
+<library> <name>6 - Add &amp; Compare</name>
 	<gate> <name>AA_FULLADDER_1BIT</name>
 		<caption>1-Bit Full Adder</caption>
 		<logic_type>ADDER</logic_type>
 		<logic_param>INPUT_BITS 1</logic_param>
 
-#		X,Y,Cin
+<!-- #		X,Y,Cin -->
 		<input> <name>IN_0</name>
 		          <point>1,3</point> 
 		</input>
@@ -8173,7 +8172,7 @@
 		          <point>4,0</point> 
 		</input>
 		
-#		Co and S
+<!-- #		Co and S -->
 		<output> <name>carry_out</name>
 		          <point>0,-3</point> 
 		</output>
@@ -8182,31 +8181,31 @@
 		</output>
 	
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>-3,2,3,2</line>
 			<line>3,2,3,-2</line>
 			<line>3,-2,-3,-2</line>
 			<line>-3,-2,-3,2</line>
 
-#			X and Y  Input
+<!-- #			X and Y  Input -->
 			<line>-1,2,-1,3</line>
 			<line>1,2,1,3</line>
 
-#			Cin and Cout
+<!-- #			Cin and Cout -->
 			<line>4,0,3,0</line>
 			<line>-3,0,-4,0</line>
 
-#			S Output
+<!-- #			S Output -->
 			<line>0,-2,0,-3</line>
 
-#			C
+<!-- #			C -->
 			<offset><point>-2.7,0.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-2.2,0.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8216,41 +8215,41 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>1.8,0.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			I
+<!-- #			I -->
 			<offset><point>2.3,0.4</point>
 			<line>0.2,0,0.2,-0.8</line>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			X
+<!-- #			X -->
 			<offset><point>-1.2,1.7</point>
 			<line>0,0,0.4,-0.8</line>
 			<line>0,-0.8,0.4,0</line>
 			</offset>
 
-#			Y
+<!-- #			Y -->
 			<offset><point>0.8,1.7</point>
 			<line>0,0,0.2,-0.4</line>
 			<line>0.4,0,0.2,-0.4</line>
 			<line>0.2,-0.4,0.2,-0.8</line>
 			</offset>
 
-#			F
+<!-- #			F -->
 			<offset><point>-0.5,0.4</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			A
+<!-- #			A -->
 			<offset><point>0.1,0.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
@@ -8259,7 +8258,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			S
+<!-- #			S -->
 			<offset><point>-0.2,-0.9</point>
 			<line>0.4,0,0.1,0</line>
 			<line>0,-0.1,0.1,0</line>
@@ -8277,7 +8276,7 @@
 		<logic_type>ADDER</logic_type>
 		<logic_param>INPUT_BITS 4</logic_param>
 
-#		X
+<!-- #		X -->
 		<input> <name>IN_0</name>
 		          <point>-2,4</point> 
 		</input>
@@ -8291,7 +8290,7 @@
 		          <point>-5,4</point> 
 		</input>
 
-#		Y
+<!-- #		Y -->
 		<input> <name>IN_B_0</name>
 		          <point>5,4</point> 
 		</input>
@@ -8305,12 +8304,12 @@
 		          <point>2,4</point> 
 		</input>
 
-#		Cin
+<!-- #		Cin -->
 		<input> <name>carry_in</name>
 		          <point>8,1</point> 
 		</input>
 
-#		S
+<!-- #		S -->
 		<output> <name>OUT_0</name>
 		          <point>1.5,-4</point> 
 		</output>
@@ -8324,54 +8323,54 @@
 		          <point>-1.5,-4</point> 
 		</output>
 		
-#		Co
+<!-- #		Co -->
 		<output> <name>carry_out</name>
 		          <point>-8,1</point> 
 		</output>
 
-#		V
+<!-- #		V -->
 		<output> <name>overflow</name>
 		          <point>-8,-1</point> 
 		</output>
 	
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>7,3,7,-3</line>
 			<line>7,-3,-7,-3</line>
 			<line>-7,-3,-7,3</line>
 			<line>-7,3,7,3</line>
 
-#			X Inputs
+<!-- #			X Inputs -->
 			<line>-2,3,-2,4</line>
 			<line>-3,3,-3,4</line>
 			<line>-4,3,-4,4</line>
 			<line>-5,3,-5,4</line>
 
-#			Y Inputs
+<!-- #			Y Inputs -->
 			<line>5,3,5,4</line>
 			<line>4,3,4,4</line>
 			<line>3,3,3,4</line>
 			<line>2,3,2,4</line>
 
-#			Cout,V,Cin
+<!-- #			Cout,V,Cin -->
 			<line>-7,1,-8,1</line>
 			<line>-7,-1,-8,-1</line>
 			<line>7,1,8,1</line>
 
-#			S Outputs
+<!-- #			S Outputs -->
 			<line>1.5,-3,1.5,-4</line>
 			<line>0.5,-3,0.5,-4</line>
 			<line>-0.5,-3,-0.5,-4</line>
 			<line>-1.5,-3,-1.5,-4</line>
 
-#			C
+<!-- #			C -->
 			<offset><point>-6.7,1.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-6.2,1.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8381,33 +8380,33 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			V
+<!-- #			V -->
 			<offset><point>-6.7,-0.6</point>
 			<line>0,0,0.2,-0.8</line>
 			<line>0.2,-0.8,0.4,0</line>
 			</offset>
 
-#			C
+<!-- #			C -->
 			<offset><point>5.8,1.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0,0,0,-0.8</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			I
+<!-- #			I -->
 			<offset><point>6.3,1.4</point>
 			<line>0.2,0,0.2,-0.8</line>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.8,0.4,-0.8</line>
 			</offset>
 
-#			X
+<!-- #			X -->
 			<offset><point>-3.7,1.9</point>
 			<line>0,0,0.4,-0.8</line>
 			<line>0,-0.8,0.4,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-2.2,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8417,7 +8416,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-5.2,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -8425,14 +8424,14 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			Y
+<!-- #			Y -->
 			<offset><point>3.3,1.9</point>
 			<line>0,0,0.2,-0.4</line>
 			<line>0.4,0,0.2,-0.4</line>
 			<line>0.2,-0.4,0.2,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>4.8,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8442,7 +8441,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>1.7,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -8450,14 +8449,14 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			F
+<!-- #			F -->
 			<offset><point>-0.5,0.4</point>
 			<line>0,0,0,-0.8</line>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
 			</offset>
 
-#			A
+<!-- #			A -->
 			<offset><point>0.1,0.4</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.4,0.4,-0.4</line>
@@ -8466,7 +8465,7 @@
 			<line>0,0,0,-0.8</line>
 			</offset>
 
-#			S
+<!-- #			S -->
 			<offset><point>-0.2,-0.9</point>
 			<line>0.4,0,0.1,0</line>
 			<line>0,-0.1,0.1,0</line>
@@ -8478,7 +8477,7 @@
 			<line>0.3,-0.8,0,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>1.3,-1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8488,7 +8487,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-1.7,-1.9</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -8498,16 +8497,16 @@
 
 		</shape>
 	</gate>
-#	<gate> <name>AI_FULLADDER_8BIT</name>
-#NOTE: Need to make 8-bit full adder shape.
-#		<caption>8-Bit Full Adder (TODO)</caption>
-#	</gate>
+<!-- #	<gate> <name>AI_FULLADDER_8BIT</name> -->
+<!-- #NOTE: Need to make 8-bit full adder shape. -->
+<!-- #		<caption>8-Bit Full Adder (TODO)</caption> -->
+<!-- #	</gate> -->
 	<gate> <name>BE_COMPARATOR_4BIT</name>
 		<caption>4-Bit Magnitude Comparator</caption>
 		<logic_type>COMPARE</logic_type>
 		<logic_param>INPUT_BITS 4</logic_param>
 
-#		X
+<!-- #		X -->
 		<input> <name>IN_0</name>
 		          <point>-2,4</point> 
 		</input>
@@ -8521,7 +8520,7 @@
 		          <point>-5,4</point> 
 		</input>
 
-#		Y
+<!-- #		Y -->
 		<input> <name>IN_B_0</name>
 		          <point>5,4</point> 
 		</input>
@@ -8535,7 +8534,7 @@
 		          <point>2,4</point> 
 		</input>
 
-#		Input Carry:
+<!-- #		Input Carry: -->
 		<input> <name>in_A_greater_B</name>
 		          <point>8,2</point> 
 		</input>
@@ -8546,7 +8545,7 @@
 		          <point>8,-2</point> 
 		</input>
 
-#		Output Values:
+<!-- #		Output Values: -->
 		<output> <name>A_greater_B</name>
 		          <point>-8,2</point> 
 		</output>
@@ -8558,41 +8557,41 @@
 		</output>
 		
 		<shape>
-#			Box
+<!-- #			Box -->
 			<line>7,3,7,-3</line>
 			<line>7,-3,-7,-3</line>
 			<line>-7,-3,-7,3</line>
 			<line>-7,3,7,3</line>
 
-#			X Inputs
+<!-- #			X Inputs -->
 			<line>-2,3,-2,4</line>
 			<line>-3,3,-3,4</line>
 			<line>-4,3,-4,4</line>
 			<line>-5,3,-5,4</line>
 
-#			Y Inputs
+<!-- #			Y Inputs -->
 			<line>5,3,5,4</line>
 			<line>4,3,4,4</line>
 			<line>3,3,3,4</line>
 			<line>2,3,2,4</line>
 
-#			Inputs:
+<!-- #			Inputs: -->
 			<line>7,2,8,2</line>
 			<line>7,-2,8,-2</line>
 			<line>7,0,8,0</line>
 
-#			Outputs:
+<!-- #			Outputs: -->
 			<line>-7,2,-8,2</line>
 			<line>-7,-2,-8,-2</line>
 			<line>-7,0,-8,0</line>
 
-#			X
+<!-- #			X -->
 			<offset><point>-3.7,1.9</point>
 			<line>0,0,0.4,-0.8</line>
 			<line>0,-0.8,0.4,0</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>-2.2,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8602,7 +8601,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>-5.2,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -8610,14 +8609,14 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			Y
+<!-- #			Y -->
 			<offset><point>3.3,1.9</point>
 			<line>0,0,0.2,-0.4</line>
 			<line>0.4,0,0.2,-0.4</line>
 			<line>0.2,-0.4,0.2,-0.8</line>
 			</offset>
 
-#			0
+<!-- #			0 -->
 			<offset><point>4.8,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.4</line>
@@ -8627,7 +8626,7 @@
 			<line>0,-0.4,0,0</line>
 			</offset>
 
-#			3
+<!-- #			3 -->
 			<offset><point>1.7,2.7</point>
 			<line>0,0,0.4,0</line>
 			<line>0.4,0,0.4,-0.8</line>
@@ -8635,19 +8634,19 @@
 			<line>0.4,-0.8,0,-0.8</line>
 			</offset>
 
-#			>
+<!-- #			> -->
 			<offset><point>-6.7,2.2</point>
 			<line>0,0,0.4,-0.2</line>
 			<line>0,-0.4,0.4,-0.2</line>
 			</offset>
 
-#			=
+<!-- #			= -->
 			<offset><point>-6.7,0.1</point>
 			<line>0,0,0.4,0</line>
 			<line>0,-0.2,0.4,-0.2</line>
 			</offset>
 
-#			<
+<!-- #			< -->
 			<offset><point>-6.7,-1.8</point>
 			<line>0.4,0,0,-0.2</line>
 			<line>0.4,-0.4,0,-0.2</line>
@@ -8655,10 +8654,10 @@
 
 		</shape>
 	</gate>
-#	<gate> <name>BI_COMPARATOR_8BIT</name>
-#NOTE: Need to make comparator shape!
-#		<caption>8-Bit Magnitude Comparator (TODO)</caption>
-#	</gate>
+<!-- #	<gate> <name>BI_COMPARATOR_8BIT</name> -->
+<!-- #NOTE: Need to make comparator shape! -->
+<!-- #		<caption>8-Bit Magnitude Comparator (TODO)</caption> -->
+<!-- #	</gate> -->
 </library>
 <library> <name>4 - Decorations</name>
 	<gate> <name>AA_LABEL</name>
@@ -8670,7 +8669,7 @@
 			<param>
 				<type>STRING</type>
 				<label>Label</label>
-# Specify the type (LOGIC or GUI) and the param's name:
+<!-- # Specify the type (LOGIC or GUI) and the param's name: -->
 				<varname>GUI LABEL_TEXT</varname>
 			</param>
 		</param_dlg_data>
@@ -8678,10 +8677,11 @@
 			<param>
 				<type>FLOAT</type>
 				<label>Text Height</label>
-# Specify the type (LOGIC or GUI) and the param's name:
+<!-- # Specify the type (LOGIC or GUI) and the param's name: -->
 				<varname>GUI TEXT_HEIGHT</varname>
 				<range>0.05,50</range>
 			</param>
 		</param_dlg_data>
 	</gate>
 </library>
+</libraries>

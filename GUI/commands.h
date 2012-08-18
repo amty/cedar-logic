@@ -22,7 +22,7 @@
 #include <sstream>
 
 using namespace std;
-
+using namespace __gnu_cxx;
 // Holds pointers to all of a gate's parameters
 struct paramSet {
 	map < string, string >* gParams;

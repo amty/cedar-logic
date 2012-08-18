@@ -15,13 +15,15 @@
 #include "wx/wx.h"
 #include "wx/print.h"
 #include "wx/printdlg.h"
-
+#include "str-convs.h"
 #include "GUICanvas.h"
 #include "GUICircuit.h"
 
 class CircuitPrint : public wxPrintout {
 public:
-	CircuitPrint(GUICanvas* can, wxString strFile, wxChar *title = _T("Circuit Printout")):wxPrintout(title) { sourceCanvas = can; filename = strFile; }
+	CircuitPrint(GUICanvas* can, wxString strFile,
+		     const wxChar *title = std2wx("Circuit Printout")) :
+	wxPrintout(title) { sourceCanvas = can; filename = strFile; }
 
 	// Functions implemented for wxPrintout	
 	bool OnPrintPage(int page);

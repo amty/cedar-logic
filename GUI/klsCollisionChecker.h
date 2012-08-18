@@ -14,6 +14,8 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <assert.h>
+
 using namespace std;
 
 #include "klsBBox.h"

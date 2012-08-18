@@ -10,13 +10,13 @@
 
 #include "commands.h"
 #include <sstream>
-#include <hash_map.h>
-
+#include <ext/hash_map>
+#include "str-convs.h"
 DECLARE_APP(MainApp)
 
 // CMDMOVEGATE
 
-cmdMoveGate::cmdMoveGate( GUICircuit* gCircuit, unsigned long gid, float startX, float startY, float endX, float endY, bool uW ) : klsCommand(true, _T("Move Gate")) {
+cmdMoveGate::cmdMoveGate( GUICircuit* gCircuit, unsigned long gid, float startX, float startY, float endX, float endY, bool uW ) : klsCommand(true, std2wx("Move Gate")) {
 	this->gCircuit = gCircuit;
 	this->gid = gid;
 	this->startX = startX;
@@ -47,7 +47,7 @@ string cmdMoveGate::toString() {
 
 // CMDMOVEWIRE
 
-cmdMoveWire::cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, wireSegment > oldList, map < long, wireSegment > newList ) : klsCommand(true, _T("Move Wire")) {
+cmdMoveWire::cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, wireSegment > oldList, map < long, wireSegment > newList ) : klsCommand(true, std2wx("Move Wire")) {
 	this->gCircuit = gCircuit;
 	this->wid = wid;
 	oldSegList = oldList;
@@ -55,7 +55,7 @@ cmdMoveWire::cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, w
 	delta = GLPoint2f(0,0);
 }
 
-cmdMoveWire::cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, wireSegment > oldList, GLPoint2f delta ) : klsCommand(true, _T("Move Wire")) {
+cmdMoveWire::cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, wireSegment > oldList, GLPoint2f delta ) : klsCommand(true, std2wx("Move Wire")) {
 	this->gCircuit = gCircuit;
 	this->wid = wid;
 	oldSegList = oldList;
@@ -63,7 +63,7 @@ cmdMoveWire::cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, w
 	(*(gCircuit->getWires()))[wid]->printme("\t\t");
 }
 
-cmdMoveWire::cmdMoveWire( string def ) : klsCommand( true, _T("Move Wire") ) {
+cmdMoveWire::cmdMoveWire( string def ) : klsCommand( true, std2wx("Move Wire") ) {
 	istringstream iss(def);
 	// wire looks like "movewire wid" then series of segments
 	string temp; char dump;
@@ -204,7 +204,7 @@ string cmdMoveWire::toString() {
 
 // CMDMOVESELECTION
 
-cmdMoveSelection::cmdMoveSelection( GUICircuit* gCircuit, vector < GateState > &preMove, vector < WireState > &preMoveWire, float startX, float startY, float endX, float endY ) : klsCommand(true, "Move Selection") {
+cmdMoveSelection::cmdMoveSelection( GUICircuit* gCircuit, vector < GateState > &preMove, vector < WireState > &preMoveWire, float startX, float startY, float endX, float endY ) : klsCommand(true, std2wx("Move Selection")) {
 	for (unsigned int i = 0; i < preMove.size(); i++) gateList.push_back(preMove[i].id);
 	for (unsigned int i = 0; i < preMoveWire.size(); i++) {
 		wireList.push_back(preMoveWire[i].id);
@@ -255,7 +255,7 @@ bool cmdMoveSelection::Undo() {
 
 // CMDCREATEGATE
 
-cmdCreateGate::cmdCreateGate( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long gid, string gateType, float x, float y) : klsCommand( true, "Create Gate" ) {
+cmdCreateGate::cmdCreateGate( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long gid, string gateType, float x, float y) : klsCommand(true, std2wx("Create Gate") ) {
 	this->gCanvas = gCanvas;
 	this->gCircuit = gCircuit;
 	this->gid = gid;
@@ -265,7 +265,7 @@ cmdCreateGate::cmdCreateGate( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned
 	this->fromString = false;
 }
 
-cmdCreateGate::cmdCreateGate( string def ) : klsCommand( true, "Create Gate" ) {
+cmdCreateGate::cmdCreateGate( string def ) : klsCommand( true, std2wx("Create Gate") ) {
 	istringstream iss(def);
 	string dump;
 	iss >> dump >> gid >> gateType >> x >> y;
@@ -365,7 +365,7 @@ void cmdCreateGate::setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_
 
 // CMDCREATEWIRE
 
-cmdCreateWire::cmdCreateWire( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long wid, cmdConnectWire* conn1, cmdConnectWire* conn2 ) : klsCommand(true, "Create Wire") {
+cmdCreateWire::cmdCreateWire( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long wid, cmdConnectWire* conn1, cmdConnectWire* conn2 ) : klsCommand(true, std2wx("Create Wire")) {
 	this->gCanvas = gCanvas;
 	this->gCircuit = gCircuit;
 	this->wid = wid;
@@ -373,7 +373,7 @@ cmdCreateWire::cmdCreateWire( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned
 	this->conn2 = conn2;
 }
 
-cmdCreateWire::cmdCreateWire( string def ) : klsCommand(true, "Create Wire") {
+cmdCreateWire::cmdCreateWire( string def ) : klsCommand(true, std2wx("Create Wire")) {
 	istringstream iss(def);
 	string dump;
 	iss >> dump >> wid;
@@ -425,7 +425,7 @@ void cmdCreateWire::setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_
 
 // CMDDELETEGATE
 
-cmdDeleteGate::cmdDeleteGate( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long gid) : klsCommand(true, "Delete Gate") {
+cmdDeleteGate::cmdDeleteGate( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long gid) : klsCommand(true, std2wx("Delete Gate")) {
 	this->gCircuit = gCircuit;
 	this->gCanvas = gCanvas;
 	this->gid = gid;
@@ -493,7 +493,7 @@ bool cmdDeleteGate::Undo() {
 
 // CMDDELETEWIRE
 
-cmdDeleteWire::cmdDeleteWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid) : klsCommand(true, "Delete Wire") {
+cmdDeleteWire::cmdDeleteWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid) : klsCommand(true, std2wx("Delete Wire")) {
 	this->gCircuit = gCircuit;
 	this->gCanvas = gCanvas;
 	this->wid = wid;
@@ -532,7 +532,7 @@ bool cmdDeleteWire::Undo() {
 
 // CMDDELETESELECTION
 
-cmdDeleteSelection::cmdDeleteSelection( GUICircuit* gCircuit, GUICanvas* gCanvas, vector < unsigned long > &gates, vector < unsigned long > &wires) : klsCommand(true, "Delete Selection") {
+cmdDeleteSelection::cmdDeleteSelection( GUICircuit* gCircuit, GUICanvas* gCanvas, vector < unsigned long > &gates, vector < unsigned long > &wires) : klsCommand(true, std2wx("Delete Selection")) {
 	this->gCircuit = gCircuit;
 	this->gCanvas = gCanvas;
 	for (unsigned int i = 0; i < gates.size(); i++) this->gates.push_back(gates[i]);
@@ -564,7 +564,7 @@ bool cmdDeleteSelection::Undo() {
 
 // CMDCONNECTWIRE
 
-cmdConnectWire::cmdConnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape ) : klsCommand(true, "Connection") {
+cmdConnectWire::cmdConnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape ) : klsCommand(true, std2wx("Connection")) {
 	this->gCircuit = gCircuit;
 	this->wid = wid;
 	this->gid = gid;
@@ -572,7 +572,7 @@ cmdConnectWire::cmdConnectWire( GUICircuit* gCircuit, unsigned long wid, unsigne
 	this->noCalcShape = noCalcShape;
 }
 
-cmdConnectWire::cmdConnectWire( string def ) : klsCommand(true, "Connection") {
+cmdConnectWire::cmdConnectWire( string def ) : klsCommand(true, std2wx("Connection")) {
 	istringstream iss(def);
 	string dump;
 	iss >> dump >> wid >> gid >> hotspot;
@@ -621,7 +621,7 @@ void cmdConnectWire::setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash
 
 // CMDDISCONNECTWIRE
 
-cmdDisconnectWire::cmdDisconnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape ) : klsCommand(true, "Disconnection") {
+cmdDisconnectWire::cmdDisconnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape ) : klsCommand(true, std2wx("Disconnection")) {
 	this->gCircuit = gCircuit;
 	this->wid = wid;
 	this->gid = gid;
@@ -665,7 +665,7 @@ string cmdDisconnectWire::toString() {
 
 // CMDMERGEWIRE
 
-cmdMergeWire::cmdMergeWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid1, unsigned long wid2, GLPoint2f mc ) : klsCommand(true, "Connection") {
+cmdMergeWire::cmdMergeWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid1, unsigned long wid2, GLPoint2f mc ) : klsCommand(true, std2wx("Connection")) {
 	this->gCircuit = gCircuit;
 	this->gCanvas = gCanvas;
 	this->wid1 = wid1;
@@ -791,7 +791,7 @@ bool cmdMergeWire::Undo() {
 
 // CMDSETPARAMS
 
-cmdSetParams::cmdSetParams( GUICircuit* gCircuit, unsigned long gid, paramSet pSet, bool setMode ) : klsCommand(true, "Set Parameter") {
+cmdSetParams::cmdSetParams( GUICircuit* gCircuit, unsigned long gid, paramSet pSet, bool setMode ) : klsCommand(true, std2wx("Set Parameter")) {
 	if ( (gCircuit->getGates())->find(gid) == (gCircuit->getGates())->end() ) return; // error: gate not found
 	this->gCircuit = gCircuit;
 	this->gid = gid;
@@ -824,7 +824,7 @@ cmdSetParams::cmdSetParams( GUICircuit* gCircuit, unsigned long gid, paramSet pS
 	}
 }
 
-cmdSetParams::cmdSetParams(string def) : klsCommand(true, "Set Parameter") {
+cmdSetParams::cmdSetParams(string def) : klsCommand(true, std2wx("Set Parameter")) {
 	this->fromString = true;
 	istringstream iss(def);
 	string dump; char comma;
@@ -934,7 +934,7 @@ void cmdSetParams::setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_m
 
 // CMDPASTEBLOCK
 
-cmdPasteBlock::cmdPasteBlock( vector < klsCommand* > &cmdList ) : klsCommand(true, "Paste") { 
+cmdPasteBlock::cmdPasteBlock( vector < klsCommand* > &cmdList ) : klsCommand(true, std2wx("Paste")) { 
 	for (unsigned int i = 0; i < cmdList.size(); i++) this->cmdList.push_back(cmdList[i]);
 	m_init = false;
 }
@@ -957,7 +957,7 @@ bool cmdPasteBlock::Undo() {
 
 // CMDWIRESEGDRAG
 
-cmdWireSegDrag::cmdWireSegDrag( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wireID ) : klsCommand(true, "Wire Shape") {
+cmdWireSegDrag::cmdWireSegDrag( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wireID ) : klsCommand(true, std2wx("Wire Shape")) {
 	this->gCircuit = gCircuit;
 	this->gCanvas = gCanvas;
 	this->wireID = wireID;
