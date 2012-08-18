@@ -11,7 +11,6 @@
 #include "guiGate.h"
 #include "wx/wx.h"
 #include "MainApp.h"
-#include "glf.h"
 #include "klsCollisionChecker.h"
 #include "paramDialog.h"
 #include <iomanip>
@@ -23,6 +22,16 @@ guiGate::guiGate() : klsCollisionObject(COLL_GATE) {
 	myY = 1.0;
 	selected = false;
 	gparams["angle"] = "0.0";
+}
+
+guiGate::~guiGate(){
+	// Destroy the hotspots:
+	map< string, gateHotspot* >::iterator hs = hotspots.begin();
+	while( hs != hotspots.end() ) {
+		delete (hs->second);
+		hotspots.erase(hs);
+		hs = hotspots.begin();
+	}
 }
 
 // Run through my connections and update the merges
@@ -243,7 +252,7 @@ void guiGate::insertHotspot( float x1, float y1, string connection ) {
 	hotspots[connection] = newHS;
 	
 	// Add the hs to the gate's sub-object list:
-	cData.subObjs.insert( newHS );
+	this->insertSubObject( newHS );
 	
 	// Update the hotspot's world-space bbox:
 	updateBBoxes();
@@ -355,6 +364,20 @@ void guiGate::saveGate(XMLParser* xparse) {
 		xparse->closeTag("lparam");
 		pParams++;
 	}
+	
+	//*********************************
+	//Edit by Joshua Lansford 6/06/2007
+	//I want the ram files to save their contents to file
+	//with the circuit.  However, I don't want to send
+	//an entire page of data up to the gui each time
+	//an entry changes.
+	//This way the ram gate can intelegently save what
+	//it wants to into the file.
+	//Also any other gate that wishes too, can also
+	//save specific stuff.
+	this->saveGateTypeSpecifics( xparse );
+	//End of edit***********************
+	
 	xparse->closeTag("gate");	
 }
 
@@ -379,41 +402,40 @@ guiGateTOGGLE::guiGateTOGGLE() {
 }
 
 void guiGateTOGGLE::draw( bool color ) {
-	// Position the gate at its x and y coordinates:
-	glLoadMatrixd(mModel);
-	
-	// Add the rectangle:
-	GLfloat oldColor[4];
-	glGetFloatv( GL_CURRENT_COLOR, oldColor );
-	
-	if( getLogicParam("OUTPUT_NUM") == "1" ) {
-		glColor4f( 1.0, 0.0, 0.0, 1.0 );
-	} else {
-		glColor4f( 0.0, 0.0, 0.0, 1.0 );
-	}
-
-	// Get the size of the CLICK square from the parameters:
-	string clickBox = getGUIParam( "CLICK_BOX" );
-	istringstream iss(clickBox);
-	GLdouble minx = -0.5;
-	GLdouble miny = -0.5;
-	GLdouble maxx = 0.5;
-	GLdouble maxy = 0.5;
-	char dump;
-	iss >> minx >> dump >> miny >> dump >> maxx >> dump >> maxy;
-
-	//Inner Square
-	if (color) glRectd  ( minx, miny, maxx, maxy ) ;
-	
-	// Set the color back to the old color:
-	glColor4f( oldColor[0], oldColor[1], oldColor[2], oldColor[3] );
-
 	// Draw the default lines:
 	guiGate::draw(color);
+	
+	// Add the rectangle:
+	glColor4f( (float)renderInfo_outputNum, 0.0, 0.0, 1.0 );
+
+	//Inner Square
+	if (color) glRectd  ( renderInfo_clickBox.begin.x, renderInfo_clickBox.begin.y, 
+			renderInfo_clickBox.end.x, renderInfo_clickBox.end.y ) ;
+	
+	// Set the color back to the old color:
+	glColor4f( 0.0, 0.0, 0.0, 1.0 );
+}
+
+void guiGateTOGGLE::setGUIParam( string paramName, string value ) {
+	if (paramName == "CLICK_BOX") {
+		istringstream iss(value);
+		char dump;
+		iss >> renderInfo_clickBox.begin.x >> dump >> renderInfo_clickBox.begin.y >>
+			dump >> renderInfo_clickBox.end.x >> dump >> renderInfo_clickBox.end.y;
+	}
+	guiGate::setGUIParam(paramName, value);
+}
+
+void guiGateTOGGLE::setLogicParam( string paramName, string value ) {
+	if (paramName == "OUTPUT_NUM") {
+		istringstream iss(value);
+		iss >> renderInfo_outputNum;
+	}
+	guiGate::setLogicParam(paramName, value);
 }
 
 // Toggle the output button on and off:
-string guiGateTOGGLE::checkClick( GLfloat x, GLfloat y ) {
+klsMessage::Message_SET_GATE_PARAM* guiGateTOGGLE::checkClick( GLfloat x, GLfloat y ) {
 	klsBBox toggleButton;
 
 	// Get the size of the CLICK square from the parameters:
@@ -433,10 +455,10 @@ string guiGateTOGGLE::checkClick( GLfloat x, GLfloat y ) {
 
 	if (toggleButton.contains( GLPoint2f( x, y ) )) {
 		setLogicParam("OUTPUT_NUM", (getLogicParam("OUTPUT_NUM") == "0") ? "1" : "0" );
-		ostringstream oss;
-		oss << "SET GATE ID " << getID() << " PARAMETER OUTPUT_NUM " << getLogicParam("OUTPUT_NUM");
-		return oss.str();
-	} else return "";
+/*		ostringstream oss;
+		oss << "SET GATE ID " << getID() << " PARAMETER OUTPUT_NUM " << getLogicParam("OUTPUT_NUM"); */
+		return new klsMessage::Message_SET_GATE_PARAM(getID(), "OUTPUT_NUM", getLogicParam("OUTPUT_NUM"));
+	} else return NULL;
 }
 
 // ******************** END guiGateTOGGLE **********************
@@ -459,59 +481,57 @@ void guiGateKEYPAD::draw( bool color ) {
 	// Position the gate at its x and y coordinates:
 	glLoadMatrixd(mModel);
 	
-	// Add the rectangle:
-	GLfloat oldColor[4];
-	glGetFloatv( GL_CURRENT_COLOR, oldColor );
+	// Add the rectangle - this is a highlight so needs done before main gate draw:
 	glColor4f( 0.0, 0.4, 1.0, 0.3 );
 
-	// Get the size of the CLICK square from the parameters:
-	//  Get param KEYPAD_BOX_<keypadValue>
-	ostringstream ossParamName;
-	if (getLogicParam("OUTPUT_NUM") != "") {
-		string decKeypadValue = getLogicParam("OUTPUT_NUM");
-		istringstream iss(decKeypadValue);
-		int intVal;
-		iss >> intVal;
-        ostringstream ossVal;
-		// Convert to hex
-        for (int i=2*sizeof(int) - 1; i>=0; i--) {
-            ossVal << "0123456789ABCDEF"[((intVal >> i*4) & 0xF)];
-        }
-        iss.clear(); iss.str(getLogicParam("OUTPUT_BITS"));
-        iss >> intVal;
-        string currentValue = ossVal.str().substr(ossVal.str().size()-(intVal/4),(intVal/4));		
-		ossParamName << "KEYPAD_BOX_" << currentValue;
-	} else {
-		map < string, string >::iterator gparamWalk = gparams.begin();
-		while (gparamWalk != gparams.end()) {
-			if ((gparamWalk->first).substr(0,11) != "KEYPAD_BOX_") { gparamWalk++; continue; }
-			ossParamName << gparamWalk->first;
-			break;
-		}
-	}
-	if (ossParamName.str() != "") {
-		string clickBox = getGUIParam( ossParamName.str() );
-		istringstream iss(clickBox);
-		GLdouble minx = -0.5;
-		GLdouble miny = -0.5;
-		GLdouble maxx = 0.5;
-		GLdouble maxy = 0.5;
-		char dump;
-		iss >> minx >> dump >> miny >> dump >> maxx >> dump >> maxy;
-	
-		//Inner Square
-		if (color) glRectd  ( minx, miny, maxx, maxy ) ;
-	}
+	//Inner Square
+	if (color) glRectd  ( renderInfo_valueBox.begin.x, renderInfo_valueBox.begin.y, 
+			renderInfo_valueBox.end.x, renderInfo_valueBox.end.y ) ;
 	
 	// Set the color back to the old color:
-	glColor4f( oldColor[0], oldColor[1], oldColor[2], oldColor[3] );
+	glColor4f( 0.0, 0.0, 0.0, 1.0 );
 
 	// Draw the default lines:
 	guiGate::draw(color);
 }
 
+void guiGateKEYPAD::setLogicParam( string paramName, string value ) {
+	if (paramName == "OUTPUT_NUM" || paramName == "OUTPUT_BITS") {
+		istringstream iss(paramName == "OUTPUT_NUM" ? value : lparams["OUTPUT_NUM"]);
+		int intVal;
+		iss >> intVal;
+        ostringstream ossVal, ossParamName;
+		// Convert to hex
+        for (int i=2*sizeof(int) - 1; i>=0; i--) {
+            ossVal << "0123456789ABCDEF"[((intVal >> i*4) & 0xF)];
+        }
+        iss.clear(); iss.str(paramName == "OUTPUT_BITS" ? value : lparams["OUTPUT_BITS"]);
+        iss >> intVal;
+        string currentValue = ossVal.str().substr(ossVal.str().size()-(intVal/4),(intVal/4));		
+		ossParamName << "KEYPAD_BOX_" << currentValue;
+		if (gparams.find(ossParamName.str()) == gparams.end()) {
+			ossParamName.str("");
+			map < string, string >::iterator gparamWalk = gparams.begin();
+			while (gparamWalk != gparams.end()) {
+				if ((gparamWalk->first).substr(0,11) != "KEYPAD_BOX_") { gparamWalk++; continue; }
+				ossParamName << gparamWalk->first;
+				break;
+			}			
+		}
+		if (ossParamName.str() != "") {
+			string clickBox = getGUIParam( ossParamName.str() );
+			istringstream iss(clickBox);
+			char dump;
+			iss >> renderInfo_valueBox.begin.x >> dump >> renderInfo_valueBox.begin.y >> 
+				dump >> renderInfo_valueBox.end.x >> dump >> renderInfo_valueBox.end.y;
+		}		
+	}
+
+	guiGate::setLogicParam(paramName, value);
+}
+
 // Check the click boxes for the keypad and set appropriately:
-string guiGateKEYPAD::checkClick( GLfloat x, GLfloat y ) {
+klsMessage::Message_SET_GATE_PARAM* guiGateKEYPAD::checkClick( GLfloat x, GLfloat y ) {
 	map < string, string >::iterator gparamWalk = gparams.begin();
 	while (gparamWalk != gparams.end()) {
 		// Is this a keypad box param?
@@ -545,14 +565,14 @@ string guiGateKEYPAD::checkClick( GLfloat x, GLfloat y ) {
 			ostringstream ossValue;
 			ossValue << keypadIntVal;
 			setLogicParam("OUTPUT_NUM", ossValue.str() );
-			ostringstream oss;
-			oss << "SET GATE ID " << getID() << " PARAMETER OUTPUT_NUM " << getLogicParam("OUTPUT_NUM");
-			return oss.str();
+/*			ostringstream oss;
+			oss << "SET GATE ID " << getID() << " PARAMETER OUTPUT_NUM " << getLogicParam("OUTPUT_NUM"); */
+			return new klsMessage::Message_SET_GATE_PARAM(getID(), "OUTPUT_NUM", getLogicParam("OUTPUT_NUM"));
 		}
 		gparamWalk++;
 	}
 	
-	return "";
+	return NULL;
 }
 
 // ******************** END guiGateKEYPAD **********************
@@ -564,100 +584,112 @@ guiGateREGISTER::guiGateREGISTER() {
 	// Default to 0 when creating:
 	//NOTE: Does not send this to the core, just updates it
 	// on the GUI side.
+	renderInfo_numDigitsToShow = 1;
 	setLogicParam( "CURRENT_VALUE", "0" );
 	setLogicParam( "UNKNOWN_OUTPUTS", "false" );
 }
 
 void guiGateREGISTER::draw( bool color ) {
-	// Position the gate at its x and y coordinates:
-	glLoadMatrixd(mModel);
+	// Draw the default lines:
+	guiGate::draw(color);
 
-	// Get my master box for value display
-	string clickBox = getGUIParam( "VALUE_BOX" );
-	istringstream iss(clickBox);
-	GLdouble minx = -0.5;
-	GLdouble miny = -0.5;
-	GLdouble maxx = 0.5;
-	GLdouble maxy = 0.5;
-	char dump;
-	iss >> minx >> dump >> miny >> dump >> maxx >> dump >> maxy;
-	GLdouble diffx = maxx - minx;
-	GLdouble diffy = maxy - miny;
+	float diffx = renderInfo_diffx;
+	float diffy = renderInfo_diffy;
 	
-	// How many digits should I show? (min of 1)
-	iss.clear(); iss.str( getLogicParam( "INPUT_BITS" ) );
-	int numDigitsToShow = 1;
-	iss >> numDigitsToShow;
-	numDigitsToShow = (int) ceil( ((double) numDigitsToShow) / 4.0 );
-	if (numDigitsToShow == 0) numDigitsToShow = 1;
-	diffx /= (double)numDigitsToShow; // set width of each digit
-	unsigned int currentDigit = 0; // which one are we looking at?
+	diffx /= (double)renderInfo_numDigitsToShow; // set width of each digit
 	
 	//Inner Square for value
 	if (color) {
 		// Display box
 		glBegin( GL_LINE_LOOP );
-			glVertex2f(minx,miny);
-			glVertex2f(minx,maxy);
-			glVertex2f(maxx,maxy);
-			glVertex2f(maxx,miny);
+			glVertex2f(renderInfo_valueBox.begin.x,renderInfo_valueBox.begin.y);
+			glVertex2f(renderInfo_valueBox.begin.x,renderInfo_valueBox.end.y);
+			glVertex2f(renderInfo_valueBox.end.x,renderInfo_valueBox.end.y);
+			glVertex2f(renderInfo_valueBox.end.x,renderInfo_valueBox.begin.y);
 		glEnd();
 		
 		// Draw the number in red (or blue if inputs are not all sane)
-		GLfloat oldColor[4];
-		glGetFloatv( GL_CURRENT_COLOR, oldColor );
-
-		bool doBlue = (getLogicParam("UNKNOWN_OUTPUTS") == "true");
-
-		if (doBlue) glColor4f( 0.0, 0.0, 1.0, 1.0 );
+		if (renderInfo_drawBlue) glColor4f( 0.3, 0.3, 1.0, 1.0 );
 		else glColor4f( 1.0, 0.0, 0.0, 1.0 );
 
 		GLfloat lineWidthOld;
 		glGetFloatv(GL_LINE_WIDTH, &lineWidthOld);
 		glLineWidth(2.0);
-		iss.clear(); iss.str(getLogicParam( "CURRENT_VALUE" ));
-		int intVal;
-		iss >> intVal;
-        ostringstream ossVal;
-        for (int i=2*sizeof(int) - 1; i>=0; i--) {
-            ossVal << "0123456789ABCDEF"[((intVal >> i*4) & 0xF)];
-        }
-        string currentValue = ossVal.str().substr(ossVal.str().size()-numDigitsToShow,numDigitsToShow);
         
 		// THESE ARE ALL SEVEN SEGMENTS WITH DIFFERENTIAL COORDS.  USE THEM FOR EACH DIGIT VALUE FOR EACH DIGIT
 		//		AND INCREMENT CURRENTDIGIT.  CURRENTDIGIT=0 IS MSB.
 		glBegin( GL_LINES );
-		for (currentDigit = 0; currentDigit < currentValue.size(); currentDigit++) {
-			char c = currentValue[currentDigit];
+		for (unsigned int currentDigit = 0; currentDigit < renderInfo_currentValue.size(); currentDigit++) {
+			char c = renderInfo_currentValue[currentDigit];
 			if ( c != '1' && c != '4' && c != 'B' && c != 'D' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.88462)); // TOP
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.88462)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.88462)); // TOP
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.88462)); }
 			if ( c != '0' && c != '1' && c != '7' && c != 'C' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.5)); // MID
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.5)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.5)); // MID
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.5)); }
 			if ( c != '1' && c != '4' && c != '7' && c != '9' && c != 'A' && c != 'F' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.11538)); // BOTTOM
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.11538)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.11538)); // BOTTOM
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.11538)); }
 			if ( c != '1' && c != '2' && c != '3' && c != '7' && c != 'D' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.88462)); // TL
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.5)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.88462)); // TL
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.5)); }
 			if ( c != '5' && c != '6' && c != 'B' && c != 'C' && c != 'E' && c != 'F' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.88462)); // TR
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.5)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.88462)); // TR
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.5)); }
 			if ( c != '1' && c != '3' && c != '4' && c != '5' && c != '7' && c != '9' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.11538)); // BL
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.1875),miny+(diffy*0.5)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.11538)); // BL
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.1875),renderInfo_valueBox.begin.y+(diffy*0.5)); }
 			if ( c != '2' && c != 'C' && c != 'E' && c != 'F' ) {
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.11538)); // BR
-				glVertex2f(minx+(diffx*currentDigit)+(diffx*0.8125),miny+(diffy*0.5)); }
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.11538)); // BR
+				glVertex2f(renderInfo_valueBox.begin.x+(diffx*currentDigit)+(diffx*0.8125),renderInfo_valueBox.begin.y+(diffy*0.5)); }
 		}
 		glEnd();
 		glLineWidth(lineWidthOld);
-		glColor4f( oldColor[0], oldColor[1], oldColor[2], oldColor[3] );
+		glColor4f( 0.0, 0.0, 0.0, 1.0 );
 	}
+}
 
-	// Draw the default lines:
-	guiGate::draw(color);
+void guiGateREGISTER::setLogicParam( string paramName, string value ) {
+	int intVal;
+	if (paramName == "INPUT_BITS") {
+		// How many digits should I show? (min of 1)
+		istringstream iss( value );
+		iss >> renderInfo_numDigitsToShow;
+		renderInfo_numDigitsToShow = (int) ceil( ((double) renderInfo_numDigitsToShow) / 4.0 );
+		if (renderInfo_numDigitsToShow == 0) renderInfo_numDigitsToShow = 1;
+		if (getLogicParam("CURRENT_VALUE") != "") {
+			iss.clear(); iss.str( getLogicParam("CURRENT_VALUE") );
+			iss >> intVal;		
+	        ostringstream ossVal;
+	        for (int i=2*sizeof(int) - 1; i>=0; i--) {
+	            ossVal << "0123456789ABCDEF"[((intVal >> i*4) & 0xF)];
+	        }
+	        renderInfo_currentValue = ossVal.str().substr(ossVal.str().size()-renderInfo_numDigitsToShow,renderInfo_numDigitsToShow);
+		}
+	} else if (paramName == "UNKNOWN_OUTPUTS") {
+		renderInfo_drawBlue = (value == "true");
+	} else if (paramName == "CURRENT_VALUE") {
+		istringstream iss( value );
+		iss >> intVal;		
+        ostringstream ossVal;
+        for (int i=2*sizeof(int) - 1; i>=0; i--) {
+            ossVal << "0123456789ABCDEF"[((intVal >> i*4) & 0xF)];
+        }
+        renderInfo_currentValue = ossVal.str().substr(ossVal.str().size()-renderInfo_numDigitsToShow,renderInfo_numDigitsToShow);
+	}
+	guiGate::setLogicParam(paramName, value);
+}
+
+void guiGateREGISTER::setGUIParam( string paramName, string value ) {
+	if (paramName == "VALUE_BOX") {
+		istringstream iss(value);
+		char dump;
+		iss >> renderInfo_valueBox.begin.x >> dump >> renderInfo_valueBox.begin.y >>
+			dump >> renderInfo_valueBox.end.x >> dump >> renderInfo_valueBox.end.y;
+		renderInfo_diffx = renderInfo_valueBox.end.x - renderInfo_valueBox.begin.x;
+		renderInfo_diffy = renderInfo_valueBox.end.y - renderInfo_valueBox.begin.y;
+	}
+	guiGate::setGUIParam(paramName, value);
 }
 
 // ******************** END guiGateREGISTER **********************
@@ -667,7 +699,7 @@ void guiGateREGISTER::draw( bool color ) {
 
 // Send a pulse message to the logic core whenever the gate is
 // clicked on:
-string guiGatePULSE::checkClick( GLfloat x, GLfloat y ) {
+klsMessage::Message_SET_GATE_PARAM* guiGatePULSE::checkClick( GLfloat x, GLfloat y ) {
 	klsBBox toggleButton;
 
 	// Get the size of the CLICK square from the parameters:
@@ -686,10 +718,10 @@ string guiGatePULSE::checkClick( GLfloat x, GLfloat y ) {
 	toggleButton.addPoint( modelToWorld( GLPoint2f( maxx, maxy ) ) );
 
 	if (toggleButton.contains( GLPoint2f( x, y ) )) {
-		ostringstream oss;
-		oss << "SET GATE ID " << getID() << " PARAMETER PULSE " << getGUIParam("PULSE_WIDTH");
-		return oss.str();
-	} else return "";
+/*		ostringstream oss;
+		oss << "SET GATE ID " << getID() << " PARAMETER PULSE " << getGUIParam("PULSE_WIDTH"); */
+		return new klsMessage::Message_SET_GATE_PARAM(getID(), "PULSE", getGUIParam("PULSE_WIDTH"));
+	} else return NULL;
 }
 
 // ******************** END guiGatePULSE **********************
@@ -709,10 +741,6 @@ void guiGateLED::draw( bool color ) {
 	// Draw the default lines:
 	guiGate::draw(color);
 	
-	// Add the rectangle:
-	GLfloat oldColor[4];
-	glGetFloatv( GL_CURRENT_COLOR, oldColor );
-
 	// Get the first connected input in the LED's library description:
 	// map i/o name to wire id
 	map< string, guiWire* >::iterator theCnk = connections.begin();
@@ -728,33 +756,33 @@ void guiGateLED::draw( bool color ) {
 		glColor4f( 1.0, 0.0, 0.0, 1.0 );
 		break;
 	case HI_Z:
-		glColor4f( 0.0, 1.0, 0.0, 1.0 );
+		glColor4f( 0.0, 0.78, 0.0, 1.0 );
 		break;
 	case UNKNOWN:
-		glColor4f( 0.0, 0.0, 1.0, 1.0 );
+		glColor4f( 0.3, 0.3, 1.0, 1.0 );
 		break;
 	case CONFLICT:
 		glColor4f( 0.0, 1.0, 1.0, 1.0 );
 		break;
 	}
 
-	// Get the size of the LED square from the parameters:
-	string ledBox = getGUIParam( "LED_BOX" );
-	istringstream iss(ledBox);
-	GLdouble minx = -0.5;
-	GLdouble miny = -0.5;
-	GLdouble maxx = 0.5;
-	GLdouble maxy = 0.5;
-	char dump;
-	iss >> minx >> dump >> miny >> dump >> maxx >> dump >> maxy;
-
 	//Inner Square
-	if (color) glRectd  ( minx, miny, maxx, maxy ) ;
+	if (color) glRectd  ( renderInfo_ledBox.begin.x, renderInfo_ledBox.begin.y, 
+			renderInfo_ledBox.end.x, renderInfo_ledBox.end.y ) ;
 
-	// Set the color back to the old color:
-	glColor4f( oldColor[0], oldColor[1], oldColor[2], oldColor[3] );
+	// Set the color back to black:
+	glColor4f( 0.0, 0.0, 0.0, 1.0 );
 }
 
+void guiGateLED::setGUIParam( string paramName, string value ) {
+	if (paramName == "LED_BOX") {
+		istringstream iss(value);
+		char dump;
+		iss >> renderInfo_ledBox.begin.x >> dump >> renderInfo_ledBox.begin.y >>
+			dump >> renderInfo_ledBox.end.x >> dump >> renderInfo_ledBox.end.y;
+	}
+	guiGate::setGUIParam(paramName, value);
+}
 
 // ********************************** guiLabel ***********************************
 
@@ -818,9 +846,13 @@ void guiLabel::setGUIParam( string paramName, string value ) {
 
 void guiLabel::calcBBox( void ) {
 	GLbox textBBox = theText.getBoundingBox();
+	float dx = fabs(textBBox.right-textBBox.left)/2.;
+	float dy = fabs(textBBox.top-textBBox.bottom)/2.;
+	double currentX, currentY; theText.getPosition(currentX, currentY);
+	theText.setPosition(-dx, +dy);
 	modelBBox.reset();
-	modelBBox.addPoint( GLPoint2f(textBBox.left, textBBox.bottom) );
-	modelBBox.addPoint( GLPoint2f(textBBox.right, textBBox.top) );
+	modelBBox.addPoint( GLPoint2f(textBBox.left-dx, textBBox.bottom+dy) );
+	modelBBox.addPoint( GLPoint2f(textBBox.right-dx, textBBox.top+dy) );
 
 	// Recalculate the world-space bbox:
 	updateBBoxes();
@@ -844,7 +876,7 @@ guiTO_FROM::guiTO_FROM() {
 void guiTO_FROM::draw( bool color ) {
 	// Draw the lines for this gate:
 	guiGate::draw();
-	
+
 	// Position the gate at its x and y coordinates:
 	glLoadMatrixd(mModel);
 	
@@ -855,6 +887,31 @@ void guiTO_FROM::draw( bool color ) {
 	} else {
 		theText.setColor( 0.0, 0.0, 0.0, 1.0 );
 	}
+	
+	//********************************
+	//Edit by Joshua Lansford 04/04/07
+	//Upside down text on tos and froms
+	//isn't that exciting.
+	//This will rotate the text around
+	//before it is printed
+	if( this->getGUIParam( "angle" ) == "180" ||
+	    this->getGUIParam( "angle" ) ==  "90" ){
+		
+		//scoot the label over
+		GLbox textBBox = theText.getBoundingBox();
+		GLdouble textWidth = textBBox.right - textBBox.left;
+		int direction = 0;
+		if( getGUIType() == "TO" ) {
+			direction = +1;
+		} else if (getGUIType() == "FROM") {
+			direction = -1;
+		}
+		glTranslatef( direction * (textWidth + FLIPPED_OFFSET), 0, 0 );
+		
+		//and spin it around
+		glRotatef( 180, 0.0, 0.0, 1.0);
+	}
+	//End of Edit*********************
 	
 	// Draw the text:
 	theText.draw();
@@ -892,81 +949,203 @@ void guiTO_FROM::calcBBox( void ) {
 		GLPoint2f bR = modelBBox.getBottomRight();
 		bR.x += textWidth;
 		modelBBox.addPoint( bR );
-		theText.setPosition( TO_BUFFER, 0.0 );
+		theText.setPosition( TO_BUFFER, TO_FROM_TEXT_HEIGHT/2+0.30 );
 	} else if (getGUIType() == "FROM") {
 		GLPoint2f tL = modelBBox.getTopLeft();
 		tL.x -= (textWidth + FROM_BUFFER);
 		modelBBox.addPoint( tL );
-		theText.setPosition( tL.x + FROM_FIX_SHIFT, 0.0 );
+		theText.setPosition( tL.x + FROM_FIX_SHIFT, TO_FROM_TEXT_HEIGHT/2+0.30 );
 	}
 
 	// Recalculate the world-space bbox:
 	updateBBoxes();
 }
 
+// ************************ RAM gate ****************************
 
-
-
-
-// ************************ Counter gate *************************
-
-guiGateCOUNTER::guiGateCOUNTER() {
+//*************************************************
+//Edit by Joshua Lansford 12/25/2006
+//I am creating a guiGate for the RAM so that
+//the ram can have its own special pop-up window
+guiGateRAM::guiGateRAM(){
 	guiGate();
-	
-	// Initialize the text objects:
-	R.setText("R");
-	R.setSize(0.8);
-	R.setPosition(-0.8, -2.5);
-	
-	E.setText("E");
-	E.setSize( 0.8 );
-	E.setPosition( -1.3, 1.0 );
-
-	CNT.setText("0");
-	CNT.setSize( 1.633 );
-	CNT.setPosition( 1.58, 1.2 );
+	ramPopupDialog = NULL;
 }
 
-void guiGateCOUNTER::draw( bool color ) {
-	// Draw the lines for this gate:
-	guiGate::draw(color);
-	
-	// Position the gate at its x and y coordinates:
-	glLoadMatrixd(mModel);
-	
-	// Pick the color for the text:
-	if( selected && color ) {
-		GLdouble c = 1.0 - SELECTED_LABEL_INTENSITY;
-		R.setColor( 1.0, c / 4, c / 4, SELECTED_LABEL_INTENSITY );
-		E.setColor( 1.0, c / 4, c / 4, SELECTED_LABEL_INTENSITY );
-		CNT.setColor( 1.0, 0.0, 0.0, SELECTED_LABEL_INTENSITY );
-	} else {
-		R.setColor( 0.0, 0.0, 0.0, 1.0 );
-		E.setColor( 0.0, 0.0, 0.0, 1.0 );
-		CNT.setColor( 1.0, 0.0, 0.0, 1.0 );
-	}
-
-	StateType theState[4];
-	theState[0] = (isConnected("OUT_1") ? connections["OUT_1"]->getState() : UNKNOWN);
-	theState[1] = (isConnected("OUT_2") ? connections["OUT_2"]->getState() : UNKNOWN);
-	theState[2] = (isConnected("OUT_3") ? connections["OUT_3"]->getState() : UNKNOWN);
-	theState[3] = (isConnected("OUT_4") ? connections["OUT_4"]->getState() : UNKNOWN);
-
-	// Set the count text:
-	istringstream count(getLogicParam("CURRENT_VALUE"));
-	if (count.str().size() > 0) {
-		int counter;
-		count >> counter;
-		ostringstream modcount;
-		modcount << hex << counter;
-		string final = modcount.str();
-		if (final[final.size()-1] >= 'a' && final[final.size()-1] <= 'z') final[final.size()-1] += ('A'-'a');
-		CNT.setText(final);
-	}
-	// Draw the text:
-	if (color) {
-		R.draw();
-		E.draw();
-		CNT.draw();
+guiGateRAM::~guiGateRAM(){	
+	//Destroy is how you 'delete' wxwidget objects
+	if( ramPopupDialog != NULL ){
+		ramPopupDialog->Destroy();
+		ramPopupDialog = NULL;
 	}
 }
+
+
+void guiGateRAM::doParamsDialog( void* gc, wxCommandProcessor* wxcmd ){
+	if( ramPopupDialog == NULL ){
+		ramPopupDialog = new RamPopupDialog( this, addressBits, (GUICircuit*)gc );
+		ramPopupDialog->updateGridDisplay();
+	}
+	ramPopupDialog->Show( true );
+}
+
+//Saves the ram contents to the circuit file
+//when the circuit saves
+void guiGateRAM::saveGateTypeSpecifics( XMLParser* xparse ){
+	for( map< unsigned long, unsigned long >::iterator I = memory.begin();
+	     	I != memory.end();  ++I ){
+	     if( I->second != 0 ){
+			xparse->openTag("lparam");
+		    ostringstream memoryValue;
+			memoryValue << "Address:" << I->first << " " << I->second; 
+			xparse->writeTag("lparam", memoryValue.str());
+			xparse->closeTag("lparam");
+	     }
+	}
+}
+
+//Because the ram gui will be passed lots of data
+//from the ram logic, we don't want it all going
+//into the default hash of changed paramiters.
+//Thus we catch it here
+void guiGateRAM::setLogicParam( string paramName, string value ){
+	
+	if( paramName.substr( 0, 8 ) == "lastRead" ){	
+		//this makes it so that the pop-up will green things
+		//that have been just read
+		istringstream addressiss( value );
+		unsigned long address = 0;
+		addressiss >> address;
+		lastRead = address;
+		if( ramPopupDialog != NULL )
+			ramPopupDialog->updateGridDisplay();
+	}else if( paramName.substr( 0, 8 ) == "Address:" ){
+		istringstream addressiss( paramName.substr( 8 ) );
+		unsigned long address = 0;
+		addressiss >> address;
+		istringstream dataiss( value );
+		unsigned long data = 0;
+		dataiss >> data;
+		memory[ address ] = data;
+		if( ramPopupDialog != NULL )
+			ramPopupDialog->updateGridDisplay();
+		lastWritten = address;
+	}else if( paramName == "MemoryReset" ){
+		memory.clear();
+		if( ramPopupDialog != NULL )
+		    ramPopupDialog->notifyAllChanged();
+	}else if( paramName == "ADDRESS_BITS" ) {
+		istringstream dataiss( value );
+		dataiss >> addressBits;
+		guiGate::setLogicParam( paramName, value );
+		// Declare the address pins!		
+	} else if( paramName == "DATA_BITS" ) {
+		istringstream dataiss( value );
+		dataiss >> dataBits;
+		guiGate::setLogicParam( paramName, value );
+	}else{ 
+		guiGate::setLogicParam( paramName, value );
+	}
+}
+
+//This method is used by the RamPopupDialog to
+//learn what values are at different addresses
+//in memory.
+unsigned long guiGateRAM::getValueAt( unsigned long address ){
+	//we want to refrain from creating an entry for an item
+	//if it does not already exist.  Therefore we will not
+	//use the [] operator
+	map<unsigned long, unsigned long>::iterator finder = memory.find( address );
+	if( finder != memory.end() )
+		return finder->second;
+	return 0;
+}
+
+//These is used by the pop-up to determine
+//what was the last value read and written
+long guiGateRAM::getLastWritten(){
+	return lastWritten;
+}
+long guiGateRAM::getLastRead(){
+	return lastRead;
+}
+//End of edit
+//*************************************************
+
+// ************************ z80 gate ****************************
+
+//*************************************************
+//Edit by us 1/26/2006
+//I am creating a guiGate for the z80 so that
+//the Z80 can have its own special pop-up window
+guiGateZ80::guiGateZ80(){
+	guiGate();
+	z80PopupDialog = NULL;
+}
+
+guiGateZ80::~guiGateZ80(){	
+	//Destroy is how you 'delete' wxwidget objects
+	if( z80PopupDialog != NULL ){
+		z80PopupDialog->Destroy();
+		z80PopupDialog = NULL;
+	}
+}
+
+
+void guiGateZ80::doParamsDialog( void* gc, wxCommandProcessor* wxcmd ){
+	if( z80PopupDialog == NULL ){
+		z80PopupDialog = new Z80PopupDialog( this, (GUICircuit*)gc );
+	}
+	z80PopupDialog->Show( true );
+}
+
+void guiGateZ80::setLogicParam( string paramName, string value ){
+	
+
+	guiGate::setLogicParam( paramName, value );
+	
+	if (z80PopupDialog != NULL) {
+		z80PopupDialog->NotifyOfRegChange();
+	}
+	
+}
+//End of edit
+//*************************************************
+
+// ************************ ADC gate ****************************
+
+//*************************************************
+//Edit by Joshua Lansford 05/10/2007
+//I am creating a guiGate for the ADC so that
+//the ADC can have its own special pop-up window
+guiGateADC::guiGateADC(){
+	guiGate();
+	aDCPopupDialog = NULL;
+}
+
+guiGateADC::~guiGateADC(){	
+	//Destroy is how you 'delete' wxwidget objects
+	if( aDCPopupDialog != NULL ){
+		aDCPopupDialog->Destroy();
+		aDCPopupDialog = NULL;
+	}
+}
+
+
+void guiGateADC::doParamsDialog( void* gc, wxCommandProcessor* wxcmd ){
+	if( aDCPopupDialog == NULL ){
+		aDCPopupDialog = new ADCPopupDialog( this, (GUICircuit*)gc );
+		aDCPopupDialog->notifyValueChanged();
+	}
+	aDCPopupDialog->Show( true );
+}
+
+void guiGateADC::setLogicParam( string paramName, string value ){
+	guiGate::setLogicParam( paramName, value );
+	
+	if( paramName == "VALUE" and aDCPopupDialog != NULL )
+		aDCPopupDialog->notifyValueChanged();
+}
+
+//End of edit
+//*************************************************

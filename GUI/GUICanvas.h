@@ -139,7 +139,7 @@ public:
 	void deleteSelection();
 	
 	// Render this page
-    void OnRender();
+    void OnRender( bool noColor = false );
 
 	// Update the collision checker and refresh
 	void Update();
@@ -159,7 +159,7 @@ public:
 	void unselectAllWires();
 	
 	// Pointer to the main application graphic circuit
-	GUICircuit* gCircuit;
+	GUICircuit* getCircuit() { return gCircuit; };
 	
 	// Handle copy and paste for this canvas
 	void copyBlockToClipboard( void );
@@ -168,9 +168,12 @@ public:
 	// Tell the canvas which minimap it should use; sets the minimaps pointers and lists
 	void setMinimap(klsMiniMap* minimap) {
 		this->minimap = minimap;
-		minimap->setCanvas( this );
-		minimap->setLists( &gateList, &wireList );
-		updateMiniMap();
+		//Josh Edit 4/9/07
+		if( minimap != NULL ){
+			minimap->setCanvas( this );
+			minimap->setLists( &gateList, &wireList );
+			updateMiniMap();
+		}
 	};
 	
 	// Zoom the canvas to fit all items within it:
@@ -200,12 +203,14 @@ private:
 	klsCollisionObject* snapMouse;
 	klsCollisionObject* dragselectbox;
 	
+	// Pointer to the main application graphic circuit
+	GUICircuit* gCircuit;
+
 	// Maps of the gates and wires on this page
 	hash_map< unsigned long, guiGate* > gateList;
 	hash_map< unsigned long, guiWire* > wireList;
 	vector < unsigned long > selectedGates;
 	vector < unsigned long > selectedWires;
-
 
 	// Hotspot and wire highlights:
 	unsigned long hotspotGate; // The gate in which a hotspot is highlighted.

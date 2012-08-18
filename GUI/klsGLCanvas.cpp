@@ -11,6 +11,7 @@
 #include "klsGLCanvas.h"
 #include "MainApp.h"
 #include "paramDialog.h"
+#include "GLFont/glfont2.h"
 
 // Included to use the min() and max() templates:
 #include <algorithm>
@@ -85,11 +86,14 @@ klsGLCanvas::klsGLCanvas(wxWindow *parent, const wxString& name, wxWindowID id,
 	glInitialized = false;
 
 	minimap = NULL;
+	
+	canvasLocked = false;
 }
 
 
 klsGLCanvas::~klsGLCanvas() {
 	scrollTimer->Stop();
+	delete scrollTimer;
 	return;
 }
 
@@ -100,7 +104,7 @@ void klsGLCanvas::updateMiniMap() {
 }
 
 // Print the canvas contents to a bitmap:
-wxImage klsGLCanvas::renderToImage( unsigned long width, unsigned long height, unsigned long colorDepth ) {
+wxImage klsGLCanvas::renderToImage( unsigned long width, unsigned long height, unsigned long colorDepth, bool noColor ) {
 //WARNING!!! Heavily platform-dependent code ahead! This only works in MS Windows because of the
 // DIB Section OpenGL rendering.
 
@@ -145,14 +149,28 @@ wxImage klsGLCanvas::renderToImage( unsigned long width, unsigned long height, u
 	// Set the bitmap clear color:
 	glClearColor (1.0, 1.0, 1.0, 0.0);
 	glColor3b(0, 0, 0);
+
+  // Load the font texture
+  guiText::loadFont(wxGetApp().appSettings.textFontFile);
+    
 		
 	//TODO: Check if alpha is hardware supported, and
 	// don't enable it if not!
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	
+	//*********************************
+	//Edit by Joshua Lansford 4/05/07
+	//I placed this in here to hopefully
+	//anti-alis the the text font.
+	//however, it doesn't but it does
+	//anti-alies the gates which looks nice.
+	glEnable( GL_LINE_SMOOTH );
+	//End of edit
+		
 
 	// Do the rendering here.
-	klsGLCanvasRender();
+	klsGLCanvasRender( noColor );
 
 	// Flush the OpenGL buffer to make sure the rendering has happened:	
 	glFlush();
@@ -243,7 +261,7 @@ void klsGLCanvas::getViewport( GLPoint2f& p1, GLPoint2f& p2 ) {
 	p2.y = panY - (sz.GetHeight()*viewZoom);
 }
 
-void klsGLCanvas::klsGLCanvasRender( void ) {
+void klsGLCanvas::klsGLCanvasRender( bool noColor ) {
 	int w, h;
 	GetClientSize(&w, &h);
 
@@ -254,7 +272,12 @@ void klsGLCanvas::klsGLCanvasRender( void ) {
 	glColor4f( 0, 0, 0, 1 );
 
 	// Render the background grid:
-	if( grid.horizOn || grid.vertOn ) {
+	if( (grid.horizOn || grid.vertOn) && wxGetApp().appSettings.gridlineVisible ) {
+		// Note: since adding a very few line primitives is a small price to pay,
+		//	we not only draw the grid for the visible area, but also (PAN_STEP*viewZoom)
+		//	around the visible area.  This is so when the user pans, there will be no
+		//	flicker at the edge of the grid.
+		
 		GLfloat oldColor[4];
 		glGetFloatv( GL_CURRENT_COLOR, oldColor );
 
@@ -267,13 +290,13 @@ void klsGLCanvas::klsGLCanvasRender( void ) {
 			long gridSpacing = max( (long) (grid.horizSpacing + 0.5), (long) 1 ); // Limit the grid spacing options to integer values!
 			long glSpacing = max( (long) gridSpacing, (long) (MIN_GRID_SCREEN_SPACING * viewZoom) );
 
-			long firstX = (long)(glSpacing * floor( vW / (float) glSpacing + 0.5 ));
+			long firstX = (long)(glSpacing * floor( (vW-(PAN_STEP*viewZoom)) / (float) glSpacing + 0.5 ));
 
 			glColor4fv( grid.hColor );
 			glBegin(GL_LINES);
-			for( long x = firstX; x < vE; x += glSpacing ) {
-				glVertex2f( x, vS );
-				glVertex2f( x, vN );
+			for( long x = firstX; x < vE + (PAN_STEP*viewZoom); x += glSpacing ) {
+				glVertex2f( x, vS-(PAN_STEP*viewZoom) );
+				glVertex2f( x, vN+(PAN_STEP*viewZoom) );
 			}
 			glEnd();
 		}
@@ -282,13 +305,13 @@ void klsGLCanvas::klsGLCanvasRender( void ) {
 			long gridSpacing = max( (long) (grid.vertSpacing + 0.5), (long) 1 ); // Limit the grid spacing options to integer values!
 			long glSpacing = max( (long) gridSpacing, (long) (MIN_GRID_SCREEN_SPACING * viewZoom) );
 
-			long firstY = (long)(glSpacing * floor(vS / (float) glSpacing + 0.5));
+			long firstY = (long)(glSpacing * floor( (vS-(PAN_STEP*viewZoom)) / (float) glSpacing + 0.5 ));
 
 			glColor4fv( grid.vColor );
 			glBegin(GL_LINES);
-			for( long y = firstY; y < vN; y += glSpacing ) {
-				glVertex2f( vW, y );
-				glVertex2f( vE, y );
+			for( long y = firstY; y < vN + (PAN_STEP*viewZoom); y += glSpacing ) {
+				glVertex2f( vW-(PAN_STEP*viewZoom), y );
+				glVertex2f( vE+(PAN_STEP*viewZoom), y );
 			}
 			glEnd();
 		}
@@ -354,7 +377,7 @@ void klsGLCanvas::klsGLCanvasRender( void ) {
 	// Call subclassed Render():
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
-	OnRender();
+	OnRender( noColor );
 }
 
 
@@ -370,12 +393,28 @@ void klsGLCanvas::wxOnPaint(wxPaintEvent& event) {
 	{
 		glClearColor (1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		
 		//TODO: Check if alpha is hardware supported, and
 		// don't enable it if not!
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
+		
+		//*********************************
+		//Edit by Joshua Lansford 4/05/07
+		//I placed this in here to hopefully
+		//anti-alis the the text font.
+		//however, it doesn't but it does
+		//anti-alies the gates which looks nice.
+		//glEnable( GL_LINE_SMOOTH );
+		//End of edit
+		
+		// Load the font texture
+		guiText::loadFont(wxGetApp().appSettings.textFontFile);
 
+		// Connection point list
+		defineGLLists();
+		
 		glInitialized = true;
 	}
 
@@ -401,16 +440,21 @@ void klsGLCanvas::wxOnSize(wxSizeEvent& event)
     wxGLCanvas::OnSize(event);
 
     // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
-#ifndef __WXMOTIF__
-    if (GetContext())
-#endif
+	#ifndef __WXMOTIF__
+		if (GetContext())
+	#endif
     {
         SetCurrent();
         Refresh();
     }
 
-	OnSize();
-    event.Skip();
+	/**********
+	 * Edit by David Riggleman 5/22/11
+	 * 	These methods seemed to be causing flickering on resize events upon startup
+	 * 	so I commented them out
+	 */
+	//OnSize();
+    //event.Skip();
 
 }
 

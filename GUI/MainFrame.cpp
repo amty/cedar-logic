@@ -39,15 +39,19 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
 	EVT_MENU(wxID_REDO, MainFrame::OnRedo)
 	EVT_MENU(wxID_COPY, MainFrame::OnCopy)
 	EVT_MENU(wxID_PASTE, MainFrame::OnPaste)
-	EVT_MENU(Edit_Export, MainFrame::OnExportBitmap)
+	EVT_MENU(Edit_Export_BW, MainFrame::OnExportBitmapBW)
+	EVT_MENU(Edit_Export_C, MainFrame::OnExportBitmapC)
 	
     EVT_MENU(View_Oscope, MainFrame::OnOscope)
-   
+    EVT_MENU(View_Gridline, MainFrame::OnViewGridline)
+    EVT_MENU(View_WireConn, MainFrame::OnViewWireConn)
+    
 	EVT_TOOL(Tool_Pause, MainFrame::OnPause)
 	EVT_TOOL(Tool_Step, MainFrame::OnStep)
 	EVT_TOOL(Tool_ZoomIn, MainFrame::OnZoomIn)
 	EVT_TOOL(Tool_ZoomOut, MainFrame::OnZoomOut)
 	EVT_SCROLL(MainFrame::OnTimeStepModSlider)
+	EVT_TOOL(Tool_Lock, MainFrame::OnLock)
 	
 //    EVT_SIZE(MainFrame::OnSize)
 //    EVT_MAXIMIZE(MainFrame::OnMaximize)
@@ -76,7 +80,9 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 	if (wxGetApp().appSettings.lastDir == "") lastDirectory = wxGetHomeDir() + _T("/My Documents");
 	else lastDirectory = wxGetApp().appSettings.lastDir.c_str();
 
+	//////////////////////////////////////////////////////////////////////////
     // create a menu bar
+	//////////////////////////////////////////////////////////////////////////
     wxMenu *fileMenu = new wxMenu; // FILE MENU
 	fileMenu->Append(wxID_NEW, _T("&New\tCtrl+N"), _T("Create new circuit"));
 	fileMenu->Append(wxID_OPEN, _T("&Open\tCtrl+O"), _T("Open circuit"));
@@ -90,7 +96,12 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 
     wxMenu *viewMenu = new wxMenu; // VIEW MENU
     viewMenu->Append(View_Oscope, _T("&Oscope\tCtrl+G"), _T("Show the Oscope"));
-
+    wxMenu *settingsMenu = new wxMenu;
+    settingsMenu->AppendCheckItem(View_Gridline, _T("Display Gridlines"), _T("Toggle gridline display"));
+    settingsMenu->AppendCheckItem(View_WireConn, _T("Display Wire Connection Points"), _T("Toggle wire connection points"));
+    viewMenu->AppendSeparator();
+    viewMenu->AppendSubMenu(settingsMenu, _T("Settings"));
+    
     wxMenu *helpMenu = new wxMenu; // HELP MENU
     helpMenu->Append(wxID_HELP_CONTENTS, _T("&Contents...\tF1"), _T("Show Help system"));
 	helpMenu->AppendSeparator();
@@ -103,7 +114,10 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 	editMenu->Append(wxID_COPY, _T("Copy\tCtrl+C"), _T("Copy selection to clipboard"));
 	editMenu->Append(wxID_PASTE, _T("Paste\tCtrl+V"), _T("Paste selection from clipboard"));
 	editMenu->AppendSeparator();
-	editMenu->Append(Edit_Export, _T("Export bitmap"), _T("Export circuit bitmap to clipboard"));
+	wxMenu *exportMenu = new wxMenu;
+	exportMenu->Append(Edit_Export_BW, _T("Black and White"), _T("Export B&W circuit bitmap to clipboard"));
+	exportMenu->Append(Edit_Export_C, _T("Color"), _T("Export color circuit bitmap to clipboard"));
+	editMenu->AppendSubMenu(exportMenu, _T("Export bitmap"));
 	
     // now append the freshly created menu to the menu bar...
     wxMenuBar *menuBar = new wxMenuBar();
@@ -111,19 +125,78 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
     menuBar->Append(editMenu, _T("&Edit"));
     menuBar->Append(viewMenu, _T("&View"));
     menuBar->Append(helpMenu, _T("&Help"));
-	
+
+    // set checkmarks on settings menu
+    menuBar->Check(View_Gridline, wxGetApp().appSettings.gridlineVisible);
+    menuBar->Check(View_WireConn, wxGetApp().appSettings.wireConnVisible);
+    
     // ... and attach this menu bar to the frame
     SetMenuBar(menuBar);
-	// open a default library
+    
+	//////////////////////////////////////////////////////////////////////////
+    // parse a gate library
+	//////////////////////////////////////////////////////////////////////////
 #ifndef _PRODUCTION_
-	string libPath = "../GUI/TestGates.lib";
+	string libPath = wxGetApp().pathToExe + "../GUI/cl_gatedefs.lib";
+	//WARNING( "just so you know argv[0] == " );
+	//WARNING( wxString(wxGetApp().argv[0]) );
 #else
 	string libPath = wxGetApp().appSettings.gateLibFile;
 #endif
 	LibraryParse newLib(libPath);
 	wxGetApp().libParser = newLib;
 	
+	//////////////////////////////////////////////////////////////////////////
+    // create a toolbar
+	//////////////////////////////////////////////////////////////////////////
 	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0), wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
+	
+	wxBitmap bmpNew(wxBITMAP(new));
+	wxBitmap bmpOpen(wxBITMAP(open));
+	wxBitmap bmpSave(wxBITMAP(save));
+	wxBitmap bmpUndo(wxBITMAP(undo));
+	wxBitmap bmpRedo(wxBITMAP(redo));
+	wxBitmap bmpCopy(wxBITMAP(copy));
+	wxBitmap bmpPaste(wxBITMAP(paste));
+	wxBitmap bmpPrint(wxBITMAP(print));
+	wxBitmap bmpAbout(wxBITMAP(help));
+	wxBitmap bmpPause(wxBITMAP(pause));
+	wxBitmap bmpStep(wxBITMAP(step));
+	wxBitmap bmpZoomIn(wxBITMAP(zoomin));
+	wxBitmap bmpZoomOut(wxBITMAP(zoomout));
+	wxBitmap bmpLocked(wxBITMAP(locked));
+	
+	
+    int w = bmpNew.GetWidth(),
+        h = bmpNew.GetHeight();
+    toolBar->SetToolBitmapSize(wxSize(w, h));
+	toolBar->AddTool(wxID_NEW, _T("New"), bmpNew, _T("New"));
+	toolBar->AddTool(wxID_OPEN, _T("Open"), bmpOpen, wxT("Open"));
+	toolBar->AddTool(wxID_SAVE, _T("Save"), bmpSave, wxT("Save")); 
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_PRINT, _T("Print"), bmpPrint, wxT("Print"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_UNDO, _T("Undo"), bmpUndo, wxT("Undo"));
+	toolBar->AddTool(wxID_REDO, _T("Redo"), bmpRedo, wxT("Redo"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_COPY, _T("Copy"), bmpCopy, wxT("Copy"));
+	toolBar->AddTool(wxID_PASTE, _T("Paste"), bmpPaste, wxT("Paste"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(Tool_ZoomIn, _T("Zoom In"), bmpZoomIn, wxT("Zoom In"));
+	toolBar->AddTool(Tool_ZoomOut, _T("Zoom Out"), bmpZoomOut, wxT("Zoom Out"));
+	toolBar->AddSeparator();
+	toolBar->AddTool(Tool_Pause, _T("Pause/Resume"), bmpPause, wxT("Pause/Resume"), wxITEM_CHECK);
+	toolBar->AddTool(Tool_Step, _T("Step"), bmpStep, wxT("Step"));
+	timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
+	ostringstream oss;
+	oss << wxGetApp().timeStepMod << "ms";
+	timeStepModVal = new wxStaticText(toolBar, wxID_ANY, oss.str().c_str(), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
+	toolBar->AddControl( timeStepModSlider );
+	toolBar->AddControl( timeStepModVal );
+	toolBar->AddSeparator();
+	toolBar->AddTool(Tool_Lock, _T("Lock state"), bmpLocked, wxT("Lock state"), wxITEM_CHECK);
+	toolBar->AddSeparator();
+	toolBar->AddTool(wxID_ABOUT, _T("About"), bmpAbout, wxT("About"));
 	SetToolBar(toolBar);
 	toolBar->Show(true);
 
@@ -152,6 +225,7 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 	canvasBook = new wxNotebook(this, NOTEBOOK_ID, wxDefaultPosition, wxSize(400,400));
 	mainSizer->Add( canvasBook, wxSizerFlags(1).Expand().Border(wxALL, 0) );
 
+	//add 10 tabs
 	for (int i = 0; i < 10; i++) {
 		canvases.push_back(new GUICanvas(canvasBook, gCircuit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS));
 		ostringstream oss;
@@ -160,7 +234,7 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 	}
 	
 	currentCanvas = canvases[0];
-	gCircuit->gCanvas = currentCanvas;
+	gCircuit->setCurrentCanvas(currentCanvas);
 	currentCanvas->setMinimap(miniMap);
 	mainSizer->Show( canvasBook );
 	currentCanvas->SetFocus();
@@ -174,7 +248,6 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
        wxLogError(wxT("Can't start thread!"));
     }
 	
-	wxGetApp().appSystemTime = new wxStopWatch();
 	mTimer = new wxTimer(this, TIMER_ID);
 	mTimer->Stop();
 	idleTimer = new wxTimer(this, IDLETIMER_ID);
@@ -184,10 +257,8 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 	// Setup the "Maximize Catch" flag:
 	sizeChanged = false;
 	
-	gCircuit->myOscope = new OscopeFrame(this, _T("O-Scope"), gCircuit);
+	gCircuit->setOscope(new OscopeFrame(this, _T("O-Scope"), gCircuit));
 	
-	toolbarCreated = false;
-
 	toolBar->Realize();
 
 	// Create the print data object:
@@ -201,21 +272,47 @@ MainFrame::MainFrame(const wxString& title, string cmdFilename)
 }
 
 MainFrame::~MainFrame() {
+	
 	saveSettings();
 	
 	// Stop the timers so no more events fire
 	mTimer->Stop();
 	idleTimer->Stop();
+	
+	
 	// Shut down the detached thread and wait for it to exit
 	wxGetApp().logicThread->Delete();
+	
 	wxGetApp().m_semAllDone.Wait();
+	
+	
+	
 	// Delete the various objects
 	delete wxGetApp().helpController;
-	delete toolBar;
+	wxGetApp().helpController = NULL;
+	
+	
+	
+	//Edit by Joshua Lansford 10/18/2007.
+	//Commented out the delete on the toolbar.
+	//wxWidets auto deletes toolBars.  See the destructor for
+	//wxFrame.
+	//delete toolBar;
+	
+	
 	delete gCircuit;
-	delete wxGetApp().appSystemTime;
+	gCircuit = NULL;
+	
+	//Joshua Lansford Edit 10/18/07
+	//Removed the delete of systemTime because it was causeing a
+	//crash on close.  In stead, I changed it from a pointer
+	//to a local var so that it would not need to be deleted.
+	
 	delete mTimer;
+	mTimer = NULL;
+	
 	delete idleTimer;
+	idleTimer = NULL;
 }
 
 threadLogic *MainFrame::CreateThread()
@@ -235,32 +332,75 @@ threadLogic *MainFrame::CreateThread()
 // event handlers
 
 void MainFrame::OnClose(wxCloseEvent& event) {
-	wxGetApp().appSystemTime->Pause();
+	//Edit by Joshua Lansford 10/18/07
+	//Calling Destroy is not what was crashing the system.
+	//Deleting wxGetApp().appSystemTime in MainFrame::~MainFrame
+	//was crashing the system.  This problem was solved by
+	//replaceing the pointer appSystemTime with the non pointer
+	//appSystemTime.  Now it doesn't need to be deleted, and
+	//the system doesn't crash on close.
+	
+	//If Destroy is replaced with Close, then you get in
+	//an infinite loop because Close calls this method we
+	//are in right now.
+
+	//This synopsis is wrong... See comment above. ~JEL 10/18/07
+	
+	// The call to destroy the application window was causing abnormal
+	// termination.  I'm not sure why, but I'm guessing that after the
+	// window was destroyed, there was another reference to the window
+	// object (or one of its children) as the application closed down.
+	// I modified this event handler to note the destroy request with
+	// the static boolean variable below, and then in the presence of
+	// such a request close the window.  This more gentle manner of
+	// termination seems to allow time for whatever needs to clean up
+	// so that the application terminates normally.  KAS 4/26/07
+	static bool destroy = false;
+	
+	wxGetApp().appSystemTime.Pause();
 	mTimer->Stop();
 	idleTimer->Stop();
 
-	// Allow the user to save the file!!	
-	if (commandProcessor->IsDirty()) {
+	// Allow the user to save the file, unless we are in the midst of terminating the app!!, KAS 4/26/07	
+	if (commandProcessor->IsDirty() && !destroy) {
 		wxMessageDialog dialog( this, wxT("Circuit has not been saved.  Would you like to save it?"), wxT("Save Circuit"), wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
 		switch (dialog.ShowModal()) {
 		case wxID_YES:
 			OnSave(*((wxCommandEvent*)(&event)));
-			this->Destroy();
+			destroy = true;  // postpone destruction until wxWidgets cleans up, KAS 4/26/07
 			break;
 		case wxID_NO:
-			this->Destroy();
+			destroy = true;  // postpone destruction until wxWidgets cleans up, KAS 4/26/07
 			break;
 		case wxID_CANCEL:
-			if (event.CanVeto()) event.Veto();
+			if (event.CanVeto()) event.Veto(); else destroy = true;
 			break;
 		}			
-	} else this->Destroy();
+	} else {
+		destroy = true;      // postpone destruction until wxWidgets cleans up, KAS 4/26/07
+	}
 	
 	idleTimer->Start(20);
 	if (!(toolBar->GetToolState(Tool_Pause))) {
-		wxGetApp().appSystemTime->Start(0);
+		wxGetApp().appSystemTime.Start(0);
 		mTimer->Start(20);
 	}
+	
+
+	//Edit by Joshua Lansford 10/18/07
+	//KAS replaced the destroy method with a close method.
+	//However the close method simply calls the method we
+	//are currently in.  This causes an ininitue loop which
+	//wxWidgets detects and terminates.
+	//While this did remove the crash on close, it did so
+	//by makeing the program simple give up before it ever got
+	//to the crashing code.  The destructor of the MainFrame
+	//never was being called and the save settings function
+	//in it never was being called.
+	//See 
+	//http://www.wxwidgets.org/manuals/stable/wx_windowdeletionoverview.html
+	if (destroy) this->Destroy();
+	
 }
 
 void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event)) {
@@ -270,7 +410,7 @@ void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event)) {
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event)) {
     wxString msg;
-    msg.Printf( _T("CEDAR Logic Simulator\nCopyright 2006 Cedarville University, Matt Lewellyn, \n\tDavid Knierim, and Ben Sprague\n\tAll rights reserved\nSee license.txt for details."));
+    msg.Printf( _T("CEDAR Logic Simulator 1.5\nCopyright 2007 Cedarville University, Matt Lewellyn, \n\tDavid Knierim, Ben Sprague, Joshua Lansford\n\tand Nathan Harro\n\nFont rendering thanks to GLFont library (created by Brad Fish, bhf5@email.byu.edu)\n\n All rights reserved\nSee license.txt for details."));
 
     wxMessageBox(msg, _T("About"), wxOK | wxICON_INFORMATION, this);
 }
@@ -286,7 +426,7 @@ void MainFrame::OnNew(wxCommandEvent& event) {
 			return;
 		}			
 	}
-	wxGetApp().appSystemTime->Pause();
+	wxGetApp().appSystemTime.Pause();
 	mTimer->Stop();
 	idleTimer->Stop();
 	wxGetApp().dGUItoLOGIC.clear();
@@ -300,13 +440,13 @@ void MainFrame::OnNew(wxCommandEvent& event) {
     openedFilename = _T("");
 	idleTimer->Start(20);
 	if (!(toolBar->GetToolState(Tool_Pause))) {
-		wxGetApp().appSystemTime->Start(0);
+		wxGetApp().appSystemTime.Start(0);
 		mTimer->Start(20);
 	}
 }
 
 void MainFrame::OnOpen(wxCommandEvent& event) {
-	currentCanvas->gCircuit->simulate = false;
+	currentCanvas->getCircuit()->setSimulate(false);
 	if (commandProcessor->IsDirty()) {
 		wxMessageDialog dialog( this, wxT("Circuit has not been saved.  Would you like to save it?"), wxT("Save Circuit"), wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
 		switch (dialog.ShowModal()) {
@@ -314,71 +454,82 @@ void MainFrame::OnOpen(wxCommandEvent& event) {
 			OnSave(event);
 			break;
 		case wxID_CANCEL:
-			currentCanvas->gCircuit->simulate = true;
+			currentCanvas->getCircuit()->setSimulate(true);
 			return;
 		}			
 	}
-	wxGetApp().appSystemTime->Pause();
+	wxGetApp().appSystemTime.Pause();
 	mTimer->Stop();
 	idleTimer->Stop();
 
 	wxString caption = wxT("Open a circuit");
 	wxString wildcard = wxT("Circuit files (*.cdl)|*.cdl");
 	wxString defaultFilename = wxT("");
-	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxOPEN | wxFILE_MUST_EXIST);
+	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	dialog.SetDirectory(lastDirectory);
 	
+	
 	if (dialog.ShowModal() == wxID_OK) {
-		wxString path = dialog.GetPath();
 		lastDirectory = dialog.GetDirectory();
-		openedFilename = path;
-		this->SetTitle( _T("CEDAR Logic Simulator - ") + path );
-		while (!(wxGetApp().dGUItoLOGIC.empty())) wxGetApp().dGUItoLOGIC.pop_front();
-		while (!(wxGetApp().dLOGICtoGUI.empty())) wxGetApp().dLOGICtoGUI.pop_front();
-		for (unsigned int i = 0; i < canvases.size(); i++) canvases[i]->clearCircuit();
-		gCircuit->reInitializeLogicCircuit();
-		commandProcessor->ClearCommands();
-		commandProcessor->SetMenuStrings();
-	    CircuitParse cirp((string)path.c_str(), canvases);
-    	cirp.parseFile();
+		loadCircuitFile( dialog.GetPath().c_str() );
 	}
     currentCanvas->Update(); // Render();
-	currentCanvas->gCircuit->simulate = true;
+	currentCanvas->getCircuit()->setSimulate(true);
 	idleTimer->Start(20);
 	if (!(toolBar->GetToolState(Tool_Pause))) {
-		wxGetApp().appSystemTime->Start(0);
+		wxGetApp().appSystemTime.Start(0);
 		mTimer->Start(20);
 	}
+}
+//Edit by Joshua Lansford 2/15/07
+//Purpose of edit:  by obstracting the loading of
+//circuit files out of the onOpen rutine,
+//I can now make it so that if a circuit file
+//is specified as an argument to cedarls when
+//it starts, that cedarls can load that file
+//by calling this method.
+void MainFrame::loadCircuitFile( string fileName ){
+	wxString path = fileName.c_str();
+	openedFilename = path;
+	this->SetTitle( _T("CEDAR Logic Simulator - ") + path );
+	while (!(wxGetApp().dGUItoLOGIC.empty())) wxGetApp().dGUItoLOGIC.pop_front();
+	while (!(wxGetApp().dLOGICtoGUI.empty())) wxGetApp().dLOGICtoGUI.pop_front();
+	for (unsigned int i = 0; i < canvases.size(); i++) canvases[i]->clearCircuit();
+	gCircuit->reInitializeLogicCircuit();
+	commandProcessor->ClearCommands();
+	commandProcessor->SetMenuStrings();
+    CircuitParse cirp((string)path.c_str(), canvases);
+	cirp.parseFile();
 }
 
 void MainFrame::OnSave(wxCommandEvent& event) {
 	if (openedFilename == _T("")) OnSaveAs(event);
 	else {
-		gCircuit->simulate = false;
+		gCircuit->setSimulate(false);
 		commandProcessor->MarkAsSaved();
-		wxGetApp().appSystemTime->Pause();
+		wxGetApp().appSystemTime.Pause();
 		mTimer->Stop();
 		idleTimer->Stop();
 		CircuitParse cirp(currentCanvas);
 		cirp.saveCircuit((string)(const char*)openedFilename.c_str(), canvases); //currentCanvas->getGateList(), currentCanvas->getWireList());
 		idleTimer->Start(20);
 		if (!(toolBar->GetToolState(Tool_Pause))) {
-			wxGetApp().appSystemTime->Start(0);
+			wxGetApp().appSystemTime.Start(0);
 			mTimer->Start(20);
 		}
-		gCircuit->simulate = true;		
+		gCircuit->setSimulate(true);		
 	}
 }
 
 void MainFrame::OnSaveAs(wxCommandEvent& WXUNUSED(event)) {
-	gCircuit->simulate = false;
-	wxGetApp().appSystemTime->Pause();
+	gCircuit->setSimulate(false);
+	wxGetApp().appSystemTime.Pause();
 	mTimer->Stop();
 	idleTimer->Stop();
 	wxString caption = wxT("Save circuit");
 	wxString wildcard = wxT("Circuit files (*.cdl)|*.cdl");
 	wxString defaultFilename = wxT("");
-	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxSAVE | wxOVERWRITE_PROMPT);
+	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	dialog.SetDirectory(lastDirectory);
 	if (dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
@@ -390,35 +541,41 @@ void MainFrame::OnSaveAs(wxCommandEvent& WXUNUSED(event)) {
 	}
 	idleTimer->Start(20);
 	if (!(toolBar->GetToolState(Tool_Pause))) {
-		wxGetApp().appSystemTime->Start(0);
+		wxGetApp().appSystemTime.Start(0);
 		mTimer->Start(20);
 	}
-	gCircuit->simulate = true;
+	gCircuit->setSimulate(true);
 }
 
-void MainFrame::OnOscope(wxCommandEvent& WXUNUSED(event))
-{
-	gCircuit->myOscope->Show(true);
+void MainFrame::OnOscope(wxCommandEvent& WXUNUSED(event)) {
+	gCircuit->getOscope()->Show(true);
 }
 
+void MainFrame::OnViewGridline(wxCommandEvent& event) {
+	wxGetApp().appSettings.gridlineVisible = event.IsChecked();
+	if (currentCanvas != NULL) currentCanvas->Update();
+}
+
+void MainFrame::OnViewWireConn(wxCommandEvent& event) {
+	wxGetApp().appSettings.wireConnVisible = event.IsChecked();
+	if (currentCanvas != NULL) currentCanvas->Update();
+}
 
 void MainFrame::OnTimer(wxTimerEvent& event) {
 	ostringstream oss;
-	if (!(currentCanvas->gCircuit->simulate)) {
+	if (!(currentCanvas->getCircuit()->getSimulate())) {
 		return;
 	}
-	if (wxGetApp().appSystemTime->Time() < wxGetApp().appSettings.refreshRate) return;
-	wxGetApp().appSystemTime->Pause();
-wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "ms" << endl;
+	if (wxGetApp().appSystemTime.Time() < wxGetApp().appSettings.refreshRate) return;
+	wxGetApp().appSystemTime.Pause();
 	if (gCircuit->panic) return;
 	// Do function of number of milliseconds that passed since last step
-	gCircuit->lastTime = wxGetApp().appSystemTime->Time();
+	gCircuit->lastTime = wxGetApp().appSystemTime.Time();
 	gCircuit->lastTimeMod = wxGetApp().timeStepMod;
-	gCircuit->lastNumSteps = wxGetApp().appSystemTime->Time() / wxGetApp().timeStepMod;
-	oss << "STEPSIM " << wxGetApp().appSystemTime->Time() / wxGetApp().timeStepMod;
-	gCircuit->sendMessageToCore(oss.str());
-	currentCanvas->gCircuit->simulate = false;
-	wxGetApp().appSystemTime->Start(wxGetApp().appSystemTime->Time() % wxGetApp().timeStepMod);
+	gCircuit->lastNumSteps = wxGetApp().appSystemTime.Time() / wxGetApp().timeStepMod;
+	gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_STEPSIM, new klsMessage::Message_STEPSIM(wxGetApp().appSystemTime.Time() / wxGetApp().timeStepMod)));
+	currentCanvas->getCircuit()->setSimulate(false);
+	wxGetApp().appSystemTime.Start(wxGetApp().appSystemTime.Time() % wxGetApp().timeStepMod);
 }
 
 void MainFrame::OnIdle(wxTimerEvent& event) {
@@ -431,51 +588,6 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 	wxGetApp().mexMessages.Unlock();
 
 	if (mainSizer == NULL) return;
-	if (!toolbarCreated) {
-		wxBitmap bmpNew(wxBITMAP(new));
-		wxBitmap bmpOpen(wxBITMAP(open));
-		wxBitmap bmpSave(wxBITMAP(save));
-		wxBitmap bmpUndo(wxBITMAP(undo));
-		wxBitmap bmpRedo(wxBITMAP(redo));
-		wxBitmap bmpCopy(wxBITMAP(copy));
-		wxBitmap bmpPaste(wxBITMAP(paste));
-		wxBitmap bmpPrint(wxBITMAP(print));
-		wxBitmap bmpAbout(wxBITMAP(help));
-		wxBitmap bmpPause(wxBITMAP(pause));
-		wxBitmap bmpStep(wxBITMAP(step));
-		wxBitmap bmpZoomIn(wxBITMAP(zoomin));
-		wxBitmap bmpZoomOut(wxBITMAP(zoomout));
-	    int w = bmpNew.GetWidth(),
-	        h = bmpNew.GetHeight();
-	        toolBar->SetToolBitmapSize(wxSize(w, h));
-		toolBar->AddTool(wxID_NEW, _T("New"), bmpNew, _T("New"));
-		toolBar->AddTool(wxID_OPEN, _T("Open"), bmpOpen, wxT("Open"));
-		toolBar->AddTool(wxID_SAVE, _T("Save"), bmpSave, wxT("Save")); 
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_PRINT, _T("Print"), bmpPrint, wxT("Print"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_UNDO, _T("Undo"), bmpUndo, wxT("Undo"));
-		toolBar->AddTool(wxID_REDO, _T("Redo"), bmpRedo, wxT("Redo"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_COPY, _T("Copy"), bmpCopy, wxT("Copy"));
-		toolBar->AddTool(wxID_PASTE, _T("Paste"), bmpPaste, wxT("Paste"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(Tool_ZoomIn, _T("Zoom In"), bmpZoomIn, wxT("Zoom In"));
-		toolBar->AddTool(Tool_ZoomOut, _T("Zoom Out"), bmpZoomOut, wxT("Zoom Out"));
-		toolBar->AddSeparator();
-		toolBar->AddTool(Tool_Pause, _T("Pause/Resume"), bmpPause, wxT("Pause/Resume"), wxITEM_CHECK);
-		toolBar->AddTool(Tool_Step, _T("Step"), bmpStep, wxT("Step"));
-		timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
-		ostringstream oss;
-		oss << wxGetApp().timeStepMod << "ms";
-		timeStepModVal = new wxStaticText(toolBar, wxID_ANY, oss.str().c_str(), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
-		toolBar->AddControl( timeStepModSlider );
-		toolBar->AddControl( timeStepModVal );
-		toolBar->AddSeparator();
-		toolBar->AddTool(wxID_ABOUT, _T("About"), bmpAbout, wxT("About"));		
-		toolBar->Realize();
-		toolbarCreated = true;
-	}
 	
 	if ( doOpenFile ) {
 		doOpenFile = false;
@@ -489,9 +601,20 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 		gCircuit->panic = false;
 		toolBar->ToggleTool( Tool_Pause, true );
 		mTimer->Stop();
-		wxGetApp().appSystemTime->Start(0);
-		wxGetApp().appSystemTime->Pause();
-		wxMessageBox(_T("Overloading simulator: please increase time per step and then resume simulation."), _T("Error - overload"), wxOK | wxICON_ERROR, NULL);
+		wxGetApp().appSystemTime.Start(0);
+		wxGetApp().appSystemTime.Pause();
+		//Edit by Joshua Lansford 11/24/06
+		//I have overloaded the meaning of panic
+		//panic is now also used to pause the system.
+		//thus we don't want to shout if we are just pausing
+		//This edit was made so that the Z_80LogicGate
+		//can 'step' through instructions.
+		//see the location were pausing is set to true
+		//for further explination in GUICircuit::parseMessage
+		if( !gCircuit->pausing ){
+			wxMessageBox(_T("Overloading simulator: please increase time per step and then resume simulation."), _T("Error - overload"), wxOK | wxICON_ERROR, NULL);
+		}
+		gCircuit->pausing = false;
 	}
 
 	if( sizeChanged ) {	
@@ -499,7 +622,6 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 		wxSizeEvent temp;
 	}
 }
-
 void MainFrame::OnSize(wxSizeEvent& event) {
 	if (currentCanvas != NULL) currentCanvas->Update();
 
@@ -512,11 +634,20 @@ void MainFrame::OnMaximize(wxMaximizeEvent& event) {
 }
 
 void MainFrame::OnNotebookPage(wxNotebookEvent& event) {
-	if (!toolbarCreated) return;
 	long canvasID = event.GetSelection();
-	if (canvases[canvasID] == currentCanvas) return;
+	if (currentCanvas == NULL || canvases[canvasID] == currentCanvas) return;
+	//**********************************
+	//Edit by Joshua Lansford 4/9/07
+	//This edit is to make the minimap
+	//only be controled by the current
+	//Canvase.
+	//This will avoid the minimap
+	//spazing out when the mainFrame is
+	//resized
+	currentCanvas->setMinimap( NULL );
+	//End of Edit*********************
 	currentCanvas = canvases[canvasID];
-	gCircuit->gCanvas = currentCanvas;
+	gCircuit->setCurrentCanvas(currentCanvas);
 	currentCanvas->setMinimap(miniMap);
 	currentCanvas->SetFocus();
 	currentCanvas->Update();
@@ -577,34 +708,60 @@ void MainFrame::OnPrintPreview(wxCommandEvent& WXUNUSED(event)) {
     frame->Show();
 }
 
-void MainFrame::OnExportBitmap(wxCommandEvent& event) {
+void MainFrame::OnExportBitmapBW(wxCommandEvent& event) {
+	// disable the grid display
+	bool gridlineVisible = wxGetApp().appSettings.gridlineVisible;
+	wxGetApp().appSettings.gridlineVisible = false;
+	wxGetApp().doingBitmapExport = true;
+	// render the image
 	wxSize imageSize = currentCanvas->GetClientSize();
-	wxImage circuitImage = currentCanvas->renderToImage(imageSize.GetWidth()*2, imageSize.GetHeight()*2, 24);
+	wxImage circuitImage = currentCanvas->renderToImage(imageSize.GetWidth()*2, imageSize.GetHeight()*2, 32, true);
 	wxBitmap circuitBitmap(circuitImage);
 	if (wxTheClipboard->Open()) {
 		wxTheClipboard->SetData(new wxBitmapDataObject(circuitBitmap));
 		wxTheClipboard->Close();
 	}
+	// restore grid display setting
+	wxGetApp().appSettings.gridlineVisible = gridlineVisible;
+	wxGetApp().doingBitmapExport = false;
+}
+
+void MainFrame::OnExportBitmapC(wxCommandEvent& event) {
+	// disable the grid display
+	bool gridlineVisible = wxGetApp().appSettings.gridlineVisible;
+	wxGetApp().appSettings.gridlineVisible = false;
+	wxGetApp().doingBitmapExport = true;
+	// render the image
+	wxSize imageSize = currentCanvas->GetClientSize();
+	wxImage circuitImage = currentCanvas->renderToImage(imageSize.GetWidth()*2, imageSize.GetHeight()*2, 32);
+	wxBitmap circuitBitmap(circuitImage);
+	if (wxTheClipboard->Open()) {
+		wxTheClipboard->SetData(new wxBitmapDataObject(circuitBitmap));
+		wxTheClipboard->Close();
+	}
+	// restore grid display setting
+	wxGetApp().appSettings.gridlineVisible = gridlineVisible;
+	wxGetApp().doingBitmapExport = false;
 }
 
 void MainFrame::OnPause(wxCommandEvent& event) {
-	if (toolBar->GetToolState(Tool_Pause)) {
-		mTimer->Stop();
-		wxGetApp().appSystemTime->Start(0);
-		wxGetApp().appSystemTime->Pause();
-	}
-	else {
-		wxGetApp().appSystemTime->Start(0);
-		mTimer->Start(20);
-	}
+	PauseSim();
 }
 
 void MainFrame::OnStep(wxCommandEvent& event) {
-	if (!(currentCanvas->gCircuit->simulate)) {
+	if (!(currentCanvas->getCircuit()->getSimulate())) {
 		return;
 	}
-	gCircuit->sendMessageToCore("STEPSIM 1");
-	currentCanvas->gCircuit->simulate = false;
+	gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_STEPSIM, new klsMessage::Message_STEPSIM(1)));
+	currentCanvas->getCircuit()->setSimulate(false);
+}
+
+void MainFrame::OnLock(wxCommandEvent& event) {
+	if (toolBar->GetToolState(Tool_Lock)) {
+		for (unsigned int i = 0; i < canvases.size(); i++) canvases[i]->lockCanvas();
+	} else {
+		for (unsigned int i = 0; i < canvases.size(); i++) canvases[i]->unlockCanvas();
+	}
 }
 
 void MainFrame::OnZoomIn(wxCommandEvent& event) {
@@ -630,10 +787,24 @@ void MainFrame::OnTimeStepModSlider(wxScrollEvent& event) {
 
 
 void MainFrame::saveSettings() {
-	ofstream iniFile("./settings.ini", ios::out);
-	iniFile << "GateLib=" << wxGetApp().appSettings.gateLibFile << endl;
-	iniFile << "HelpFile=" << wxGetApp().appSettings.helpFile << endl;
-	iniFile << "TextFont=" << wxGetApp().appSettings.textFontFile << endl;
+	//Edit by Joshua Lansford 2/15/07
+	//making the execution of cedarls indipendent of were
+	//it was executed from.  However the settings.ini file still
+	//needs to be relative.
+	//adding substring on the end of the relative paths to knock
+	//of the part I put on.
+	int numCharAbsolute = wxGetApp().pathToExe.length();
+	
+	#ifdef _PRODUCTION_
+		string settingsIni = wxGetApp().pathToExe + "./settings.ini";
+	#else
+		string settingsIni = wxGetApp().pathToExe + "../settings.ini";
+	#endif
+	
+	ofstream iniFile(settingsIni.c_str(), ios::out);
+	iniFile << "GateLib=" << wxGetApp().appSettings.gateLibFile.substr(numCharAbsolute) << endl;
+	iniFile << "HelpFile=" << wxGetApp().appSettings.helpFile.substr(numCharAbsolute) << endl;
+	iniFile << "TextFont=" << wxGetApp().appSettings.textFontFile.substr(numCharAbsolute) << endl;
 	iniFile << "FrameWidth=" << this->GetSize().GetWidth() << endl;
 	iniFile << "FrameHeight=" << this->GetSize().GetHeight() << endl;
 	iniFile << "FrameLeft=" << this->GetPosition().x << endl;
@@ -641,5 +812,30 @@ void MainFrame::saveSettings() {
 	iniFile << "TimeStep=" << wxGetApp().timeStepMod << endl;
 	iniFile << "RefreshRate=" << wxGetApp().appSettings.refreshRate << endl;
 	iniFile << "LastDirectory=" << lastDirectory.c_str() << endl;
+	iniFile << "WireConnRadius=" << wxGetApp().appSettings.wireConnRadius << endl;
+	iniFile << "WireConnVisible=" << wxGetApp().appSettings.wireConnVisible << endl;
+	iniFile << "GridlineVisible=" << wxGetApp().appSettings.gridlineVisible << endl;
 	iniFile.close();
+}
+
+void MainFrame::ResumeExecution() {
+	if (toolBar->GetToolState(Tool_Pause)) {
+		toolBar->ToggleTool(Tool_Pause, false);
+		PauseSim();
+	}
+	else {
+		//do nothing
+	}
+}
+
+void MainFrame::PauseSim() {	
+	if (toolBar->GetToolState(Tool_Pause)) {
+		mTimer->Stop();
+		wxGetApp().appSystemTime.Start(0);
+		wxGetApp().appSystemTime.Pause();
+	}
+	else {
+		wxGetApp().appSystemTime.Start(0);
+		mTimer->Start(20);
+	}
 }

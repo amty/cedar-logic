@@ -1,0 +1,4 @@
+FEATURES
+automatic update option
+better About dialog
+extension structure

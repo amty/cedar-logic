@@ -10,6 +10,7 @@
 
 #include "GUICircuit.h"
 #include "MainApp.h"
+#include "OscopeFrame.h"
 
 DECLARE_APP(MainApp)
 IMPLEMENT_DYNAMIC_CLASS(GUICircuit, wxDocument)
@@ -19,18 +20,19 @@ GUICircuit::GUICircuit() {
 	simulate = true;
 	waitToSendMessage = true;
 	panic = false;
+	pausing = false;
 	return;
 }
 
 GUICircuit::~GUICircuit() {
-	return;
+
 }
 
 void GUICircuit::reInitializeLogicCircuit() {
 	// do not wait to send messages to the core for reinit
 	bool iswaiting = waitToSendMessage;
 	waitToSendMessage = false;
-	sendMessageToCore("REINIT");
+	sendMessageToCore(klsMessage::Message(klsMessage::MT_REINITIALIZE));
 	waitToSendMessage = iswaiting;
 	hash_map< unsigned long, guiWire* >::iterator thisWire = wireList.begin();
 	while( thisWire != wireList.end() ) {
@@ -50,14 +52,16 @@ void GUICircuit::reInitializeLogicCircuit() {
 }
 
 guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
-	string libName = wxGetApp().gateNameToLibrary[gateName]; //TODO: Silly default library name. Should be a variable somewheres...
+	string libName = wxGetApp().gateNameToLibrary[gateName];
 	
 	if (id == -1) id = getNextAvailableGateID();
 	guiGate* newGate = NULL;
 	LibraryGate gateDef = wxGetApp().libraries[libName][gateName];
 	//wxGetApp().libraries[libName].getGate(gateName, gateDef);
+	
 
 	string ggt = gateDef.guiType;
+	
 	if (ggt == "REGISTER")
 		newGate = (guiGate*)(new guiGateREGISTER());
 	else if (ggt == "TO" || ggt == "FROM")
@@ -72,6 +76,38 @@ guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 		newGate = (guiGate*)(new guiGateKEYPAD());
 	else if (ggt == "PULSE")
 		newGate = (guiGate*)(new guiGatePULSE());
+		
+//*************************************************
+//Edit by Joshua Lansford 12/25/2006
+//I am creating a guiGate for the RAM so that
+//the ram can have its own special pop-up window
+	else if (ggt == "RAM"){
+		newGate = (guiGate*)(new guiGateRAM());
+	}
+
+//End of edit
+//*************************************************
+
+//*************************************************
+//Edit by Nathan Harro 01/13/2007
+//This will recognize the Z80 type
+//and call the correct guiGate method
+	else if (ggt == "Z80"){
+		newGate = (guiGate*)(new guiGateZ80());
+	}
+
+//End of edit
+//*************************************************
+
+//*******************************************
+//Edit by Joshua Lansford 05/10/2007
+//This is for the ADC as you might have guessed
+	else if (ggt == "ADC"){
+		newGate = (guiGate*)(new guiGateADC());
+	}
+//End of edit
+//******************************************
+
 	else
 		newGate = new guiGate();
 
@@ -90,13 +126,11 @@ guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 	map < string, string >::iterator paramWalk = gateDef.guiParams.begin();
 	while (paramWalk != gateDef.guiParams.end()) {
 		newGate->setGUIParam(paramWalk->first, paramWalk->second);
-		wxGetApp().logfile << "set gparam " << paramWalk->first << " " << paramWalk->second << endl << flush;
 		paramWalk++;
 	}
 	paramWalk = gateDef.logicParams.begin();
 	while (paramWalk != gateDef.logicParams.end()) {
 		newGate->setLogicParam(paramWalk->first, paramWalk->second);
-		wxGetApp().logfile << "set lparam " << paramWalk->first << " " << paramWalk->second << endl << flush;
 		paramWalk++;
 	}
 	newGate->calcBBox();
@@ -161,66 +195,84 @@ void GUICircuit::Render() {
 	return;
 }
 
-void GUICircuit::parseMessage(string message) {
-#ifndef _PRODUCTION_ 
-	wxGetApp().logfile << "received " << message << endl << flush;
-#endif
-//	istringstream iss(message);
+void GUICircuit::parseMessage(klsMessage::Message message) {
 	string temp, type;
 	static bool shouldRender = false;
-	long id, state;
-//	iss >> temp;
-	if (message[0] == 'S') { // SET WIRE/GATE
-		shouldRender = true;
-		//iss >> temp;
-		if (message[4] == 'W') {
+	switch (message.mType) {
+		case klsMessage::MT_SET_WIRE_STATE: {
 			// SET WIRE id STATE TO state
-			message = message.substr(9, message.size()-9);
-			id = parseIntFromString(message);
-			message = message.substr(9, message.size()-9);
-			state = parseIntFromString(message);
-			//iss >> id >> temp >> temp >> state;
-			setWireState(id, state);			
-		} else if (message[4] == 'G') {
-			// SET GATE id PARAMETER name val
-			//iss >> id >> temp >> temp;
-			message = message.substr(9,message.size()-9);
-			id = parseIntFromString(message);
-			message = message.substr(10,message.size()-10);
-			temp = parseStringFromString(message);
-			string val;
-			//getline(iss, val, '\n');
-			if (gateList.find(id) != gateList.end()) gateList[id]->setLogicParam(temp, message); //val.substr(1,val.size()-1));
+			shouldRender = true;
+			klsMessage::Message_SET_WIRE_STATE* msgSetWireState = (klsMessage::Message_SET_WIRE_STATE*)(message.mStruct);
+			setWireState(msgSetWireState->wireId, msgSetWireState->state);
+			delete msgSetWireState;
+			break;
 		}
-	}
-	else if (message[0] == 'D') { // DONESTEP
-		simulate = true;
-wxGetApp().logfile << message << "     ";
-		message = message.substr(9,message.size()-9);
-		int logicTime = parseIntFromString(message);
-wxGetApp().logfile << logicTime << " " << lastTime << endl << flush;
-		// Panic if core isn't keeping up, keep a 3ms buffer...
-		panic = (logicTime > lastTime+3); //lastTimeMod*lastNumSteps);
-		for (unsigned int i = 0; i < messageQueue.size(); i++) sendMessageToCore(messageQueue[i]);
-		messageQueue.clear();
-		if (shouldRender) gCanvas->Refresh();
-		shouldRender = false;
-	}
-	else if (message[0] == 'C') { // COMPLETE INTERIM STEP - UPDATE OSCOPE
-		myOscope->UpdateData();
+		case klsMessage::MT_SET_GATE_PARAM: {
+			// SET GATE id PARAMETER name val
+			shouldRender = true;
+			klsMessage::Message_SET_GATE_PARAM* msgSetGateParam = (klsMessage::Message_SET_GATE_PARAM*)(message.mStruct);
+			if (gateList.find(msgSetGateParam->gateId) != gateList.end()) gateList[msgSetGateParam->gateId]->setLogicParam(msgSetGateParam->paramName, msgSetGateParam->paramValue);
+			//************************************************************
+			//Edit by Joshua Lansford 11/24/06
+			//the perpose of this edit is to allow logic gates to be able
+			//to pause the simulation.  This is so that the 
+			//Z_80LogicGate can 'single step' through T states and
+			//instruction states by pauseing the simulation when it
+			//compleates eather.
+			//
+			//The way that this is acomplished is that when ever any gate
+			//signals that a property has changed, and the name of that
+			//property is "PAUSE_SIM", then the core should bail out
+			//and not finnish the requested number of steps.
+			//The GUI will also see this property fly by and will toggle
+			//the pause button.
+			//
+			//This spacific edit is so that the GUI thread will
+			//hit the pause button
+			if( msgSetGateParam->paramName == "PAUSE_SIM" ){
+				pausing = true;
+				panic = true;
+			}
+			//End of edit*************************************************
+			delete msgSetGateParam;
+			break;
+		}
+		case klsMessage::MT_DONESTEP: { // DONESTEP
+			simulate = true;
+			int logicTime = ((klsMessage::Message_DONESTEP*)(message.mStruct))->logicTime;
+			// Panic if core isn't keeping up, keep a 3ms buffer...
+			panic = (logicTime > lastTime+3) || panic;
+			// Now we can send the waiting messages
+			for (unsigned int i = 0; i < messageQueue.size(); i++) sendMessageToCore(messageQueue[i]);
+			messageQueue.clear();
+			// Only render at the end of a step and only if necessary
+			if (shouldRender) gCanvas->Refresh();
+			shouldRender = false;
+			delete ((klsMessage::Message_DONESTEP*)(message.mStruct));
+			break;
+		}
+		case klsMessage::MT_COMPLETE_INTERIM_STEP: {// COMPLETE INTERIM STEP - UPDATE OSCOPE
+			myOscope->UpdateData();
+			break;
+		}
+		default:
+			break;
 	}
 }
 
-void GUICircuit::sendMessageToCore(string message) {
+void GUICircuit::sendMessageToCore(klsMessage::Message message) {
 	wxMutexLocker lock(wxGetApp().mexMessages);
-#ifndef _PRODUCTION_ 
-	if ((simulate || !waitToSendMessage) && message != "STEPSIM") wxGetApp().logfile << "sending " << message << endl << flush;
-#endif
+
 	if (waitToSendMessage) {
+		
 		if (simulate) {
 			wxGetApp().dGUItoLOGIC.push_back(message);
-		} else messageQueue.push_back(message);
-	} else wxGetApp().dGUItoLOGIC.push_back(message);
+		} else{
+			messageQueue.push_back(message);
+		}
+	} else{
+		wxGetApp().dGUItoLOGIC.push_back(message);
+	}	
 }
 
 void GUICircuit::setWireState( long wid, long state ) {

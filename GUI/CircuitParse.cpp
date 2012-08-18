@@ -9,6 +9,7 @@
 *****************************************************************************/
 
 #include "CircuitParse.h"
+#include "OscopeFrame.h"
 #include "MainApp.h"
 #include <fstream>
 #include <sstream>
@@ -83,6 +84,37 @@ void CircuitParse::parseFile() {
 						ID = mParse->readTagValue(temp);
 					} else if (temp == "type") { // get type
 						type = mParse->readTagValue(temp);
+						
+						//***********************************
+						//Edit by Joshua Lansford 4/4/07
+						//We have eliminated a couple of gate
+						//types.
+						//Opening a file with an outdated
+						//ram file will crash the system.
+						//I don't think it does so with
+						//the outdated flip-flops, anyways,
+						//this bit of code will change the
+						//gate type of the outdated gate
+						//to a new gate type that is supported
+						//without crashing the program.
+						if( type == "AM_RAM_16x16_Single_Port" ){
+							//there is no different between these two types.
+							//the AM_RAM_16x16_Single_Port was an experiment
+							//before we converted all the gates.
+							//Thus no warning needs to be given.
+							type = "AM_RAM_16x16";
+						}else if( type == "AA_DFF" ){
+							wxMessageBox(_T("The High Active Reset D flip flop has been deprecated.  Automatically replacing with a Low active version"), _T("Old gate"), wxOK | wxICON_ASTERISK, NULL);
+							type = "AE_DFF_LOW";
+						}else if( type == "BA_JKFF" ){
+							wxMessageBox(_T("The High Active Reset JK flip flop has been deprecated.  Automatically replacing with a Low active version"), _T("Old gate"), wxOK | wxICON_ASTERISK, NULL);
+							type = "BE_JKFF_LOW";
+						}else if( type == "BA_JKFF_NT" ){
+							wxMessageBox(_T("The High Active Reset negitive triggered JK flip flop has been deprecated.  Automatically replacing with a Low active version"), _T("Old gate"), wxOK | wxICON_ASTERISK, NULL);
+							type = "BE_JKFF_LOW_NT";
+						}
+						//**********************************
+						
 					} else if (temp == "position") { // get position
 						position = mParse->readTagValue(temp);
 					} else if (temp == "input") { // get input
@@ -93,6 +125,7 @@ void CircuitParse::parseFile() {
 						istringstream iss(mParse->readTagValue("input"));
 						iss >> gc->wireID;
 						inputs.push_back(*gc);
+						delete gc;
 					} else if (temp == "output") { // get output
 						temp = mParse->readTag();
 						gc = new gateConnector();
@@ -101,6 +134,7 @@ void CircuitParse::parseFile() {
 						istringstream iss(mParse->readTagValue("output"));
 						iss >> gc->wireID;
 						outputs.push_back(*gc);
+						delete gc;
 					} else if (temp == "gparam" || temp == "lparam") { // get parameter
 						string paramData = mParse->readTagValue(temp);
 						string x, y;
@@ -109,6 +143,7 @@ void CircuitParse::parseFile() {
 						getline(iss, y, '\n');
 						pParam = new parameter(x, y.substr(1,y.size()-1), (temp == "gparam"));
 						params.push_back(*pParam);
+						delete pParam;
 					}
 					// ADD OTHER TAGS FOR GATE HERE
 						// ALSO MODIFY parseGateToSend
@@ -125,7 +160,7 @@ void CircuitParse::parseFile() {
 		mParse->readTagValue(pageTag);
 		mParse->readCloseTag();
 	} while (!mParse->isCloseTag(mParse->getCurrentIndex()));
-	gCanvas->gCircuit->myOscope->UpdateMenu();
+	gCanvas->getCircuit()->getOscope()->UpdateMenu();
 }
 
 void CircuitParse::parseGateToSend(string type, string ID, string position, vector < gateConnector > &inputs, vector < gateConnector > &outputs, vector < parameter > &params) {
@@ -137,73 +172,58 @@ void CircuitParse::parseGateToSend(string type, string ID, string position, vect
 	float x, y;
 	istringstream issb(ID);
 	issb >> id;
-	oss << "CREATE GATE TYPE " << wxGetApp().libraries[wxGetApp().gateNameToLibrary[type]][type].logicType << " ID " << id;
-	// SEND oss.str() TO LOGIC SOCKET
-	gCanvas->gCircuit->sendMessageToCore(oss.str());
+	
+	string logicType = wxGetApp().libParser.getGateLogicType( type );
+	if ( logicType.size() > 0 )
+		gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_CREATE_GATE, new klsMessage::Message_CREATE_GATE(wxGetApp().libraries[wxGetApp().gateNameToLibrary[type]][type].logicType, id)));
 	// Create gate for GUI
 	istringstream issa(position.substr(0,position.find(",")+1));
 	issa >> x;
 	issa.str(position.substr(position.find(",")+1,position.size()-position.find(",")-1));
 	issa >> y;
-	guiGate* newGate = gCanvas->gCircuit->createGate( type, id, true );
+	guiGate* newGate = gCanvas->getCircuit()->createGate( type, id, true );
 	if (newGate == NULL) return; // IN CASE OF ERROR
 	gCanvas->insertGate(id, newGate, x, y);
-	string logicType = wxGetApp().libParser.getGateLogicType( type );
 	for (unsigned int i = 0; i < params.size(); i++) {
 		if (!(params[i].isGUI)) {
-			oss.str("");
-			oss << "SET GATE ID " << id << " PARAMETER " << params[i].paramName << " " << params[i].paramValue;
 			newGate->setLogicParam( params[i].paramName, params[i].paramValue );
-			gCanvas->gCircuit->sendMessageToCore(oss.str());
+			gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(id, params[i].paramName, params[i].paramValue)));
 		} else newGate->setGUIParam( params[i].paramName, params[i].paramValue );
 	}
 	if( logicType.size() > 0 ) {
 		// Loop through the hotspots and pass logic core hotspot settings:
-		// SET GATE ID <ID> INPUT ID <NAME> PARAM <NAME> <VALUE>
 		LibraryGate libGate;
 		wxGetApp().libParser.getGate(type, libGate);
 		for( unsigned int i = 0; i < libGate.hotspots.size(); i++ ) {
 
-			// Set up the default "Gate hotspot set" message:
-			ostringstream oss;
-			oss << "SET GATE ID " << id;
-			if( libGate.hotspots[i].isInput ) {
-				oss << " INPUT ID ";
-			} else {
-				oss << " OUTPUT ID ";
-			}
-			oss << libGate.hotspots[i].name << " PARAM ";
-
 			// Send the isInverted message:
 			if( libGate.hotspots[i].isInverted ) {
-				ostringstream msgOss;
-				msgOss << "INVERTED TRUE";
-				gCanvas->gCircuit->sendMessageToCore(oss.str() + msgOss.str());
+				if ( libGate.hotspots[i].isInput ) {
+					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_INPUT_PARAM, new klsMessage::Message_SET_GATE_INPUT_PARAM(id, libGate.hotspots[i].name, "INVERTED", "TRUE")));
+				} else {
+					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_OUTPUT_PARAM, new klsMessage::Message_SET_GATE_OUTPUT_PARAM(id, libGate.hotspots[i].name, "INVERTED", "TRUE")));
+				}
 			}
 
 			// Send the logicEInput message:
 			if( libGate.hotspots[i].logicEInput != "" ) {
-				ostringstream msgOss;
-				msgOss << "E_INPUT " << libGate.hotspots[i].logicEInput;
-				gCanvas->gCircuit->sendMessageToCore(oss.str() + msgOss.str());
+				if ( libGate.hotspots[i].isInput ) {
+					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_INPUT_PARAM, new klsMessage::Message_SET_GATE_INPUT_PARAM(id, libGate.hotspots[i].name, "E_INPUT", libGate.hotspots[i].logicEInput)));
+				} else {
+					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_OUTPUT_PARAM, new klsMessage::Message_SET_GATE_OUTPUT_PARAM(id, libGate.hotspots[i].name, "E_INPUT", libGate.hotspots[i].logicEInput)));
+				}
 			}
 		} // for( loop through the hotspots )
 	} // if( logic type is non-null )
 	for (unsigned int i = 0; i < inputs.size(); i++) {
-		oss.str("");
-		oss << "SET GATE ID " << id << " INPUT ID " << inputs[i].connectionID << " TO WIRE " << inputs[i].wireID;
-		// SEND oss.str() TO LOGIC SOCKET
-		gCanvas->gCircuit->sendMessageToCore(oss.str());
+		gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_INPUT, new klsMessage::Message_SET_GATE_INPUT(id, inputs[i].connectionID, inputs[i].wireID)));
 		// Create gate input for GUI (setWireConnection returns a pointer to the wire)
-		gCanvas->insertWire(inputs[i].wireID, gCanvas->gCircuit->setWireConnection( inputs[i].wireID, id, inputs[i].connectionID, true ));
+		gCanvas->insertWire(inputs[i].wireID, gCanvas->getCircuit()->setWireConnection( inputs[i].wireID, id, inputs[i].connectionID, true ));
 	}
 	for (unsigned int i = 0; i < outputs.size(); i++) {
-		oss.str("");
-		oss << "SET GATE ID " << id << " OUTPUT ID " << outputs[i].connectionID << " TO WIRE " << outputs[i].wireID;
-		// SEND oss.str() TO LOGIC SOCKET
-		gCanvas->gCircuit->sendMessageToCore(oss.str());
+		gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_OUTPUT, new klsMessage::Message_SET_GATE_OUTPUT(id, outputs[i].connectionID, outputs[i].wireID)));		
 		// Create gate output for GUI (setWireConnection returns a pointer to the wire)
-		gCanvas->insertWire(outputs[i].wireID, gCanvas->gCircuit->setWireConnection( outputs[i].wireID, id, outputs[i].connectionID, true ));
+		gCanvas->insertWire(outputs[i].wireID, gCanvas->getCircuit()->setWireConnection( outputs[i].wireID, id, outputs[i].connectionID, true ));
 	}
 }
 
@@ -266,7 +286,7 @@ void CircuitParse::parseWireToSend( void ) {
 							}
 						}
 						wireConnection nwc; nwc.gid = GID; nwc.connection = hsName;
-						nwc.cGate = (*(gCanvas->gCircuit->getGates()))[GID];
+						nwc.cGate = (*(gCanvas->getCircuit()->getGates()))[GID];
 						newSeg.connections.push_back( nwc );
 						mParse->readCloseTag();
 					} else if (temp == "intersection") {
@@ -286,8 +306,8 @@ void CircuitParse::parseWireToSend( void ) {
 	} while (!mParse->isCloseTag(mParse->getCurrentIndex())); // !closewire
 	mParse->readCloseTag(); // >wire
 	// Check to make sure the wire exists before we do things to it
-	if ((gCanvas->gCircuit->getWires())->find(id) == (gCanvas->gCircuit->getWires())->end()) return;
-	(*(gCanvas->gCircuit->getWires()))[id]->setSegmentMap( wireShape );
+	if ((gCanvas->getCircuit()->getWires())->find(id) == (gCanvas->getCircuit()->getWires())->end()) return;
+	(*(gCanvas->getCircuit()->getWires()))[id]->setSegmentMap( wireShape );
 }
 
 void CircuitParse::saveCircuit(string filename, vector< GUICanvas* > glc, unsigned int currPage) {

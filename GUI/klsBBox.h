@@ -11,29 +11,15 @@
 #ifndef KLSBBOX_H_
 #define KLSBBOX_H_
 
-// For GLfloat:
-#ifdef __WXMAC__
-#  ifdef __DARWIN__
-#    include <OpenGL/glu.h>
-#  else
-#    include <glu.h>
-#  endif
-#else
-#  include <GL/glu.h>
-#endif
+// For GLfloat and GLPoint2f:
+#include "gl_defs.h"
 
 // For FLT_MAX and fabs():
 #include <float.h>
-#include <math.h>
+#include <cmath>
 
 // Included to use the min() and max() templates:
 #include <algorithm>
-
-
-struct GLPoint2f {
-	GLPoint2f( GLfloat newX = 0.0, GLfloat newY = 0.0 ) : x(newX), y(newY) {};
-	GLfloat x, y;
-};
 
 class klsBBox
 {

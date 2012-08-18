@@ -26,9 +26,13 @@
 #include <vector>
 #include "../logic/logic_defaults.h"
 #include "klsCollisionChecker.h"
+#include "gl_defs.h"
 
-#define WIRE_ENDPOINT_SIZE 0.18
-#define WIRE_BBOX_THICKNESS 0.25
+struct glWireRenderInfo {
+	vector< GLPoint2f > vertexPoints;
+	vector< GLPoint2f > intersectPoints;
+	vector< GLLine2f > lineSegments;
+};
 
 float distanceToLine( GLPoint2f p, GLPoint2f l1, GLPoint2f l2 );
 bool operator==(const GLPoint2f& p1, const GLPoint2f& p2);
@@ -132,9 +136,7 @@ public:
 	GLPoint2f getCenter( void );
 	
 	// Moving functions
-	void startMove( void );
 	void move( GLPoint2f origin, GLPoint2f delta );
-	void endMove( void );
 	
 	// Create the bbox for this wire, based on
 	// the bboxes of the wire segments. Also,
@@ -165,13 +167,15 @@ public:
 	// Set the map/tree from which the wire will generate its shape.
 	//	Tree must contain valid wireConnection information.
 	//	IMPORTANT: Also must set nextSegID to be a valid ID
-	void setSegmentMap( map < long, wireSegment > newSegMap) { 
+	void setSegmentMap( map < long, wireSegment > newSegMap) {
+		this->deleteSubObjects(); // prevent coll checker pointers from invalidating
 		segMap = newSegMap; 
 		calcBBox(); 
 		headSegment = ((segMap.begin())->first);
 		nextSegID = ((segMap.rbegin())->first)+1;
 		endSegDrag();
 	};
+	
 	// We need to hold an initial seg map for undo/redo functionality.
 	map < long, wireSegment > getOldSegmentMap( void ) { return oldSegMap; };
 
@@ -205,6 +209,7 @@ private:
 	
 	// Take existing segments and merge concurrent segments
 	void mergeSegments();
+	void generateRenderInfo();
 	
 	// Store the tree in a non-pointered way for easy copy
 	map < long, wireSegment > segMap;
@@ -225,6 +230,8 @@ private:
 	
 	// Handle a pointer for the segment being moved, -1 if not set
 	long currentDragSegment;
+	
+	glWireRenderInfo renderInfo;
 };
 
 #endif /*GUIWIRE_H_*/

@@ -20,7 +20,7 @@ class klsGLCanvas;
 #include "guiWire.h"
 
 // Included for floor() method:
-#include <math.h>
+#include <cmath>
 
 #include <map>
 #include <vector>
@@ -71,7 +71,7 @@ public:
 
 
 	// Print the canvas contents to a bitmap:
-	wxImage renderToImage( unsigned long width, unsigned long height, unsigned long colorDepth = 32 );
+	wxImage renderToImage( unsigned long width, unsigned long height, unsigned long colorDepth = 32, bool noColor = false );
 
 	//TODO: Add some scrollbars and some methods for setting the usable canvas size.
 
@@ -79,7 +79,7 @@ public:
     void wxOnPaint(wxPaintEvent& event);
     void wxOnSize(wxSizeEvent& event);
     void wxOnEraseBackground(wxEraseEvent& event);
-    void klsGLCanvasRender( void );
+    void klsGLCanvasRender( bool noColor = false );
 
     void wxOnMouseEvent(wxMouseEvent& event);
     void wxOnMouseWheel(wxMouseEvent& event);
@@ -110,7 +110,7 @@ public:
     virtual void OnKeyDown( wxKeyEvent& event ) {};
     virtual void OnKeyUp( wxKeyEvent& event ) {};
 
-    virtual void OnRender( void ) {};
+    virtual void OnRender( bool noColor = false ) {};
 	virtual void OnSize( void ) {};
 
 	// Event query methods:
@@ -143,7 +143,19 @@ public:
 	};
 
 	void updateMiniMap( void );
+	
+	// Editing control functions
+	void lockCanvas( void ) {
+		canvasLocked = true; return;
+	}
+	void unlockCanvas( void ) {
+		canvasLocked = false; return;
+	}
+	bool isLocked( void ) {
+		return canvasLocked;
+	}
 
+protected:
 	// The minimap associated with this canvas
 	klsMiniMap* minimap;
 
@@ -293,6 +305,9 @@ private:
 	// Key Control Flags
 	bool isShiftDown;
 	bool isControlDown;
+	
+	// Flag for edit control
+	bool canvasLocked;
 DECLARE_EVENT_TABLE()
 };
 

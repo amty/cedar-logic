@@ -14,6 +14,7 @@
 #include "wx/wxprec.h"
 #include "wx/wx.h"
 #include "wx/thread.h"
+#include "klsMessage.h"
 #include "../logic/logic_defaults.h"
 #include "../logic/logic_wire.h"
 #include "../logic/logic_gate.h"
@@ -36,8 +37,9 @@ public:
     // stopped with Delete() (but not when it is Kill()ed!)
     virtual void OnExit();
     
-    bool parseString(string input);
-    void sendMessage(string message);
+    bool parseMessage(klsMessage::Message input);
+    void sendMessage(klsMessage::Message message);
+    
 private:
 	Circuit* cir;
 	map < IDType, IDType >* logicIDs;

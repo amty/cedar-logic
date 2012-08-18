@@ -20,6 +20,11 @@ using namespace std;
 #include "logic_gate.h"
 #include "logic_circuit.h"
 
+//for the ram gate **** by Joshua Lansford**********
+#define DATA_RECORD_HEX 0x00
+#define END_OF_FILE_HEX 0x01
+//*************************************************
+
 // ***************************** GENERIC GATE ***********************************
 
 
@@ -58,6 +63,18 @@ void Gate::updateGate( IDType myID, Circuit * theCircuit )
 	// Store the Circuit variable in the gate to be used during this call to updateGate():
 	ourCircuit = theCircuit;
 	this->myID = myID;
+	
+	//******************************************
+	//Edit by Joshua Lansford 4/22/07
+	//This goes ahead and lists all paramiters
+	//that wanted to be listed betwean updateGate
+	//class and couldn't
+	for( vector<string>::iterator I = changedParamWaitingList.begin();
+	    	I != changedParamWaitingList.end(); ++I ){
+		listChangedParam( *I );
+	}
+	changedParamWaitingList.clear();
+	//*******************************************
 	
 	// Call the subclassed gate's function to process the events for this gate:
 	this->gateProcess();
@@ -410,7 +427,8 @@ bool Gate::isFallingEdge( string name ) {
 // really send the event. Also, log the last sent event so that it can be 
 // repeated later if necessary. 
 void Gate::setOutputState( string outID, StateType newState, TimeType delay ) {
-	assert(ourCircuit != NULL);
+	
+	assert( ourCircuit != NULL );
 
 	if(outputList.find(outID) == outputList.end()) {
 		WARNING("Gate::setOutputState() - Invalid output name.");
@@ -480,10 +498,24 @@ void Gate::setOutputBusState( string outID, vector< StateType > newState, TimeTy
 
 // List a parameter in the Circuit as having been changed:
 void Gate::listChangedParam( string paramName ) {
-	assert(ourCircuit != NULL);
-
-	// Send the update param to the Circuit:
-	ourCircuit->addUpdateParam( this->myID, paramName );
+	//*************************************
+	//Edit by Joshua Lansford 4/22/07
+	//I am changeing it so that instead of
+	//asserting that ourCircuit != NULL,
+	//we will just stach paramiters to pass
+	//later instead of just forbidding them.
+	//This way pop-ups can be updated imediatly
+	//instead of waiting until next gate step
+	
+	if(ourCircuit != NULL){
+	
+		// Send the update param to the Circuit:
+		ourCircuit->addUpdateParam( this->myID, paramName );
+		
+	}else{
+		changedParamWaitingList.push_back( paramName );	
+	}
+	
 }
 
 
@@ -702,6 +734,38 @@ void Gate_AND::gateProcess( void ) {
 
 // **************************** END AND GATE ***********************************
 
+// ******************************** AND GATE ***********************************
+
+// Initialize the gate's interface:
+Gate_EQUIVALENCE::Gate_EQUIVALENCE() : Gate_N_INPUT() {
+	//NOTE: Inputs are declared by Gate_N_INPUT()
+
+	// Declare the output:
+	declareOutput("OUT");
+}
+
+// Handle gate events:
+void Gate_EQUIVALENCE::gateProcess( void ) {
+	// Get the status of all of the inputs:
+	vector< StateType > inputStates = getInputBusState("IN");
+	
+	StateType outState;
+	
+	if( (inputStates[0] == ONE && inputStates[1] == ONE)
+	  ||(inputStates[0] == ZERO && inputStates[1] == ZERO )){
+		outState = ONE;
+	}else if( (inputStates[0] == ZERO && inputStates[1] == ONE)
+	  ||(inputStates[0] == ONE && inputStates[1] == ZERO )){
+	  	outState = ZERO;
+	}else{
+		outState = UNKNOWN;
+	}
+
+	setOutputState("OUT", outState);
+}
+
+// **************************** END AND GATE ***********************************
+
 
 // ******************************** XOR GATE ***********************************
 
@@ -751,6 +815,7 @@ void Gate_XOR::gateProcess( void ) {
 Gate_REGISTER::Gate_REGISTER() : Gate_PASS() {
 	// Declare the inputs:
 	declareInput("clock", true);
+	declareInput("clock_enable"); // 9/22/11: DKR - input added to make a synchronous D-gate
 	declareInput("clear");
 	declareInput("set");
 	declareInput("load");
@@ -800,22 +865,28 @@ void Gate_REGISTER::gateProcess( void ) {
 	// an update message to the GUI:
 	unsigned long oldCurrentValue = currentValue;
 
+	/*
+	 * 9/22/11: DKR - added checks getInputState("clock_enabled") == ZERO as if the clock is
+	 *	not enabled, the value of the register should be recalculated if the input is high;
+	 *  required for proper behavior of new D-gate
+	 */
+	
 	// Update outBus and currentValue based on the input states.
 	if( getInputState("clear") == ONE ) {
-		if( (syncClear && isRisingEdge("clock")) || !syncClear ) {
+		if( (syncClear && isRisingEdge("clock")) || !syncClear || getInputState("clock_enable") == ZERO) {
 			// Clear.
 			currentValue = 0;
 			outBus = ulong_to_bus( currentValue, inBits );
 		}
 	} else if( getInputState("set") == ONE ) {
-		if( (syncSet && isRisingEdge("clock")) || !syncSet ) {
+		if( (syncSet && isRisingEdge("clock")) || !syncSet || getInputState("clock_enable") == ZERO) {
 			// Set.
 			vector< StateType > allOnes( inBits, ONE );
 			outBus = allOnes;
 			currentValue = bus_to_ulong( outBus );
 		}
 	} else if( getInputState("load") == ONE ) {
-		if( (syncLoad && isRisingEdge("clock")) || !syncLoad ) {
+		if( (syncLoad && isRisingEdge("clock")) || !syncLoad || getInputState("clock_enable") == ZERO){
 			// Load.
 			vector< StateType > inputBus = getInputBusState("IN");
 			for( unsigned long i = 0; i < inputBus.size(); i++ ) {
@@ -906,7 +977,7 @@ void Gate_REGISTER::gateProcess( void ) {
 
 		if( disableHold ) {
 		// Otherwise, load in what is on the input pins:
-			if( (syncLoad && isRisingEdge("clock")) || !syncLoad ) {
+			if((syncLoad && isRisingEdge("clock")) || !syncLoad || getInputState("clock_enable") == ZERO){
 				// Load.
 				vector< StateType > inputBus = getInputBusState("IN");
 				for( unsigned long i = 0; i < inputBus.size(); i++ ) {
@@ -924,6 +995,24 @@ void Gate_REGISTER::gateProcess( void ) {
 	// Set the output values:
 	setOutputState("carry_out", carryOut);
 	
+	//********************************
+	//Edit by Joshua Lansford 3/15/07
+	//While it makes the most sence
+	//to let the output of a latch or
+	//register to be unknown if
+	//it has latched an unknown input,
+	//in practicality it is a real pain.
+	//When implementing a finite state
+	//machine, it is a nusence if
+	//the whole thing is in an infinite
+	//state of unknowingness
+	for( vector< StateType >::iterator I = outBus.begin(); I != outBus.end(); ++I ){
+		if( *I != ONE ){
+			*I = ZERO;
+		}
+	}		
+	//End of edit**********************
+	
 	if( outBus.size() != 0 ) {
 		setOutputBusState("OUT", outBus);
 		setOutputBusState("OUTINV", outBus);
@@ -932,7 +1021,7 @@ void Gate_REGISTER::gateProcess( void ) {
 		// to the GUI:
 		bool oldUO = unknownOutputs;
 		unknownOutputs = false;
-		for( int i = 0; i < outBus.size(); i++ ) {
+		for( unsigned int i = 0; i < outBus.size(); i++ ) {
 			if( outBus[i] == UNKNOWN ) {
 				unknownOutputs = true;
 			}
@@ -1183,7 +1272,7 @@ bool Gate_MUX::setParameter( string paramName, string value ) {
 		if( inBits > 0 ) {
 			// The number of selection bits is the ceiling of
 			// the log base 2 of the number of input bits.
-			selBits = ceil( log((double)inBits) / log(2.0) );
+			selBits = (unsigned long)ceil( log((double)inBits) / log(2.0) );
 			declareInputBus( "SEL", selBits );
 		} else {
 			selBits = 0;
@@ -1214,6 +1303,13 @@ Gate_DECODER::Gate_DECODER() : Gate_N_INPUT() {
 	// (Must be set before using this method!)
 	setParameter("INPUT_BITS", "0");
 
+	//Josh Edit 4/6/2007
+	declareInput("ENABLE");
+	
+	//Josh Edit 10/3/2007
+	declareInput("ENABLE_B");
+	declareInput("ENABLE_C");
+
 	// One output:
 	declareOutput("OUT");
 }
@@ -1226,7 +1322,50 @@ void Gate_DECODER::gateProcess( void ) {
 
 	vector< StateType > outBus( outBits, ZERO ); // All bits are 0, except for the active
 
-	if( inNum < outBus.size() ) {
+	//********************************
+	//Edit by Joshua Lansford 6/4/2007
+	//Reason: The docoder is used with
+	//the Z80 to select ports in order
+	//to enable them and disable them.
+	//the ENABLE input connected to
+	//the inverted /IORQ signal.
+	//The problem is that when the chip
+	//is disabled, the outputs were 
+	//floating. This caused ports to
+	//not know if they were selected
+	//or not and then to fry the data 
+	//lines with unknownness.
+	//Change: To fix this I have
+	//changed the enable input from
+	//ENABLE_0 to just ENABLE. The
+	//enable is then manually checked
+	//to see if it is active before
+	//activating an output.
+	
+	//*************************************
+	//Reedit by Joshua Lansford 10/3/2007
+	//Resion: I am creating another decoder
+	//implementation that needs three enables.
+	//for the same resion as states above,
+	//(I can't have the outputs float on a
+	//disable), I can't use the default enables.
+	//Thus I am creating my own.  I am asumeing
+	//that it is OK to declare inputs that
+	//are not used on the gui side.
+	
+	bool enabled = true;
+	
+	//by testing for ZERO instead of one, we let a floating enable
+	//be enabling.
+	if( getInputState("ENABLE") == ZERO || getInputState("ENABLE_B") == ZERO ||
+	    getInputState("ENABLE_C") == ZERO ){
+	    	enabled = false;
+	}
+	
+	if( enabled && inNum < outBus.size() ) {
+	
+	//End of edit *********************
+	
 		outBus[inNum] = ONE;
 	}
 
@@ -1244,7 +1383,7 @@ bool Gate_DECODER::setParameter( string paramName, string value ) {
 		if( inBits > 0 ) {
 			// The number of output bits is the power of 2 of the
 			// number of input bits.
-			outBits = ceil( pow( (double) inBits, 2.0 ) );
+			outBits = (unsigned long)ceil( pow( (double) inBits, 2.0 ) );
 			declareOutputBus( "OUT", outBits );
 		} else {
 			outBits = 0;
@@ -1609,23 +1748,44 @@ Gate_RAM::Gate_RAM( ) : Gate() {
 	// Declare the stationary pins:
 	declareInput( "write_clock", true );
 	declareInput( "write_enable" );
-
+	
 	// NOTE: None of the other pins are declared in advance!
 	// They are created in setParameter, because they depend on the RAM's size!
 
 	// Set the RAM's default size:	
 	setParameter( "ADDRESS_BITS", "0" );
 	setParameter( "DATA_BITS", "0" );
+	
+	lastRead = (unsigned long)-1;
 }
 
 
 // Handle gate events:
 void Gate_RAM::gateProcess( void ) {
+	
 	// Don't do the process unless there are address and data lines declared!
 	if( (addressBits == 0) || (dataBits == 0) ) return;
 
 	unsigned long address = bus_to_ulong( getInputBusState("ADDRESS") );
 	unsigned long dataIn = bus_to_ulong( getInputBusState("DATA_IN") );
+
+//***********************************************************************
+//Edit by Joshua Lansford 12/31/06
+//Purpose of edit:  When the logic gate loads from a file, it is not
+//   possable to directly notify the gui by paramiters about the new
+//   data.  Thus instead a flag is set and we update the gui now
+    if( flushGuiMemory ){
+    	flushGuiMemory = false;
+		listChangedParam( "MemoryReset" );
+		for( map< unsigned long, unsigned long >::iterator I = memory.begin();
+		     I != memory.end();  ++I ){
+		    ostringstream virtualPropertyName;
+			virtualPropertyName << "Address:";
+			virtualPropertyName << I->first; //we just list the address
+			listChangedParam( virtualPropertyName.str() );
+		}
+    }
+//End of Edit************************************************************
 
 	if( getInputState("write_enable") == ONE ) {
 		// HI_Z all of the data outputs:
@@ -1638,11 +1798,30 @@ void Gate_RAM::gateProcess( void ) {
 			ostringstream oss;
 			oss << "Wroted to the memory thing: Address = " << address << ", data = " << dataIn;
 			WARNING(oss.str());
+//***********************************************************************
+//Edit by Joshua Lansford 12/31/06
+//Purpose of edit:  The Cedar-logic ram gate is being expanded to
+//have a popup that shows the contents of the memory
+//therefore it is necisary for the logic gate to tell the gui gate
+//every time data changes in it.
+				ostringstream virtualPropertyName;
+				virtualPropertyName << "Address:";
+				virtualPropertyName << address;
+				listChangedParam( virtualPropertyName.str() );
+//End of edit************************************************************
 		}
 	} else {
 		// Read from the RAM, and write the data to the outputs.
 		vector< StateType > ramReadData = ulong_to_bus( memory[address], dataBits );
 		setOutputBusState( "DATA_OUT", ramReadData );
+//***********************************************************************
+//Edit by Joshua Lansford 4/22/06
+//Purpose of edit:  This allerts the pop-up when ever an address has changed
+		if( getInputState("ENABLE_0") == ONE ){
+			lastRead = address;
+			listChangedParam( "lastRead" );
+		}
+//End of edit******************************************************
 	}
 }
 
@@ -1672,9 +1851,51 @@ bool Gate_RAM::setParameter( string paramName, string value ) {
 	} else if( paramName == "WRITE_FILE" ) {
 		outputMemoryFile(value);
 	} else if( paramName == "READ_FILE" ) {
-		inputMemoryFile(value);
+		if( value.substr( value.length() - 3 ) == "cdm" ){ 
+			inputMemoryFile(value);
+		//*********************************************
+		//Edit by Joshua Lansford. 1/22/06
+		//This extends the ram gate so that it can open
+		//intel hex files as well.
+		//the if that goes with this else was added as
+		//well.
+		}else{
+			inputMemoryFileFromIntelHex( value );
+		}
+		
+		//End of edit**********************************
+			
 		return true;
-	} else {
+	//*******************************************
+	//Edit by Joshua Lansford 4/22/07
+	//This edit is so that the pop-up can send changes
+	//down to the core by editing cells
+	} else if( paramName.substr( 0, 8 ) == "Address:" ){
+		istringstream addressExtractor( paramName.substr( 8 ) );
+		unsigned long addressOfNewData = 0;
+		addressExtractor >> addressOfNewData;
+		
+		unsigned long newData;
+		iss >> newData;
+		
+		if( memory[ addressOfNewData ] != newData ){
+			memory[ addressOfNewData ] = newData;
+			//now we will re list the param so
+			//that the change will bounce back up into
+			//the pop-up.
+			listChangedParam( paramName );
+		}
+		return true;
+	//********************************************
+	
+	//********************************
+	//Edit by Joshua Lansford 4/22/07
+	//This idet is so that the pop-up can know
+	//when ever there is a read.
+	}else if( paramName == "lastRead" ){
+		iss >> lastRead;
+	//End of edit******************************
+	}else{
 		return Gate::setParameter( paramName, value );
 	}
 	return false;
@@ -1690,6 +1911,33 @@ string Gate_RAM::getParameter( string paramName ) {
 	} else if( paramName == "DATA_BITS" ) {
 		oss << dataBits;
 		return oss.str();
+//***********************************************************************
+//Edit by Joshua Lansford 12/31/06
+//Purpose of edit:  The Cedar-logic ram gate is being expanded to
+//have a popup that shows the contents of the memory
+//therefore it is necisary for the logic gate to tell the gui gate
+//every time data changes in it.
+	} else if( paramName.substr( 0, 8 ) == "Address:" ){
+		istringstream iss( paramName.substr( 8 ) );
+		unsigned long addressOfDataToReturn = 0;
+		iss >> addressOfDataToReturn;
+		unsigned long dataToReturn = memory[ addressOfDataToReturn ];
+		ostringstream oss;
+		oss << dataToReturn;
+		
+		
+		return oss.str();
+	}else if( paramName == "MemoryReset" ){
+		return "true";
+//End of edit************************************************************
+	//********************************
+	//Edit by Joshua Lansford 4/22/07
+	//This idet is so that the pop-up can know
+	//when ever there is a read.
+	}else if( paramName == "lastRead" ){
+		oss << lastRead;
+		return oss.str();
+	//End of edit******************************
 	} else {
 		return Gate::getParameter( paramName );
 	}
@@ -1738,6 +1986,14 @@ void Gate_RAM::inputMemoryFile( string fName ) {
 	// Clear the old memory before loading the new one:
 	memory.clear();
 
+
+//********************************************************
+//Edit by Joshua Lansford 12/31/06
+//Purpose of edit: Let the gui reset its copy of the 
+//     memory too
+	flushGuiMemory = true;
+//End of edit*********************************************
+
 	string temp;
 	istringstream theLine;
 	unsigned long address = 0, data = 0;
@@ -1749,6 +2005,8 @@ void Gate_RAM::inputMemoryFile( string fName ) {
 	    	
 	    	// Try to parse the line:
 	    	theLine.clear();
+
+	    	
 	    	theLine.str(temp);
 			theLine.setf(ios::hex, ios::basefield); // The input data is in hex format
 	    	theLine >> address >> dump >> data;
@@ -1759,6 +2017,98 @@ void Gate_RAM::inputMemoryFile( string fName ) {
 	    }
 	}
 }
+
+//*************************************************
+//Edit by Joshua Lansford 1/22/06
+//This will make it so that the logic gate can
+//also load Intel Hex files.  This is a format
+//which is exported by the zad assembler.
+void Gate_RAM::inputMemoryFileFromIntelHex( string fName ){
+	ifstream fin( fName.c_str(), ios::in );
+	
+	bool endOfFile = false;
+	char temp = '0';
+	int byteCount = 0;
+	int nextByte = 0;
+	int addressPointer = 0;
+	int recordType = 0;
+	
+	if( fin ){
+		//check to make sure the file actually exists before
+		//we blow our last data
+		memory.clear();
+		flushGuiMemory = true;
+	}else{
+		//TODO: This needs to be able to become visible to the
+		//user somehow.  An idea would be to make an error property
+		//that gets displayed in an allert box when it changes.
+		cout << "Error reading file.  Empty or non-existant?" << endl;
+	}
+	
+	while( !endOfFile && fin ){
+		//here we will process a record
+		//first we make sure that the first character is a ":"
+		fin >> temp;
+		if( temp == ':' ){
+			byteCount = readInHex( &fin, 2 );
+			addressPointer = readInHex( &fin, 4 );
+			recordType = readInHex( &fin, 2 );
+			
+			switch( recordType ){
+				case DATA_RECORD_HEX:
+					for( int byteNum = 0; byteNum < byteCount; ++byteNum ){
+						nextByte = readInHex( &fin, 2 );
+						memory[ addressPointer + byteNum ] = nextByte;
+					}
+				
+					break;
+				case END_OF_FILE_HEX:
+					endOfFile = true;
+					break;
+				default:
+					//TODO: cout doesn't cut the cheeze
+					cout << "Unexpected record type: " << recordType << endl;
+					endOfFile = true;
+					break;
+			}
+			
+			//dump checksum
+			readInHex( &fin, 2 );
+		}else{
+			//TODO: cout doesn't cut the cheeze
+			cout << "Error reading file: Expected ':'" << endl;
+			endOfFile = true;
+		}
+	}
+	
+	fin.close();
+}
+
+//helper function that allows reading in hex files
+int Gate_RAM::readInHex( ifstream* fin, int numChars ){
+	int result = 0;
+	char nextChar = '0';
+	int charValue = 0;
+	for( int i = 0; i < numChars; ++i ){
+		(*fin) >> nextChar;
+		if( nextChar >= '0' && nextChar <= '9' ){
+			charValue = nextChar - '0';
+		}else if( nextChar >= 'A' && nextChar <= 'F' ){
+			charValue = nextChar - 'A' + 10;
+		}else if( nextChar >= 'a' && nextChar <= 'f' ){
+			charValue = nextChar - 'a' + 10;
+		}else{
+			//TODO: cout doesn't cut the cheeze
+			cout << "non hex character in stream: " << nextChar << endl;
+			charValue = 0;
+		}
+		result <<= 4;
+		result |= charValue;
+	}
+	return result;
+}
+	
+//End of edit**************************************
 
 
 // **************************** END RAM GATE ***********************************
@@ -2145,7 +2495,158 @@ IDType Gate_NODE::disconnectInput( string inputID ) {
 
 
 
+// ******************************** ADC GATE ***********************************
 
+//to change the number of ADC bits, the gate file must be edited as well
+#define numADCBits 8
+//this is how long it takes for the ADC to 'process'
+//the analog value before it is ready to be read
+//and flags the interupt
+#define ADC_COUNT_DOWN_START 10
+
+// Initialize the starting state and the output:
+Gate_ADC::Gate_ADC( ) : Gate() {
+
+	// Declare the stationary pins:
+	declareInput( "clock", true );
+	declareInput( "/CS" );
+	declareInput( "/WR" );
+	declareInput( "/RD" );
+	declareOutput( "/INT" );
+	
+	//declare out bus
+	declareOutputBus( "OUT", numADCBits );
+	
+	//init the vars
+	countDown = -2;
+	interuptIsFlaged = false;
+}
+
+
+// Handle gate events:
+void Gate_ADC::gateProcess( void ) {
+	//init the /INT to nonactive
+	if( countDown == -2 ){
+		setOutputState( "/INT", ONE );
+	}
+	
+	//we only write to the output if our /CS singnal is
+	//flagged and if the /RD is flagged as well
+	if( getInputState("/CS") == ZERO && getInputState("/RD") == ZERO ){
+		vector< StateType > digitalData = ulong_to_bus( digitalValue, numADCBits );
+		setOutputBusState( "OUT", digitalData );
+	}else{
+		//otherwise mute the output
+		vector< StateType > allHI_Z( numADCBits, HI_Z );
+		setOutputBusState( "OUT", allHI_Z );
+	}
+		
+	//now we take care of our syncronouse events
+	if( isRisingEdge( "clock" ) ){
+		
+		//we will handle them in reverse order
+		
+		//forth event
+		//when value is read, the interupt is dropped
+		if( getInputState("/CS") == ZERO && getInputState("/RD") == ZERO ){
+			setOutputState( "/INT", ONE );
+		}
+		
+		//third event
+		//when the countdown reaches zero,
+		//it is deactivated (set to -1) the analogValue
+		//finishes processing and the interupt is flagged
+		if( countDown == 0 ){
+			countDown = -1;
+			setOutputState( "/INT", ZERO );
+			digitalValue = analogValue;
+		}
+		
+		//second event
+		//the countDown counts down every time
+		//step
+		if( countDown != -1 ){
+			countDown--;
+		}
+		
+		//first event
+		//The user signals that they want to read
+		//This causes the countDown to be inited 
+		//as the ADC starts 'processing' the analog
+		//value.
+		//The interupt is also reset just in case
+		//it was active
+		if( getInputState("/CS") == ZERO && getInputState("/WR") == ZERO ){
+			countDown = ADC_COUNT_DOWN_START;
+			setOutputState( "/INT", ONE );
+		}		
+	}
+}
+
+
+// Set the parameters:
+bool Gate_ADC::setParameter( string paramName, string value ) {
+	istringstream iss(value);
+	if( paramName == "VALUE" ) {
+		unsigned int newValue = 0;
+		iss >> newValue;
+		if( analogValue != newValue ){
+			analogValue = newValue;
+			listChangedParam( "VALUE" );
+			return true;
+		}
+	}
+	return false;
+}
+
+
+// Set the parameters:
+string Gate_ADC::getParameter( string paramName ) {
+	ostringstream oss;
+	if( paramName == "VALUE" ) {
+		oss << analogValue;
+		return oss.str();
+	} else {
+		return Gate::getParameter( paramName );
+	}
+}
+
+
+// **************************** END ADC GATE ***********************************
+
+
+//***************************************************************
+//Edit by Joshua Lansford 6/5/2007
+//This edit is to create a new gate called the pauseulator.
+//This gate has one input and no outputs.  When the input of this
+//gate goes high, then it will pause the simulation.  This takes
+//avantage of the pauseing hooks that I had to create for the Z80.
+Gate_pauseulator::Gate_pauseulator() : Gate(){
+	declareInput( "signal", true );	
+}
+
+void Gate_pauseulator::gateProcess( void ) {
+	if( isRisingEdge( "signal" ) ){
+		listChangedParam( "PAUSE_SIM" );
+	}
+}
+
+bool Gate_pauseulator::setParameter( string paramName, string value ) {
+	//this is here to catch PAUSE_SIM so that when we load
+	//and PAUSE_SIM gets thrown at us from the file,
+	//we will pretend to do something with it.
+	return false;
+}
+
+string Gate_pauseulator::getParameter( string paramName ) {
+	//the only param that the system might we wanting is
+	//PAUSE_SIM, so we will return "TRUE" because we only
+	//flag it when it is true.
+	return "TRUE";
+}
+
+
+//End of edit****************************************************
 
 
 

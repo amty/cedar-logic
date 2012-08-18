@@ -22,10 +22,14 @@
 #include "../logic/logic_defaults.h"
 #include "LibraryParse.h"
 #include "product.h"
+#include "gl_defs.h"
+#include "klsMessage.h"
 #include <deque>
 #include <string>
 #include <fstream>
 #include <sstream>
+
+class MainFrame;
 
 using namespace std;
 
@@ -40,6 +44,9 @@ struct ApplicationSettings {
 	int mainFrameTop;
 	unsigned int timePerStep;
 	int refreshRate;
+    float wireConnRadius;
+    bool wireConnVisible;
+    bool gridlineVisible;
 };
 
 class MainApp : public wxApp {
@@ -57,10 +64,10 @@ public:
 	wxSemaphore readyToSend;
 
 	wxMutex mexMessages;
-	deque< string > dGUItoLOGIC;
-	deque< string > dLOGICtoGUI;
+	deque< klsMessage::Message > dGUItoLOGIC;
+	deque< klsMessage::Message > dLOGICtoGUI;
 	// Use a stopwatch for timing between step calls
-	wxStopWatch* appSystemTime;
+	wxStopWatch appSystemTime;
 	unsigned long timeStepMod;
 	
 	// We need to have a map of libraries for palette organization, and knowledge
@@ -86,7 +93,20 @@ public:
 	threadLogic* logicThread;
 	
 	ofstream logfile;
+	
+	//this pointer is added so that pop-ups can
+	//resume simulation
+	MainFrame* mainframe;
+	
+	//this string is necisary when the working directory
+	//is not were the executeable is.
+	string pathToExe;
 
+	// OK, honestly, this shouldn't be here
+	//	Basically exporting bitmaps doesn't like GL display
+	//	lists, so we flag them
+	bool doingBitmapExport;
+	
 private:
 	void loadSettings( void );
 };

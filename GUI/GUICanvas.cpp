@@ -15,10 +15,14 @@
 
 // Included to use the min() and max() templates:
 #include <algorithm>
+#include <iostream>   //added by DKR 5/22/11
 using namespace std;
 
 // Enable access to objects in the main application
 DECLARE_APP(MainApp)
+
+unsigned int renderTime = 0;
+unsigned int renderNum = 0;
 
 // GUICanvas constructor - defaults grid size to 1 unit square
 GUICanvas::GUICanvas(wxWindow *parent, GUICircuit* gCircuit, wxWindowID id,
@@ -47,7 +51,9 @@ GUICanvas::GUICanvas(wxWindow *parent, GUICircuit* gCircuit, wxWindowID id,
 }
 
 GUICanvas::~GUICanvas() {
-	return;
+	delete snapMouse;
+	delete mouse;
+	delete dragselectbox;
 }
 
 // Clears the circuit by selecting all gates and wires and then running a delete command
@@ -121,27 +127,32 @@ void GUICanvas::removeWire(unsigned long wid) {
 }
 
 // Render the page
-void GUICanvas::OnRender() {
-	
+void GUICanvas::OnRender( bool noColor ) {
 	glColor4f( 0.0, 0.0, 0.0, 1.0 );
 	
 	// Draw the wires:
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
-
-	// Draw the wires:
-	hash_map< unsigned long, guiWire* >::iterator thisWire = wireList.begin();
-	while( thisWire != wireList.end() ) {
-		(thisWire->second)->draw();
-		thisWire++;
-	}
-
+wxStopWatch renderTimer;
+	glColor4f( 0.0, 0.0, 0.0, 1.0 );
+	
 	// Draw the gates:
 	hash_map< unsigned long, guiGate* >::iterator thisGate = gateList.begin();
 	while( thisGate != gateList.end() ) {
-		(thisGate->second)->draw();
+		(thisGate->second)->draw(!noColor);
 		thisGate++;
 	}
+
+	glLoadIdentity();
+	
+	// Draw the wires:
+	hash_map< unsigned long, guiWire* >::iterator thisWire = wireList.begin();
+	while( thisWire != wireList.end() ) {
+		(thisWire->second)->draw(!noColor);
+		thisWire++;
+	}
+renderTime += renderTimer.Time();
+renderNum++;
 	
 	
 	// Draw the basic view objects:
@@ -254,7 +265,7 @@ void GUICanvas::OnRender() {
 	else if (currentDragState == DRAG_CONNECT) {
 		GLPoint2f start = getDragStartCoords();
 		GLPoint2f end = getMouseCoords();
-		glColor4f( 0.0, 1.0, 0.0, 1.0 );
+		glColor4f( 0.0, 0.78, 0.0, 1.0 );
 		glBegin(GL_LINES);
 			glVertex2f(start.x, start.y);
 			glVertex2f(end.x, end.y);
@@ -268,7 +279,7 @@ void GUICanvas::OnRender() {
 	
 	// Draw potential connection hotspots
 	glLoadIdentity ();
-	glColor4f( 0.0, 0.0, 1.0, 1.0 );
+	glColor4f( 0.3, 0.3, 1.0, 1.0 );
 	for (unsigned int i = 0; i < potentialConnectionHotspots.size(); i++) {
 		float diff = HOTSPOT_SCREEN_RADIUS * getZoom();
 		float x = potentialConnectionHotspots[i].x, y = potentialConnectionHotspots[i].y;
@@ -288,46 +299,66 @@ void GUICanvas::mouseLeftDown(wxMouseEvent& event) {
 	// If I am in a paste operation then mouse-up is all I am concerned with
 	if (isWithinPaste) return;
 	
+	// Update the mouse collision object
+	klsBBox mBox;
+	float delta = MOUSE_HOVER_DELTA * getZoom();
+	mBox.addPoint( m );
+	mBox.extendTop( delta );
+	mBox.extendBottom( delta );
+	mBox.extendLeft( delta );
+	mBox.extendRight( delta );
+	mouse->setBBox( mBox );
+	
 	// Do a collision detection on all first-level objects.
 	// The map collisionChecker.overlaps now contains
 	// all of the objects involved in any collisions.
-	//collisionChecker.update();
+	collisionChecker.update();
 
 	// Loop through all objects hit by the mouse
 	//	Favor wires over gates
 	CollisionGroup hitThings = mouse->getOverlaps();
 	CollisionGroup::iterator hit = hitThings.begin();
 	while( hit != hitThings.end() && !handled ) {
+		//*************************************
+		//Edit by Joshua Lansford 3/16/07
+		//It has been requested by students that a ctrl
+		//click will select multiple gates just like
+		//a shift click does.
+		//thus I will replace "event.ShiftDown()"
+		//everywere it appears in this file with
+		//"(event.ShiftDown()||event.ControlDown())"
+		//************************************
+		
 		if ((*hit)->getType() == COLL_WIRE) {
 			guiWire* hitWire = ((guiWire*)(*hit));
 			bool wasSelected = hitWire->isSelected();
 			hitWire->unselect();
 			if ( hitWire->hover( m.x, m.y, WIRE_HOVER_SCREEN_DELTA * getZoom() )) {
 				hitWire->select();
-				if (event.ShiftDown() && wasSelected) hitWire->unselect();
-				if (!(event.ShiftDown())) {
+				if ((event.ShiftDown()||event.ControlDown()) && wasSelected) hitWire->unselect();
+				if (!((event.ShiftDown()||event.ControlDown()))) {
 					unselectAllWires();
 					unselectAllGates();
 					hitWire->select();
 				}
-				if (event.ControlDown()) {
+				if (event.ControlDown() && !(this->isLocked())) {
 					currentConnectionSource.isGate = false;
 					currentConnectionSource.objectID = hitWire->getID();
 					currentDragState = DRAG_CONNECT;
 				}
-				else if (!(event.ShiftDown())) {
+				else if (!((event.ShiftDown()||event.ControlDown()))) {
 					wireHoverID = hitWire->getID();
-					if (wireList[wireHoverID]->startSegDrag(snapMouse)) currentDragState = DRAG_WIRESEG;
+					if (wireList[wireHoverID]->startSegDrag(snapMouse) && !(this->isLocked())) currentDragState = DRAG_WIRESEG;
 					hitWire->unselect();
 				}
 				handled = true;	
-			}
+			} else if (wasSelected && hitThings.size() > 1) hitWire->select(); // probably dragging a selection
 		}
 		hit++;
 	}
 
 	// do we have a highlighted hotspot (which means we're on it now)
-	if (hotspotHighlight.size() > 0 && currentDragState == DRAG_NONE) {
+	if (hotspotHighlight.size() > 0 && currentDragState == DRAG_NONE && !(this->isLocked())) {
 		// Start dragging a new wire:
 		//gateList[hotspotGate]->select();
 		unselectAllGates();
@@ -345,21 +376,21 @@ void GUICanvas::mouseLeftDown(wxMouseEvent& event) {
 		if ((*hit)->getType() == COLL_GATE) {
 			guiGate* hitGate = ((guiGate*)(*hit));
 			bool wasSelected = hitGate->isSelected();
-			if (event.ShiftDown() && wasSelected) hitGate->unselect(); // Remove gate from selection
-			else if (event.ShiftDown() && !wasSelected) hitGate->select(); // Add gate to selection
-			else if (!(event.ShiftDown()) && !wasSelected) { // Begin new selection group
+			if ((event.ShiftDown()||event.ControlDown()) && wasSelected) hitGate->unselect(); // Remove gate from selection
+			else if ((event.ShiftDown()||event.ControlDown()) && !wasSelected) hitGate->select(); // Add gate to selection
+			else if (!((event.ShiftDown()||event.ControlDown())) && !wasSelected) { // Begin new selection group
 				unselectAllGates();
 				unselectAllWires();
 				hitGate->select();
 			}
-			if (!(event.ShiftDown())) currentDragState = DRAG_SELECTION; // Start dragging
+			if (!((event.ShiftDown()||event.ControlDown())) && !(this->isLocked())) currentDragState = DRAG_SELECTION; // Start dragging
 			handled = true;
 		}
 		hit++;
 	}
 
 	// If I am not in a selection group and I haven't handled a selection then unselect everything
-	if (!handled && !(event.ShiftDown())) {
+	if (!handled && !((event.ShiftDown()||event.ControlDown()))) {
 		unselectAllGates();
 		unselectAllWires();
 	}
@@ -404,16 +435,29 @@ void GUICanvas::mouseRightDown(wxMouseEvent& event) {
 	bool angleHandled = false; // flag to ensure only one gate is rotated (if any)
 	vector < unsigned long >::iterator sGate;
 
-	if (isWithinPaste) return; // Left mouse up is the next event we are looking for
+	if (isWithinPaste || (currentDragState != DRAG_NONE)) return; // Left mouse up is the next event we are looking for
 
+	// Update the mouse collision object
+	klsBBox mBox;
+	float delta = MOUSE_HOVER_DELTA * getZoom();
+	mBox.addPoint( m );
+	mBox.extendTop( delta );
+	mBox.extendBottom( delta );
+	mBox.extendLeft( delta );
+	mBox.extendRight( delta );
+	mouse->setBBox( mBox );
+	
 	// Do a collision detection on all first-level objects.
 	// The map collisionChecker.overlaps now contains
 	// all of the objects involved in any collisions.
-	//collisionChecker.update();
+	collisionChecker.update();
 
 	// Go ahead and remove all selection since this is the right mouse button
 	unselectAllGates();
 	unselectAllWires();
+
+	// If locked then we have nothing else to do
+	if ( this->isLocked() ) return;
 
 	// do we have a highlighted hotspot (which means we're on it now)
 	if (hotspotHighlight.size() > 0) {
@@ -436,6 +480,20 @@ void GUICanvas::mouseRightDown(wxMouseEvent& event) {
 			if ((*hit)->getType() == COLL_GATE) {
 				guiGate* hitGate = ((guiGate*)(*hit));
 				if (!angleHandled) {
+					// BEGIN WORKAROUND
+					//	Gates that have connections cannot be rotated without sacrificing wire sanity
+					map < string, GLPoint2f > gateHotspots = hitGate->getHotspotList();
+					map < string, GLPoint2f >::iterator ghsWalk = gateHotspots.begin();
+					bool gateConnected = false;
+					while ( ghsWalk !=  gateHotspots.end() ) {
+						if ( hitGate->isConnected( ghsWalk->first ) ) {
+							gateConnected = true;
+							break;
+						}
+						ghsWalk++;
+					}
+					if ( gateConnected ) { hit++; continue; }
+					// END WORKAROUND
 					map < string, string > newParams(*(hitGate->getAllGUIParams()));
 					istringstream issAngle(newParams["angle"]);
 					GLfloat angle;
@@ -457,9 +515,8 @@ void GUICanvas::mouseRightDown(wxMouseEvent& event) {
 void GUICanvas::OnMouseMove( GLdouble glX, GLdouble glY, bool ShiftDown, bool CtrlDown ) {
 	// Keep a flag for whether things have changed.  If nothing changes, then no render is necessary.
 	bool shouldRender = false;
-
-	if (wxGetApp().appSystemTime->Time() > wxGetApp().appSettings.refreshRate) {
-		wxGetApp().appSystemTime->Pause();
+	if (wxGetApp().appSystemTime.Time() > wxGetApp().appSettings.refreshRate) {
+		wxGetApp().appSystemTime.Pause();
 		if (gCircuit->panic) return;
 		wxCriticalSectionLocker locker(wxGetApp().m_critsect);
 		while (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY) wxYield();
@@ -468,17 +525,14 @@ void GUICanvas::OnMouseMove( GLdouble glX, GLdouble glY, bool ShiftDown, bool Ct
 			wxGetApp().dLOGICtoGUI.pop_front();
 		}
 		wxGetApp().mexMessages.Unlock();
-wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "ms" << endl;
 		if (gCircuit->panic) return;
 		// Do function of number of milliseconds that passed since last step
-		ostringstream oss;
-		oss << "STEPSIM " << wxGetApp().appSystemTime->Time() / wxGetApp().timeStepMod;
-		gCircuit->lastTime = wxGetApp().appSystemTime->Time();
+		gCircuit->lastTime = wxGetApp().appSystemTime.Time();
 		gCircuit->lastTimeMod = wxGetApp().timeStepMod;
-		gCircuit->lastNumSteps = wxGetApp().appSystemTime->Time() / wxGetApp().timeStepMod;
-		gCircuit->sendMessageToCore(oss.str());
-		gCircuit->simulate = false;
-		wxGetApp().appSystemTime->Start(wxGetApp().appSystemTime->Time() % wxGetApp().timeStepMod);
+		gCircuit->lastNumSteps = wxGetApp().appSystemTime.Time() / wxGetApp().timeStepMod;
+		gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_STEPSIM, new klsMessage::Message_STEPSIM(wxGetApp().appSystemTime.Time() / wxGetApp().timeStepMod)));
+		gCircuit->setSimulate(false);
+		wxGetApp().appSystemTime.Start(wxGetApp().appSystemTime.Time() % wxGetApp().timeStepMod);
 		shouldRender = true;
 	}
 
@@ -509,17 +563,18 @@ wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "
 	dBox.addPoint( dStart );
 	dBox.addPoint( m );
 	dragselectbox->setBBox( dBox );
-wxStopWatch collCheckWatch;
+	
+	if ( this->isLocked() ) return;
+	
 	// Do a collision detection on all first-level objects.
 	// The map collisionChecker.overlaps now contains
 	// all of the objects involved in any collisions.
 	collisionChecker.update();
-wxGetApp().logfile << "profile time a: " << collCheckWatch.Time() << endl;
+	
 	// Update a newly-dragged gate's position
 	if (currentDragState == DRAG_NEWGATE) {
 		shouldRender = true;
 		newDragGate->setGLcoords(mSnap.x, mSnap.y);
-		//selectedGates.push_back(newDragGate->getID());
 	}
 	
 	// If the hotspot hover is on, make it clear
@@ -569,35 +624,31 @@ wxGetApp().logfile << "profile time a: " << collCheckWatch.Time() << endl;
 	}
 
 	if (currentDragState == DRAG_SELECT) { // Check for items within drag select box
+		unselectAllGates();
+		unselectAllWires();
+		// Other items may have been selected before if we're using shift/control
+		for (unsigned int i = 0; i < preMove.size(); i++) {
+			gateList[preMove[i].id]->select();
+		}
+		for (unsigned int i = 0; i < preMoveWire.size(); i++) {
+			wireList[preMoveWire[i].id]->select();
+		}
+		// Now check the collision box for dragselects
 		CollisionGroup selThings = dragselectbox->getOverlaps();
 		hit = selThings.begin();
 		while( hit != selThings.end()) {
 			if ((*hit)->getType() == COLL_GATE) {
 				guiGate* hitGate = ((guiGate*)(*hit));
-				bool found = false;
-				for (unsigned int i = 0; i < preMove.size() && !found; i++) {
-					if (preMove[i].id == hitGate->getID()) found = true;
-				}
-				if (!found) {
-					if (dBox.contains((*hit)->getBBox())) hitGate->select();
-					else hitGate->unselect();
-				}
+				if (dBox.contains((*hit)->getBBox())) hitGate->select();
 			}
 			if ((*hit)->getType() == COLL_WIRE) {
 				guiWire* hitWire = ((guiWire*)(*hit));
-				bool found = false;
-				for (unsigned int i = 0; i < preMoveWire.size() && !found; i++) {
-					if (preMoveWire[i].id == hitWire->getID()) found = true;
-				}
-				if (!found) {
-					if (dBox.contains((*hit)->getBBox())) hitWire->select();
-					else hitWire->unselect();
-				}
+				if (dBox.contains((*hit)->getBBox())) hitWire->select();
 			}
 			hit++;
 		}
 	}
-	
+
 	// Check potential hotspot connections (on gate/gate collisions)
 	CollisionGroup ovrList = collisionChecker.overlaps[COLL_GATE];
 	CollisionGroup::iterator obj = ovrList.begin();
@@ -626,7 +677,6 @@ wxGetApp().logfile << "profile time a: " << collCheckWatch.Time() << endl;
 		}
 		obj++;
 	}
-wxGetApp().logfile << "profile time b: " << collCheckWatch.Time() << endl;
 
 	if (currentDragState == DRAG_SELECTION || currentDragState == DRAG_SELECT || currentDragState == DRAG_CONNECT || currentDragState == DRAG_WIRESEG) shouldRender = true;
 	
@@ -657,7 +707,11 @@ wxGetApp().logfile << "profile time b: " << collCheckWatch.Time() << endl;
 
 void GUICanvas::OnMouseUp(wxMouseEvent& event) {
 	GLPoint2f m = getMouseCoords();
-
+/*//RENDER PROFILE
+renderNum = renderTime = 0;
+for (int i = 0; i < 500; i++) klsGLCanvasRender();
+wxGetApp().logfile << renderTime/(double)renderNum << "ms avg for " << renderNum << " renders: " << 1000/(renderTime/(double)renderNum) << "FPS" << endl;
+//END PROFILE */
 	bool handled = false;
 	SetCursor(wxCursor(wxCURSOR_ARROW));
 	hash_map < unsigned long, guiGate* >::iterator thisGate;
@@ -691,9 +745,7 @@ void GUICanvas::OnMouseUp(wxMouseEvent& event) {
 	if (preMove.size() > 0) {
 		float gX, gY;
 		gateList[preMove[0].id]->getGLcoords(gX, gY);
-wxGetApp().logfile << "MOUSEUP" << endl;
-wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0].y << " " << saveMove << endl;
-		if (gX == preMove[0].x && gY == preMove[0].y && !(event.ShiftDown())) { // no move
+		if (gX == preMove[0].x && gY == preMove[0].y && !((event.ShiftDown()||event.ControlDown()))) { // no move
 			CollisionGroup hitThings = mouse->getOverlaps();
 			CollisionGroup::iterator hit = hitThings.begin();
 			while( hit != hitThings.end() ) {
@@ -752,14 +804,14 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 //				if ((*hit)->getType() == COLL_GATE) {
 //					guiGate* hitGate = ((guiGate*)(*hit));
 					guiGate* hitGate = gateList[preMove[0].id];
-					if (!(event.ShiftDown()) && ((event.LeftUp() && currentDragState == DRAG_SELECTION) || event.LeftDClick())) {
+					if (!((event.ShiftDown()||event.ControlDown())) && ((event.LeftUp() && currentDragState == DRAG_SELECTION) || event.LeftDClick())) {
 						// Check for toggle switch
 						float x, y;
 						hitGate->getGLcoords(x,y);
 						if (!saveMove) {
-							string clickHandleGate = hitGate->checkClick( m.x, m.y );
-							if (clickHandleGate.size() > 0) {
-								gCircuit->sendMessageToCore(clickHandleGate);
+							klsMessage::Message_SET_GATE_PARAM* clickHandleGate = hitGate->checkClick( m.x, m.y );
+							if (clickHandleGate != NULL) {
+								gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, clickHandleGate));
 								handled = true;
 							}
 						}
@@ -767,7 +819,6 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 							hitGate->doParamsDialog( gCircuit, gCircuit->GetCommandProcessor() );
 							currentDragState = DRAG_NONE;
 							// setparams command will handle oscope update
-//							if (hitGate->getGUIType() == "TO") gCircuit->myOscope->UpdateMenu();
 							handled = true;
 						}
 					}
@@ -889,9 +940,9 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 									movecommand = new cmdMoveSelection( gCircuit, preMove, preMoveWire, 0, 0, 0, 0 );
 									if (!isWithinPaste) gCircuit->GetCommandProcessor()->Submit( (wxCommand*)movecommand );
 								}
-								movecommand->proxconnects.push_back(createwire);
+								movecommand->getConnections()->push_back(createwire);
 							}
-							else if (currentDragState == DRAG_NEWGATE) creategatecommand->proxconnects.push_back(createwire);
+							else if (currentDragState == DRAG_NEWGATE) creategatecommand->getConnections()->push_back(createwire);
 							else delete createwire;
 						}
 						hsWalk++;
@@ -903,7 +954,7 @@ wxGetApp().logfile << gX << "," << gY << " " << preMove[0].x << "," << preMove[0
 			obj++;
 		}
 	}
-	
+
 	// Drop a paste block with the proper move coords
 	if (isWithinPaste) {
 		pasteCommand->addCommand( movecommand );
@@ -926,7 +977,7 @@ void GUICanvas::OnMouseEnter(wxMouseEvent& event) {
 	//collisionChecker.update();
 
 	wxGetApp().showDragImage = false;
-	if (event.LeftIsDown() && wxGetApp().newGateToDrag.size() > 0 && currentDragState == DRAG_NONE) {
+	if (event.LeftIsDown() && wxGetApp().newGateToDrag.size() > 0 && currentDragState == DRAG_NONE && !(this->isLocked())) {
 		newDragGate = gCircuit->createGate(wxGetApp().newGateToDrag, -1);
 		if (newDragGate == NULL) { wxGetApp().newGateToDrag = ""; return; }
 		newDragGate->setGLcoords(m.x, m.y);
@@ -944,32 +995,33 @@ void GUICanvas::OnMouseEnter(wxMouseEvent& event) {
 void GUICanvas::OnKeyDown(wxKeyEvent& event) {
 	switch (event.GetKeyCode()) {
 	case WXK_DELETE:
-		if (currentDragState == DRAG_NONE) deleteSelection();
+		if (currentDragState == DRAG_NONE && !(this->isLocked())) deleteSelection();
 		break;
 	case WXK_ESCAPE:
 		unselectAllGates();
 		unselectAllWires();
-		if (preMove.size() > 0) {
-			saveMove = false;
-			for (unsigned int i = 0; i < preMove.size(); i++) {
-				if (gateList.find(preMove[i].id) == gateList.end()) continue;
-				gateList[preMove[i].id]->setGLcoords(preMove[i].x, preMove[i].y);
-				if (preMove[i].selected) gateList[preMove[i].id]->select();
-			}
-			preMove.clear();
-		}
-		if (preMoveWire.size() > 0) {
-			for (unsigned int i = 0; i < preMoveWire.size(); i++) {
-				if (wireList.find(preMoveWire[i].id) == wireList.end()) continue;
-				wireList[preMoveWire[i].id]->setSegmentMap(preMoveWire[i].oldWireTree);
-				wireList[preMoveWire[i].id]->select();
-			}
-		}
 		if (currentDragState == DRAG_NEWGATE) {
 			gCircuit->getGates()->erase(newDragGate->getID());
 			collisionChecker.removeObject( newDragGate );
 			delete newDragGate;
-			Update();
+			collisionChecker.update();
+		} else {
+			if (preMove.size() > 0) {
+				saveMove = false;
+				for (unsigned int i = 0; i < preMove.size(); i++) {
+					if (gateList.find(preMove[i].id) == gateList.end()) continue;
+					gateList[preMove[i].id]->setGLcoords(preMove[i].x, preMove[i].y);
+					if (preMove[i].selected) gateList[preMove[i].id]->select();
+				}
+				preMove.clear();
+			}
+			if (preMoveWire.size() > 0) {
+				for (unsigned int i = 0; i < preMoveWire.size(); i++) {
+					if (wireList.find(preMoveWire[i].id) == wireList.end()) continue;
+					wireList[preMoveWire[i].id]->setSegmentMap(preMoveWire[i].oldWireTree);
+					wireList[preMoveWire[i].id]->select();
+				}
+			}			
 		}
 		currentDragState = DRAG_NONE;
 		endDrag(BUTTON_LEFT);
@@ -1042,6 +1094,8 @@ void GUICanvas::copyBlockToClipboard () {
 }
 
 void GUICanvas::pasteBlockFromClipboard () {
+	if (this->isLocked()) return;
+	
 	klsClipboard myClipboard;
 	pasteCommand = myClipboard.pasteBlock( gCircuit, this );
 	if (pasteCommand == NULL) return;
@@ -1191,11 +1245,13 @@ void GUICanvas::printLists() {
 
 // Update the collision checker and refresh
 void GUICanvas::Update() {
-	if (minimap == NULL) return;
+	if (minimap == NULL){
+		return;
+	}
 
 	// In case of resize, we should update every so often
-	if (wxGetApp().appSystemTime->Time() > wxGetApp().appSettings.refreshRate) {
-		wxGetApp().appSystemTime->Pause();
+	if (wxGetApp().appSystemTime.Time() > wxGetApp().appSettings.refreshRate) {
+		wxGetApp().appSystemTime.Pause();
 		if (gCircuit->panic) return;
 		wxCriticalSectionLocker locker(wxGetApp().m_critsect);
 		while (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY) wxYield();
@@ -1204,20 +1260,16 @@ void GUICanvas::Update() {
 			wxGetApp().dLOGICtoGUI.pop_front();
 		}
 		wxGetApp().mexMessages.Unlock();
-wxGetApp().logfile << "stepping after " << wxGetApp().appSystemTime->Time() << "ms" << endl;
 		if (gCircuit->panic) return;
 		// Do function of number of milliseconds that passed since last step
-		ostringstream oss;
-		oss << "STEPSIM " << wxGetApp().appSystemTime->Time() / wxGetApp().timeStepMod;
-		gCircuit->lastTime = wxGetApp().appSystemTime->Time();
+		gCircuit->lastTime = wxGetApp().appSystemTime.Time();
 		gCircuit->lastTimeMod = wxGetApp().timeStepMod;
-		gCircuit->lastNumSteps = wxGetApp().appSystemTime->Time() / wxGetApp().timeStepMod;
-		gCircuit->sendMessageToCore(oss.str());
-		gCircuit->simulate = false;
-		wxGetApp().appSystemTime->Start(wxGetApp().appSystemTime->Time() % wxGetApp().timeStepMod);
+		gCircuit->lastNumSteps = wxGetApp().appSystemTime.Time() / wxGetApp().timeStepMod;
+		gCircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_STEPSIM, new klsMessage::Message_STEPSIM(wxGetApp().appSystemTime.Time() / wxGetApp().timeStepMod)));
+		gCircuit->setSimulate(false);
+		wxGetApp().appSystemTime.Start(wxGetApp().appSystemTime.Time() % wxGetApp().timeStepMod);
 	}
 
-	//collisionChecker.update();
 	minimap->setLists( &gateList, &wireList );
 	minimap->setCanvas(this);
 	updateMiniMap();

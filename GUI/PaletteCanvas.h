@@ -23,9 +23,6 @@ public:
 	~PaletteCanvas();
 
     void OnPaint( wxPaintEvent &event );
-    void OnEraseBackground(wxEraseEvent& event);
-    void OnMouseEvent(wxMouseEvent& event);
-	//void OnScrollEvent(wxScrollWinEvent& event);
 	void Activate( void );
 	
 private:

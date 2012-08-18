@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <stack>
 
+#include "../Z80/Z_80LogicGate.h"
+
 #ifndef _PRODUCTION_
 ofstream* logiclog;
 #endif
@@ -53,7 +55,7 @@ Circuit::Circuit()
 	juncIDCount = 0;
 	
 #ifndef _PRODUCTION_
-	logiclog = new ofstream("corelog.log");
+	logiclog = new ofstream( "corelog.log");
 #endif
 }
 
@@ -71,6 +73,29 @@ Circuit::~Circuit()
 // **************** The visible interface of the circuit ********************
 
 // ********** Circuit input methods *************
+
+//***************************************
+//Edit by Joshua Lansford 3/27/07
+//purpose of edit: The ram gate needs to
+//update its pop-up right after it loads
+//even if it is paused.  Thus this method
+//is created, so that the pop-ups
+//can request that the core proces
+//thegateUpdateList without advanceing
+//the system time
+void Circuit::stepOnlyGates(){
+	// Update the gates that have been connected or disconnected or had a 
+	// parameter change within the last call to step() so that they can
+	// recalculate correctly:
+	ID_SET< IDType >::iterator updateGate = gateUpdateList.begin();
+	while( updateGate != gateUpdateList.end() ) {
+		gateList[*updateGate]->updateGate( *updateGate, this );
+		updateGate++;
+	}
+	gateUpdateList.clear();
+}
+//End of Edit*****************************
+
 
 // Step the simulation forward by one timestep:
 // If a pointer to a set is passed, then it will
@@ -139,7 +164,6 @@ void Circuit::step( ID_SET< IDType > *changedWires )
 	changedWires->insert( wireUpdateList.begin(), wireUpdateList.end() );
 	wireUpdateList.clear();	// Empty the wireUpdateList, since we are handling the updates.
 	
-//	cout << "Events Processed: " << processedEvents << "\t\t";
 
 	// Calculate the new wire states, and make a list of affected gates:
 	ID_SET< IDType > changedGates;
@@ -257,6 +281,30 @@ IDType Circuit::newGate( string type, IDType gateID ) {
 			gateList[thisGateID] = GATE_PTR( new Gate_T( this ) );
 		} else if( type == "NODE" ) {
 			gateList[thisGateID] = GATE_PTR( new Gate_NODE( this ) );
+		} else if( type == "EQUIVALENCE" ) {
+			gateList[thisGateID] = GATE_PTR( new Gate_EQUIVALENCE );
+//*******************************************************************
+//  Edit by Joshua Lansford 1/22/06
+//  This edit is added because Nathan Harro and I are adding a new
+//  gate type!!
+		} else if( type == "Z80" ){
+			gateList[thisGateID] = GATE_PTR( new Z_80LogicGate() );
+// End of edit*******************************************************
+
+//********************************
+//  Edit by Joshua Lansford 4/10/07
+//  now adding the ADC
+		} else if( type == "ADC" ){
+			gateList[thisGateID] = GATE_PTR( new Gate_ADC() );
+// End of edit********************
+
+//********************************
+//  Edit by Joshua Lansford 6/05/07
+//  now adding the pauseulator
+		} else if( type == "Pauseulator" ){
+			gateList[thisGateID] = GATE_PTR( new Gate_pauseulator() );
+// End of edit*******************
+
 		} else {
 			WARNING( "Circuit::newGate() - Invalid logic type!" );
 		}
@@ -602,7 +650,6 @@ void Circuit::connectJunction( IDType juncID, IDType wireID ) {
 	if( juncList.find( juncID ) == juncList.end() ) return;
 	if( wireList.find( wireID ) == wireList.end() ) return;
 
-//	cout << "Connecting junction " << juncID << " to wire " << wireID << endl;
 
 	// Get the junction and wire:
 	JUNC_PTR myJunc = juncList[juncID];

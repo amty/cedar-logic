@@ -9,9 +9,17 @@
 *****************************************************************************/
 
 #include "klsMiniMap.h"
+#include "guiText.h"
+
+// Enable access to objects in the main application
+DECLARE_APP(MainApp)
 
 BEGIN_EVENT_TABLE(klsMiniMap, wxPanel)
 	EVT_PAINT(klsMiniMap::OnPaint)
+	
+	//Josh Edit 4/9/07
+    EVT_ERASE_BACKGROUND(klsMiniMap::OnEraseBackground)
+	
 	EVT_MOUSE_EVENTS(klsMiniMap::OnMouseEvent)
 END_EVENT_TABLE()
 
@@ -142,6 +150,16 @@ void klsMiniMap::generateImage() {
 	// don't enable it if not!
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	
+	//*********************************
+	//Edit by Joshua Lansford 4/08/07
+	//The minimap could use some anti
+	//aleasing
+	glEnable( GL_LINE_SMOOTH );
+	//End of edit
+		
+	// Load the font texture
+	guiText::loadFont(wxGetApp().appSettings.textFontFile);
 
 	// Do the rendering here.
 	renderMap();
@@ -200,20 +218,56 @@ void klsMiniMap::renderMap() {
 }
 
 void klsMiniMap::update(GLPoint2f origin, GLPoint2f endpoint) {
-	wxClientDC dc(this);
-	dc.FloodFill(0, 0, *wxWHITE);
+	//wxClientDC dc(this);
+	//dc.FloodFill(0, 0, *wxWHITE);
 	this->origin = origin;
 	this->endpoint = endpoint;
 	
 	generateImage();
 	
-	wxBitmap mapBitmap(mapImage);
-	dc.DrawBitmap(mapBitmap, 0, 0, true);
+	//*****************************
+	//Edit by Joshua Lansford 4/9/07
+	//In search of determineing the
+	//cause of the miniMap spazz bug
+	//I refactored update and
+	//OnPaint.
+	//Instead of update doing both
+	//jobs, I now have OnPaint
+	//handling the painting
+	//and update handling the update-
+	//ing.  It didn't seem right
+	//for the update to be grabbing
+	//the hardware and rendering
+	//to it when we were not servicing
+	//a onPaint request.
+	//***************************
+	
+	
+	//wxBitmap mapBitmap(mapImage);
+	//dc.DrawBitmap(mapBitmap, 0, 0, true);
+	Refresh( false );
+	//Update makes it so that we don't lag
+	//when the user is moveing the cavase around
+	wxWindow::Update();
 }
 
 void klsMiniMap::OnPaint(wxPaintEvent& evt) {
-	update();
+	//Josh Edit 4/9/07 see coment put in update
+	
+	//update();
+	
+	wxPaintDC dc(this);
+	//dc.FloodFill(0, 0, *wxWHITE);
+	wxBitmap mapBitmap(mapImage);
+	dc.DrawBitmap(mapBitmap, 0, 0, true);
+	
 	evt.Skip();
+}
+
+//Josh Edit 4/9/07 We were flickering, so I put this in here.
+void klsMiniMap::OnEraseBackground(wxEraseEvent& WXUNUSED(event))
+{
+  // Do nothing, to avoid flashing.
 }
 
 void klsMiniMap::OnMouseEvent(wxMouseEvent& evt) {
