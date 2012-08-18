@@ -11,7 +11,7 @@
 #include "MainApp.h"
 #include "MainFrame.h"
 #include "wx/cmdline.h"
-#include "str-convs.h"
+
 IMPLEMENT_APP(MainApp)
 
 static const wxCmdLineEntryDesc g_cmdLineDesc[] =
@@ -36,13 +36,11 @@ bool MainApp::OnInit()
 	
     wxFileSystem::AddHandler( new wxZipFSHandler );
 	helpController = new wxHelpController;
-	wxString c_str = 
 #ifndef _PRODUCTION_
-		std2wx("../KLS_Logic.chm");
+	helpController->Initialize("../KLS_Logic.chm");
 #else
-		std2wx(appSettings.helpFile);
+	helpController->Initialize(appSettings.helpFile.c_str());
 #endif
-	helpController->Initialize(c_str);
 
 	wxString cmdFilename;
 	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv);
@@ -52,16 +50,16 @@ bool MainApp::OnInit()
 		fName.Normalize(wxPATH_NORM_LONG|wxPATH_NORM_DOTS|wxPATH_NORM_TILDE|wxPATH_NORM_ABSOLUTE);
 		cmdFilename = fName.GetFullPath();
 	}
-	// create the main application window
-	MainFrame *frame = new MainFrame(std2wx("CEDAR Logic Simulator"),
-					 cmdFilename);
-	// and show it (the frames, unlike simple controls, are not shown when
-	// created initially)
-	frame->Show(true);
-	// success: wxApp::OnRun() will be called which will enter the main message
-	// loop and the application will run. If we returned false here, the
-	// application would exit immediately.
-	return true;
+
+    // create the main application window
+    MainFrame *frame = new MainFrame(_T("CEDAR Logic Simulator"), cmdFilename.c_str());
+    // and show it (the frames, unlike simple controls, are not shown when
+    // created initially)
+    frame->Show(true);
+    // success: wxApp::OnRun() will be called which will enter the main message
+    // loop and the application will run. If we returned false here, the
+    // application would exit immediately.
+    return true;
 }
 
 void MainApp::loadSettings() {

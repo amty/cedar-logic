@@ -11,18 +11,14 @@
 #include "gateImage.h"
 #include "wx/image.h"
 #include "wx/wx.h"
-#include <wx/statbmp.h>
 #include "klsGLCanvas.h"
 #include <fstream>
-#include "glmem.hh"
-#include "str-convs.h"
-DECLARE_APP(MainApp)
 
-BEGIN_EVENT_TABLE(gateImage, wxWindow) //wxStaticBitmap)
-	EVT_PAINT(gateImage::OnPaint)
-	EVT_ENTER_WINDOW( gateImage::OnEnterWindow )
-	EVT_LEAVE_WINDOW( gateImage::OnLeaveWindow )
-	EVT_MOUSE_EVENTS( gateImage::mouseCallback )
+BEGIN_EVENT_TABLE(gateImage, wxStaticBitmap)
+    EVT_PAINT(gateImage::OnPaint)
+    EVT_ENTER_WINDOW( gateImage::OnEnterWindow )
+    EVT_LEAVE_WINDOW( gateImage::OnLeaveWindow )
+    EVT_MOUSE_EVENTS( gateImage::mouseCallback )
 	EVT_ERASE_BACKGROUND(gateImage::OnEraseBackground)
 END_EVENT_TABLE()
 
@@ -32,7 +28,6 @@ gateImage::gateImage( string gateName, wxWindow *parent, wxWindowID id,
         const wxPoint& pos,
         const wxSize& size,
         long style, const wxString& name ) : 
-	gImage(GATEIMAGESIZE, GATEIMAGESIZE, false),
         wxWindow(parent, id, pos, size, style|wxFULL_REPAINT_ON_RESIZE, name ) {
 	m_init = false;
 	inImage = false;
@@ -44,8 +39,7 @@ gateImage::gateImage( string gateName, wxWindow *parent, wxWindowID id,
 	this->gateName = gateName;
 	update();
 	delete m_gate;
-	string caption = wxGetApp().libraries[wxGetApp().gateNameToLibrary[gateName]][gateName].caption;
-	this->SetToolTip(std2wx(caption.c_str()));
+	this->SetToolTip(wxGetApp().libraries[wxGetApp().gateNameToLibrary[gateName]][gateName].caption.c_str());
 }
 
 gateImage::~gateImage() {
@@ -60,17 +54,17 @@ void gateImage::OnPaint(wxPaintEvent &event) {
 	} else {
 		dc.SetPen(wxPen(*wxWHITE, 2, wxSOLID));
 	}
-	dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
-	dc.DrawRectangle(0,0,IMAGESIZE,IMAGESIZE);
+		dc.SetBrush(wxBrush(*wxTRANSPARENT_BRUSH));
+		dc.DrawRectangle(0,0,IMAGESIZE,IMAGESIZE);
 	//event.Skip();
 }
 
 void gateImage::mouseCallback( wxMouseEvent& event) {
 	if (event.LeftDown()) {
 		wxGetApp().newGateToDrag = gateName;
-	} // else if (event.LeftUp()) {
-	// 	wxGetApp().newGateToDrag = "";
-	// }
+	} else if (event.LeftUp()) {
+		wxGetApp().newGateToDrag = "";
+	}
 }
 
 void gateImage::OnEraseBackground( wxEraseEvent& event ) {
@@ -127,26 +121,73 @@ void gateImage::setViewport() {
 
 // Print the canvas contents to a bitmap:
 void gateImage::generateImage() {
-	WITH_wxImage(gImage) {
-		// Setup the viewport for rendering:
-		setViewport();
-		// Reset the glViewport to the size of the bitmap:
-		glViewport(0, 0, GATEIMAGESIZE, GATEIMAGESIZE);
-		// Set the bitmap clear color:
-		glClearColor (1.0, 1.0, 1.0, 0.0);
-		glColor3b(0, 0, 0);
+//WARNING!!! Heavily platform-dependent code ahead! This only works in MS Windows because of the
+// DIB Section OpenGL rendering.
+
+	wxSize sz = GetClientSize();
+
+	// Create a DIB section.
+	// (The Windows wxBitmap implementation will create a DIB section for a bitmap if you set
+	// a color depth of 24 or greater.)
+	wxBitmap theBM( GATEIMAGESIZE, GATEIMAGESIZE, 32 );
+	
+	// Get a memory hardware device context for writing to the bitmap DIB Section:
+	wxMemoryDC myDC;
+	myDC.SelectObject(theBM);
+	WXHDC theHDC = myDC.GetHDC();
+
+	// The basics of setting up OpenGL to render to the bitmap are found at:
+	// http://www.nullterminator.net/opengl32.html
+	// http://www.codeguru.com/cpp/g-m/opengl/article.php/c5587/
+
+    PIXELFORMATDESCRIPTOR pfd;
+    int iFormat;
+
+    // set the pixel format for the DC
+    ::ZeroMemory( &pfd, sizeof( pfd ) );
+    pfd.nSize = sizeof( pfd );
+    pfd.nVersion = 1;
+    pfd.dwFlags = PFD_DRAW_TO_BITMAP | PFD_SUPPORT_OPENGL | PFD_SUPPORT_GDI;
+    pfd.iPixelType = PFD_TYPE_RGBA;
+    pfd.cColorBits = 32;
+    pfd.cDepthBits = 16;
+    pfd.iLayerType = PFD_MAIN_PLANE;
+    iFormat = ::ChoosePixelFormat( (HDC) theHDC, &pfd );
+    ::SetPixelFormat( (HDC) theHDC, iFormat, &pfd );
+
+    // create and enable the render context (RC)
+    HGLRC hRC = ::wglCreateContext( (HDC) theHDC );
+    HGLRC oldhRC = ::wglGetCurrentContext();
+    HDC oldDC = ::wglGetCurrentDC();
+    ::wglMakeCurrent( (HDC) theHDC, hRC );
+
+	// Setup the viewport for rendering:
+	setViewport();
+	// Reset the glViewport to the size of the bitmap:
+	glViewport(0, 0, GATEIMAGESIZE, GATEIMAGESIZE);
+	
+	// Set the bitmap clear color:
+	glClearColor (1.0, 1.0, 1.0, 0.0);
+	glColor3b(0, 0, 0);
 		
-		//TODO: Check if alpha is hardware supported, and
-		// don't enable it if not!
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
+	//TODO: Check if alpha is hardware supported, and
+	// don't enable it if not!
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
 
-		// Do the rendering here.
-		renderMap();
+	// Do the rendering here.
+	renderMap();
 
-		// Flush the OpenGL buffer to make sure the rendering has happened:	
-		glFinish(); 
-	}
+	// Flush the OpenGL buffer to make sure the rendering has happened:	
+	glFlush();
+	
+	// Destroy the OpenGL rendering context, release the memDC, and
+	// convert the DIB Section into a wxImage to return to the caller:
+    ::wglMakeCurrent( oldDC, oldhRC );
+    //::wglMakeCurrent( NULL, NULL );
+    ::wglDeleteContext( hRC );
+	myDC.SelectObject(wxNullBitmap);
+	gImage = theBM.ConvertToImage();
 }
 
 void gateImage::renderMap() {
@@ -154,10 +195,12 @@ void gateImage::renderMap() {
 	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
-		
+	glColor4f( 0, 0, 0, 1 );
+
 	if (m_gate != NULL) m_gate->draw();
 }
 
 void gateImage::update() {
+	setViewport();
 	generateImage();
 }

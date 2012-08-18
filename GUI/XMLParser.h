@@ -61,9 +61,6 @@ public:
 	string readTag();
 	string readTagValue(string tagName);
 	string readCloseTag();
-	bool is_eof() {
-		return nextToken.tokenType == XML_EOF;
-	}
 	long getCurrentIndex();
 	bool isTag(long);
 	bool isCloseTag(long);

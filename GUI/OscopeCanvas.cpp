@@ -15,8 +15,6 @@
 #include "../logic/logic_defaults.h"
 #include "OscopeFrame.h"
 
-#include "glmem.hh"
-#include "str-convs.h"
 // Included to use the min() and max() templates:
 #include <algorithm>
 using namespace std;
@@ -106,10 +104,9 @@ void OscopeCanvas::OnRender() {
 	glEnd();
 
 	for (unsigned int i = 0; i < numberOfWires; i++) {
-		if (parentFrame->comboBoxVector[i]->GetValue().c_str()
-		    == std2wx("[None]")) { wireNum++; continue; }
+		if (parentFrame->comboBoxVector[i]->GetValue().c_str() == "[None]") { wireNum++; continue; }
 
-		map< string, deque< StateType > >::iterator thisWire = stateValues.find(wx2std(parentFrame->comboBoxVector[i]->GetValue()));
+		map< string, deque< StateType > >::iterator thisWire = stateValues.find(parentFrame->comboBoxVector[i]->GetValue().c_str());
 		if (thisWire == stateValues.end()) { wireNum++; continue; }
 		deque< StateType >::reverse_iterator wireVal = (thisWire->second).rbegin();
 		GLdouble horizLoc = OSCOPE_HORIZONTAL;
@@ -247,7 +244,7 @@ void OscopeCanvas::UpdateData(void) {
 	map< string, bool > stringBool; 
 	
 	for (unsigned int i = 0; i < parentFrame->comboBoxVector.size()-1; i++) {
-		string junctionName = wx2std(parentFrame->comboBoxVector[i]->GetValue());
+		string junctionName = parentFrame->comboBoxVector[i]->GetValue().c_str();
 		if (junctionName == "[None]" || junctionName == "[Remove]" || junctionName == "") continue;	
 			
 		if(stringBool.find(junctionName) == stringBool.end()) {
@@ -360,13 +357,13 @@ void OscopeCanvas::UpdateMenu()
 				//Gets gate ID
 				string junctionName = (theGate->second)->getLogicParam("JUNCTION_ID");
 			
-				(parentFrame->comboBoxVector[x])->Append(std2wx(junctionName.c_str()));
+				(parentFrame->comboBoxVector[x])->Append(wxT(junctionName.c_str()));
 			}
 		
 			theGate++;
 		}
-		(parentFrame->comboBoxVector[x])->Append(std2wx("[None]"));
-		(parentFrame->comboBoxVector[x])->Append(std2wx("[Remove]"));
+		(parentFrame->comboBoxVector[x])->Append(wxT("[None]"));
+		(parentFrame->comboBoxVector[x])->Append(wxT("[Remove]"));
 		
 		if ((parentFrame->comboBoxVector[x])->FindString(oldVal) != -1 ) {
 			(parentFrame->comboBoxVector[x])->SetValue(oldVal);
@@ -377,26 +374,72 @@ void OscopeCanvas::UpdateMenu()
 }
 
 // Print the canvas contents to a bitmap:
-wxImage OscopeCanvas::generateImage()
-{
+wxImage OscopeCanvas::generateImage() {
+//WARNING!!! Heavily platform-dependent code ahead! This only works in MS Windows because of the
+// DIB Section OpenGL rendering.
+
 	wxSize sz = GetClientSize();
-	wxImage ret(sz.GetWidth(), sz.GetHeight(), true);
+
+	// Create a DIB section.
+	// (The Windows wxBitmap implementation will create a DIB section for a bitmap if you set
+	// a color depth of 24 or greater.)
+	wxBitmap theBM( sz.GetWidth(), sz.GetHeight(), 32 );
 	
-	WITH_wxImage(ret) {
-		// Set the bitmap clear color:
-		glClearColor (1.0, 1.0, 1.0, 0.0);
-		glColor3b(0, 0, 0);
+	// Get a memory hardware device context for writing to the bitmap DIB Section:
+	wxMemoryDC myDC;
+	myDC.SelectObject(theBM);
+	WXHDC theHDC = myDC.GetHDC();
+
+	// The basics of setting up OpenGL to render to the bitmap are found at:
+	// http://www.nullterminator.net/opengl32.html
+	// http://www.codeguru.com/cpp/g-m/opengl/article.php/c5587/
+
+    PIXELFORMATDESCRIPTOR pfd;
+    int iFormat;
+
+    // set the pixel format for the DC
+    ::ZeroMemory( &pfd, sizeof( pfd ) );
+    pfd.nSize = sizeof( pfd );
+    pfd.nVersion = 1;
+    pfd.dwFlags = PFD_DRAW_TO_BITMAP | PFD_SUPPORT_OPENGL | PFD_SUPPORT_GDI;
+    pfd.iPixelType = PFD_TYPE_RGBA;
+    pfd.cColorBits = 32;
+    pfd.cDepthBits = 16;
+    pfd.iLayerType = PFD_MAIN_PLANE;
+    iFormat = ::ChoosePixelFormat( (HDC) theHDC, &pfd );
+    ::SetPixelFormat( (HDC) theHDC, iFormat, &pfd );
+
+    // create and enable the render context (RC)
+    HGLRC hRC = ::wglCreateContext( (HDC) theHDC );
+    HGLRC oldhRC = ::wglGetCurrentContext();
+    HDC oldDC = ::wglGetCurrentDC();
+    ::wglMakeCurrent( (HDC) theHDC, hRC );
+
+	// Setup the viewport for rendering:
+//	setViewport();
+	// Reset the glViewport to the size of the bitmap:
+//	glViewport(0, 0, (GLint) sz.GetWidth(), (GLint) sz.GetHeight());
+	
+	// Set the bitmap clear color:
+	glClearColor (1.0, 1.0, 1.0, 0.0);
+	glColor3b(0, 0, 0);
 		
-		//TODO: Check if alpha is hardware supported, and
-		// don't enable it if not!
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glEnable(GL_BLEND);
-		
-		// Do the rendering here.
-		OnRender();
-		
-		// Flush the OpenGL buffer to make sure the rendering has happened:	
-		glFinish();
-	}
-	return ret;
+	//TODO: Check if alpha is hardware supported, and
+	// don't enable it if not!
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+	// Do the rendering here.
+	OnRender();
+
+	// Flush the OpenGL buffer to make sure the rendering has happened:	
+	glFlush();
+	
+	// Destroy the OpenGL rendering context, release the memDC, and
+	// convert the DIB Section into a wxImage to return to the caller:
+    ::wglMakeCurrent( oldDC, oldhRC );
+    //::wglMakeCurrent( NULL, NULL );
+    ::wglDeleteContext( hRC );
+	myDC.SelectObject(wxNullBitmap);
+	return theBM.ConvertToImage();
 }

@@ -12,14 +12,14 @@
 #define GUICANVAS_H_
 
 #include <map>
-#include <ext/hash_map>
+#include <hash_map.h>
 #include <vector>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <deque>
 using namespace std;
-using namespace __gnu_cxx;
+
 class cmdPasteBlock;
 
 #include "MainApp.h"

@@ -233,8 +233,7 @@ string XMLParser::readTagValue(string tagName) {
 // readCloseTag closes the most open tag
 string XMLParser::readCloseTag() {
 	// Look for a close tag and then munch it
-	while (nextToken.tokenType != XML_CTAG && !is_eof())
-		getNextToken();
+	while (nextToken.tokenType != XML_CTAG) getNextToken();
 	Token returnToken = getNextToken();
 	return returnToken.data;
 }

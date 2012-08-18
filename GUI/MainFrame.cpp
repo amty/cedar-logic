@@ -22,7 +22,6 @@
 #include "commands.h"
 #include "CircuitPrint.h"
 
-#include "images.cc"
 DECLARE_APP(MainApp)
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
@@ -67,75 +66,69 @@ END_EVENT_TABLE()
 wxPrintData *g_printData = (wxPrintData*) NULL;
 
 
-MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
+MainFrame::MainFrame(const wxString& title, string cmdFilename)
        : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(600,600))
 {
     // set the frame icon
     //SetIcon(wxICON(sample));
 
 	// Set default locations
-	if (wxGetApp().appSettings.lastDir == "")
-#ifdef UNIX
-		lastDirectory = wxGetHomeDir();
-#else
-		lastDirectory = wxGetHomeDir() + std2wx("/My Documents");
-#endif
-	else lastDirectory = std2wx(wxGetApp().appSettings.lastDir);
+	if (wxGetApp().appSettings.lastDir == "") lastDirectory = wxGetHomeDir() + _T("/My Documents");
+	else lastDirectory = wxGetApp().appSettings.lastDir.c_str();
 
     // create a menu bar
     wxMenu *fileMenu = new wxMenu; // FILE MENU
-	fileMenu->Append(wxID_NEW, std2wx("&New\tCtrl+N"), std2wx("Create new circuit"));
-	fileMenu->Append(wxID_OPEN, std2wx("&Open\tCtrl+O"), std2wx("Open circuit"));
-	fileMenu->Append(wxID_SAVE, std2wx("&Save\tCtrl+S"), std2wx("Save circuit"));
-	fileMenu->Append(wxID_SAVEAS, std2wx("Save &As"), std2wx("Save circuit"));
+	fileMenu->Append(wxID_NEW, _T("&New\tCtrl+N"), _T("Create new circuit"));
+	fileMenu->Append(wxID_OPEN, _T("&Open\tCtrl+O"), _T("Open circuit"));
+	fileMenu->Append(wxID_SAVE, _T("&Save\tCtrl+S"), _T("Save circuit"));
+	fileMenu->Append(wxID_SAVEAS, _T("Save &As"), _T("Save circuit"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(wxID_PRINT, std2wx("&Print\tCtrl+P"), std2wx("Print circuit"));
-	fileMenu->Append(wxID_PREVIEW, std2wx("P&rint Preview"), std2wx("Preview circuit printout"));
+	fileMenu->Append(wxID_PRINT, _T("&Print\tCtrl+P"), _T("Print circuit"));
+	fileMenu->Append(wxID_PREVIEW, _T("P&rint Preview"), _T("Preview circuit printout"));
 	fileMenu->AppendSeparator();
-	fileMenu->Append(wxID_EXIT, std2wx("E&xit\tAlt+X"), std2wx("Quit this program"));
+	fileMenu->Append(wxID_EXIT, _T("E&xit\tAlt+X"), _T("Quit this program"));
 
     wxMenu *viewMenu = new wxMenu; // VIEW MENU
-    viewMenu->Append(View_Oscope, std2wx("&Oscope\tCtrl+G"), std2wx("Show the Oscope"));
+    viewMenu->Append(View_Oscope, _T("&Oscope\tCtrl+G"), _T("Show the Oscope"));
 
     wxMenu *helpMenu = new wxMenu; // HELP MENU
-    helpMenu->Append(wxID_HELP_CONTENTS, std2wx("&Contents...\tF1"), std2wx("Show Help system"));
+    helpMenu->Append(wxID_HELP_CONTENTS, _T("&Contents...\tF1"), _T("Show Help system"));
 	helpMenu->AppendSeparator();
-    helpMenu->Append(wxID_ABOUT, std2wx("&About..."), std2wx("Show about dialog"));
+    helpMenu->Append(wxID_ABOUT, _T("&About..."), _T("Show about dialog"));
 
 	wxMenu *editMenu = new wxMenu; // EDIT MENU
-	editMenu->Append(wxID_UNDO, std2wx("Undo\tCtrl+Z"), std2wx("Undo last operation"));
-	editMenu->Append(wxID_REDO, std2wx("Redo"), std2wx("Redo last operation"));
+	editMenu->Append(wxID_UNDO, _T("Undo\tCtrl+Z"), _T("Undo last operation"));
+	editMenu->Append(wxID_REDO, _T("Redo"), _T("Redo last operation"));
 	editMenu->AppendSeparator();
-	editMenu->Append(wxID_COPY, std2wx("Copy\tCtrl+C"), std2wx("Copy selection to clipboard"));
-	editMenu->Append(wxID_PASTE, std2wx("Paste\tCtrl+V"), std2wx("Paste selection from clipboard"));
+	editMenu->Append(wxID_COPY, _T("Copy\tCtrl+C"), _T("Copy selection to clipboard"));
+	editMenu->Append(wxID_PASTE, _T("Paste\tCtrl+V"), _T("Paste selection from clipboard"));
 	editMenu->AppendSeparator();
-	editMenu->Append(Edit_Export, std2wx("Export bitmap"), std2wx("Export circuit bitmap to clipboard"));
+	editMenu->Append(Edit_Export, _T("Export bitmap"), _T("Export circuit bitmap to clipboard"));
 	
     // now append the freshly created menu to the menu bar...
     wxMenuBar *menuBar = new wxMenuBar();
-    menuBar->Append(fileMenu, std2wx("&File"));
-    menuBar->Append(editMenu, std2wx("&Edit"));
-    menuBar->Append(viewMenu, std2wx("&View"));
-    menuBar->Append(helpMenu, std2wx("&Help"));
+    menuBar->Append(fileMenu, _T("&File"));
+    menuBar->Append(editMenu, _T("&Edit"));
+    menuBar->Append(viewMenu, _T("&View"));
+    menuBar->Append(helpMenu, _T("&Help"));
 	
     // ... and attach this menu bar to the frame
     SetMenuBar(menuBar);
-    // open a default library
+	// open a default library
 #ifndef _PRODUCTION_
-    string libPath("../GUI/TestGates.lib");
+	string libPath = "../GUI/TestGates.lib";
 #else
-    string libPath(wxGetApp().appSettings.gateLibFile);
+	string libPath = wxGetApp().appSettings.gateLibFile;
 #endif
-	LibraryParse newLib("./TestGates.lib");
+	LibraryParse newLib(libPath);
 	wxGetApp().libParser = newLib;
 	
-	create_toolbar();
+	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0), wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
 	SetToolBar(toolBar);
 	toolBar->Show(true);
-	toolBar->Realize();
 
     CreateStatusBar(2);
-    SetStatusText(std2wx(""));
+    SetStatusText(_T(""));
 
 	mainSizer = new wxBoxSizer( wxHORIZONTAL );
 	wxBoxSizer* leftPaneSizer = new wxBoxSizer( wxVERTICAL );
@@ -163,7 +156,7 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 		canvases.push_back(new GUICanvas(canvasBook, gCircuit, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS));
 		ostringstream oss;
 		oss << "Page " << (i+1);
-		canvasBook->AddPage(canvases[i], std2wx(oss.str()), (i == 0 ? true : false));
+		canvasBook->AddPage(canvases[i], wxT(oss.str().c_str()), (i == 0 ? true : false));
 	}
 	
 	currentCanvas = canvases[0];
@@ -178,7 +171,7 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 	
     if ( thread->Run() != wxTHREAD_NO_ERROR )
     {
-       wxLogError(std2wx("Can't start thread!"));
+       wxLogError(wxT("Can't start thread!"));
     }
 	
 	wxGetApp().appSystemTime = new wxStopWatch();
@@ -191,8 +184,12 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 	// Setup the "Maximize Catch" flag:
 	sizeChanged = false;
 	
-	gCircuit->myOscope = new OscopeFrame(this, std2wx("O-Scope"), gCircuit);
+	gCircuit->myOscope = new OscopeFrame(this, _T("O-Scope"), gCircuit);
 	
+	toolbarCreated = false;
+
+	toolBar->Realize();
+
 	// Create the print data object:
 	g_printData = new wxPrintData;
 	g_printData->SetOrientation(wxLANDSCAPE);
@@ -200,7 +197,7 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 	this->SetSize( wxGetApp().appSettings.mainFrameLeft, wxGetApp().appSettings.mainFrameTop, wxGetApp().appSettings.mainFrameWidth, wxGetApp().appSettings.mainFrameHeight );
 	
 	doOpenFile = (cmdFilename.size() > 0);
-	this->openedFilename = cmdFilename;
+	this->openedFilename = cmdFilename.c_str();
 }
 
 MainFrame::~MainFrame() {
@@ -221,60 +218,12 @@ MainFrame::~MainFrame() {
 	delete idleTimer;
 }
 
-void MainFrame::create_toolbar()
-{
-	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0),
-				wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
-
-	wxBitmap bmpNew(wxBITMAP(new));
-	wxBitmap bmpOpen(wxBITMAP(open));
-	wxBitmap bmpSave(wxBITMAP(save));
-	wxBitmap bmpUndo(wxBITMAP(undo));
-	wxBitmap bmpRedo(wxBITMAP(redo));
-	wxBitmap bmpCopy(wxBITMAP(copy));
-	wxBitmap bmpPaste(wxBITMAP(paste));
-	wxBitmap bmpPrint(wxBITMAP(print));
-	wxBitmap bmpAbout(wxBITMAP(help));
-	wxBitmap bmpPause(wxBITMAP(pause));
-	wxBitmap bmpStep(wxBITMAP(step));
-	wxBitmap bmpZoomIn(wxBITMAP(zoomin));
-	wxBitmap bmpZoomOut(wxBITMAP(zoomout));
-	int w = bmpNew.GetWidth(), h = bmpNew.GetHeight();
-	toolBar->SetToolBitmapSize(wxSize(w, h));
-	toolBar->AddTool(wxID_NEW, std2wx("New"), bmpNew, std2wx("New"));
-	toolBar->AddTool(wxID_OPEN, std2wx("Open"), bmpOpen, std2wx("Open"));
-	toolBar->AddTool(wxID_SAVE, std2wx("Save"), bmpSave, std2wx("Save")); 
-	toolBar->AddSeparator();
-	toolBar->AddTool(wxID_PRINT, std2wx("Print"), bmpPrint, std2wx("Print"));
-	toolBar->AddSeparator();
-	toolBar->AddTool(wxID_UNDO, std2wx("Undo"), bmpUndo, std2wx("Undo"));
-	toolBar->AddTool(wxID_REDO, std2wx("Redo"), bmpRedo, std2wx("Redo"));
-	toolBar->AddSeparator();
-	toolBar->AddTool(wxID_COPY, std2wx("Copy"), bmpCopy, std2wx("Copy"));
-	toolBar->AddTool(wxID_PASTE, std2wx("Paste"), bmpPaste, std2wx("Paste"));
-	toolBar->AddSeparator();
-	toolBar->AddTool(Tool_ZoomIn, std2wx("Zoom In"), bmpZoomIn, std2wx("Zoom In"));
-	toolBar->AddTool(Tool_ZoomOut, std2wx("Zoom Out"), bmpZoomOut, std2wx("Zoom Out"));
-	toolBar->AddSeparator();
-	toolBar->AddTool(Tool_Pause, std2wx("Pause/Resume"), bmpPause, std2wx("Pause/Resume"), wxITEM_CHECK);
-	toolBar->AddTool(Tool_Step, std2wx("Step"), bmpStep, std2wx("Step"));
-	timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
-	ostringstream oss;
-	oss << wxGetApp().timeStepMod << "ms";
-	timeStepModVal = new wxStaticText(toolBar, wxID_ANY, std2wx(oss.str()), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
-	toolBar->AddControl( timeStepModSlider );
-	toolBar->AddControl( timeStepModVal );
-	toolBar->AddSeparator();
-	toolBar->AddTool(wxID_ABOUT, std2wx("About"), bmpAbout, std2wx("About"));		
-	toolBar->Realize();
-}
-
 threadLogic *MainFrame::CreateThread()
 {
 	threadLogic *thread = new threadLogic();
     if ( thread->Create() != wxTHREAD_NO_ERROR )
     {
-        wxLogError(std2wx("Can't create thread!"));
+        wxLogError(wxT("Can't create thread!"));
     }
 
     wxCriticalSectionLocker enter(wxGetApp().m_critsect);
@@ -292,11 +241,7 @@ void MainFrame::OnClose(wxCloseEvent& event) {
 
 	// Allow the user to save the file!!	
 	if (commandProcessor->IsDirty()) {
-		wxMessageDialog dialog(
-			this, std2wx("Circuit has not been saved."
-				     "  Would you like to save it?"),
-			std2wx("Save Circuit"),
-			wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
+		wxMessageDialog dialog( this, wxT("Circuit has not been saved.  Would you like to save it?"), wxT("Save Circuit"), wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
 		switch (dialog.ShowModal()) {
 		case wxID_YES:
 			OnSave(*((wxCommandEvent*)(&event)));
@@ -325,18 +270,14 @@ void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event)) {
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event)) {
     wxString msg;
-    msg.Printf( std2wx("CEDAR Logic Simulator\nCopyright 2006 Cedarville University, Matt Lewellyn, \n\tDavid Knierim, and Ben Sprague\n\tAll rights reserved\nSee license.txt for details."));
+    msg.Printf( _T("CEDAR Logic Simulator\nCopyright 2006 Cedarville University, Matt Lewellyn, \n\tDavid Knierim, and Ben Sprague\n\tAll rights reserved\nSee license.txt for details."));
 
-    wxMessageBox(msg, std2wx("About"), wxOK | wxICON_INFORMATION, this);
+    wxMessageBox(msg, _T("About"), wxOK | wxICON_INFORMATION, this);
 }
 
 void MainFrame::OnNew(wxCommandEvent& event) {
 	if (commandProcessor->IsDirty()) {
-		wxMessageDialog dialog(
-			this, std2wx("Circuit has not been saved.  "
-				     "Would you like to save it?"),
-			std2wx("Save Circuit"),
-			wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
+		wxMessageDialog dialog( this, wxT("Circuit has not been saved.  Would you like to save it?"), wxT("Save Circuit"), wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
 		switch (dialog.ShowModal()) {
 		case wxID_YES:
 			OnSave(event);
@@ -355,8 +296,8 @@ void MainFrame::OnNew(wxCommandEvent& event) {
 	commandProcessor->ClearCommands();
 	commandProcessor->SetMenuStrings();
 	currentCanvas->Update(); // Render();
-	this->SetTitle(std2wx("CEDAR Logic Simulator"));
-	openedFilename = std2wx("");
+    this->SetTitle("CEDAR Logic Simulator");
+    openedFilename = _T("");
 	idleTimer->Start(20);
 	if (!(toolBar->GetToolState(Tool_Pause))) {
 		wxGetApp().appSystemTime->Start(0);
@@ -367,11 +308,7 @@ void MainFrame::OnNew(wxCommandEvent& event) {
 void MainFrame::OnOpen(wxCommandEvent& event) {
 	currentCanvas->gCircuit->simulate = false;
 	if (commandProcessor->IsDirty()) {
-		wxMessageDialog dialog(
-			this, std2wx("Circuit has not been saved.  "
-				     "Would you like to save it?"),
-			std2wx("Save Circuit"),
-			wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
+		wxMessageDialog dialog( this, wxT("Circuit has not been saved.  Would you like to save it?"), wxT("Save Circuit"), wxYES_DEFAULT|wxYES_NO|wxCANCEL|wxICON_QUESTION);
 		switch (dialog.ShowModal()) {
 		case wxID_YES:
 			OnSave(event);
@@ -385,9 +322,9 @@ void MainFrame::OnOpen(wxCommandEvent& event) {
 	mTimer->Stop();
 	idleTimer->Stop();
 
-	wxString caption = std2wx("Open a circuit");
-	wxString wildcard = std2wx("Circuit files (*.cdl)|*.cdl");
-	wxString defaultFilename = std2wx("");
+	wxString caption = wxT("Open a circuit");
+	wxString wildcard = wxT("Circuit files (*.cdl)|*.cdl");
+	wxString defaultFilename = wxT("");
 	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxOPEN | wxFILE_MUST_EXIST);
 	dialog.SetDirectory(lastDirectory);
 	
@@ -395,14 +332,14 @@ void MainFrame::OnOpen(wxCommandEvent& event) {
 		wxString path = dialog.GetPath();
 		lastDirectory = dialog.GetDirectory();
 		openedFilename = path;
-		this->SetTitle( std2wx("CEDAR Logic Simulator - ") + path );
+		this->SetTitle( _T("CEDAR Logic Simulator - ") + path );
 		while (!(wxGetApp().dGUItoLOGIC.empty())) wxGetApp().dGUItoLOGIC.pop_front();
 		while (!(wxGetApp().dLOGICtoGUI.empty())) wxGetApp().dLOGICtoGUI.pop_front();
 		for (unsigned int i = 0; i < canvases.size(); i++) canvases[i]->clearCircuit();
 		gCircuit->reInitializeLogicCircuit();
 		commandProcessor->ClearCommands();
 		commandProcessor->SetMenuStrings();
-		CircuitParse cirp(wx2std(path), canvases);
+	    CircuitParse cirp((string)path.c_str(), canvases);
     	cirp.parseFile();
 	}
     currentCanvas->Update(); // Render();
@@ -415,7 +352,7 @@ void MainFrame::OnOpen(wxCommandEvent& event) {
 }
 
 void MainFrame::OnSave(wxCommandEvent& event) {
-	if (openedFilename == std2wx("")) OnSaveAs(event);
+	if (openedFilename == _T("")) OnSaveAs(event);
 	else {
 		gCircuit->simulate = false;
 		commandProcessor->MarkAsSaved();
@@ -438,15 +375,15 @@ void MainFrame::OnSaveAs(wxCommandEvent& WXUNUSED(event)) {
 	wxGetApp().appSystemTime->Pause();
 	mTimer->Stop();
 	idleTimer->Stop();
-	wxString caption = std2wx("Save circuit");
-	wxString wildcard = std2wx("Circuit files (*.cdl)|*.cdl");
-	wxString defaultFilename = std2wx("");
+	wxString caption = wxT("Save circuit");
+	wxString wildcard = wxT("Circuit files (*.cdl)|*.cdl");
+	wxString defaultFilename = wxT("");
 	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxSAVE | wxOVERWRITE_PROMPT);
 	dialog.SetDirectory(lastDirectory);
 	if (dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
 		openedFilename = path;
-		this->SetTitle( std2wx("CEDAR Logic Simulator - ") + path );
+		this->SetTitle( _T("CEDAR Logic Simulator - ") + path );
 		commandProcessor->MarkAsSaved();
 		CircuitParse cirp(currentCanvas);
 		cirp.saveCircuit((string)(const char*)openedFilename.c_str(), canvases); //currentCanvas->getGateList(), currentCanvas->getWireList());
@@ -494,13 +431,58 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 	wxGetApp().mexMessages.Unlock();
 
 	if (mainSizer == NULL) return;
+	if (!toolbarCreated) {
+		wxBitmap bmpNew(wxBITMAP(new));
+		wxBitmap bmpOpen(wxBITMAP(open));
+		wxBitmap bmpSave(wxBITMAP(save));
+		wxBitmap bmpUndo(wxBITMAP(undo));
+		wxBitmap bmpRedo(wxBITMAP(redo));
+		wxBitmap bmpCopy(wxBITMAP(copy));
+		wxBitmap bmpPaste(wxBITMAP(paste));
+		wxBitmap bmpPrint(wxBITMAP(print));
+		wxBitmap bmpAbout(wxBITMAP(help));
+		wxBitmap bmpPause(wxBITMAP(pause));
+		wxBitmap bmpStep(wxBITMAP(step));
+		wxBitmap bmpZoomIn(wxBITMAP(zoomin));
+		wxBitmap bmpZoomOut(wxBITMAP(zoomout));
+	    int w = bmpNew.GetWidth(),
+	        h = bmpNew.GetHeight();
+	        toolBar->SetToolBitmapSize(wxSize(w, h));
+		toolBar->AddTool(wxID_NEW, _T("New"), bmpNew, _T("New"));
+		toolBar->AddTool(wxID_OPEN, _T("Open"), bmpOpen, wxT("Open"));
+		toolBar->AddTool(wxID_SAVE, _T("Save"), bmpSave, wxT("Save")); 
+		toolBar->AddSeparator();
+		toolBar->AddTool(wxID_PRINT, _T("Print"), bmpPrint, wxT("Print"));
+		toolBar->AddSeparator();
+		toolBar->AddTool(wxID_UNDO, _T("Undo"), bmpUndo, wxT("Undo"));
+		toolBar->AddTool(wxID_REDO, _T("Redo"), bmpRedo, wxT("Redo"));
+		toolBar->AddSeparator();
+		toolBar->AddTool(wxID_COPY, _T("Copy"), bmpCopy, wxT("Copy"));
+		toolBar->AddTool(wxID_PASTE, _T("Paste"), bmpPaste, wxT("Paste"));
+		toolBar->AddSeparator();
+		toolBar->AddTool(Tool_ZoomIn, _T("Zoom In"), bmpZoomIn, wxT("Zoom In"));
+		toolBar->AddTool(Tool_ZoomOut, _T("Zoom Out"), bmpZoomOut, wxT("Zoom Out"));
+		toolBar->AddSeparator();
+		toolBar->AddTool(Tool_Pause, _T("Pause/Resume"), bmpPause, wxT("Pause/Resume"), wxITEM_CHECK);
+		toolBar->AddTool(Tool_Step, _T("Step"), bmpStep, wxT("Step"));
+		timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
+		ostringstream oss;
+		oss << wxGetApp().timeStepMod << "ms";
+		timeStepModVal = new wxStaticText(toolBar, wxID_ANY, oss.str().c_str(), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
+		toolBar->AddControl( timeStepModSlider );
+		toolBar->AddControl( timeStepModVal );
+		toolBar->AddSeparator();
+		toolBar->AddTool(wxID_ABOUT, _T("About"), bmpAbout, wxT("About"));		
+		toolBar->Realize();
+		toolbarCreated = true;
+	}
 	
 	if ( doOpenFile ) {
 		doOpenFile = false;
-		CircuitParse cirp(wx2std(openedFilename), canvases);
+	    CircuitParse cirp(openedFilename.c_str(), canvases);
     	cirp.parseFile();
 	    currentCanvas->Update(); // Render();
-		this->SetTitle(std2wx("CEDAR Logic Simulator - ") + openedFilename );
+		this->SetTitle( _T("CEDAR Logic Simulator - ") + openedFilename );
 	}
 	
 	if ( gCircuit->panic ) {
@@ -509,12 +491,7 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 		mTimer->Stop();
 		wxGetApp().appSystemTime->Start(0);
 		wxGetApp().appSystemTime->Pause();
-		wxMessageBox(std2wx("Overloading simulator: "
-				    "please increase time per"
-				    " step and then resume "
-				    "simulation."),
-			     std2wx("Error - overload"),
-			     wxOK | wxICON_ERROR, NULL);
+		wxMessageBox(_T("Overloading simulator: please increase time per step and then resume simulation."), _T("Error - overload"), wxOK | wxICON_ERROR, NULL);
 	}
 
 	if( sizeChanged ) {	
@@ -535,6 +512,7 @@ void MainFrame::OnMaximize(wxMaximizeEvent& event) {
 }
 
 void MainFrame::OnNotebookPage(wxNotebookEvent& event) {
+	if (!toolbarCreated) return;
 	long canvasID = event.GetSelection();
 	if (canvases[canvasID] == currentCanvas) return;
 	currentCanvas = canvases[canvasID];
@@ -566,14 +544,14 @@ void MainFrame::OnPrint(wxCommandEvent& WXUNUSED(event)) {
     wxPrintDialogData printDialogData(* g_printData);
 
     wxPrinter printer(& printDialogData);
-    CircuitPrint printout(currentCanvas, openedFilename, std2wx("Logic Circuit"));
+    CircuitPrint printout(currentCanvas, openedFilename, _T("Logic Circuit"));
 
     if (!printer.Print(this, &printout, true /*prompt*/))
     {
         if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
-            wxMessageBox(std2wx("There was a problem printing.\nPerhaps your current printer is not set correctly?"), std2wx("Printing"), wxOK);
+            wxMessageBox(_T("There was a problem printing.\nPerhaps your current printer is not set correctly?"), _T("Printing"), wxOK);
 //        else
-//            wxMessageBox(std2wx("You canceled printing"), std2wx("Printing"), wxOK);
+//            wxMessageBox(_T("You canceled printing"), _T("Printing"), wxOK);
     }
     else
     {
@@ -583,22 +561,17 @@ void MainFrame::OnPrint(wxCommandEvent& WXUNUSED(event)) {
 
 void MainFrame::OnPrintPreview(wxCommandEvent& WXUNUSED(event)) {
 	wxPrintDialogData printDialogData(* g_printData);
-	CircuitPrint* printoutPreview = new CircuitPrint(currentCanvas, openedFilename, std2wx("Logic Circuit"));
-	CircuitPrint* printoutPrinter = new CircuitPrint(currentCanvas, openedFilename, std2wx("Logic Circuit"));
+	CircuitPrint* printoutPreview = new CircuitPrint(currentCanvas, openedFilename, _T("Logic Circuit"));
+	CircuitPrint* printoutPrinter = new CircuitPrint(currentCanvas, openedFilename, _T("Logic Circuit"));
 	wxPrintPreview *preview = new wxPrintPreview(printoutPreview, printoutPrinter, &printDialogData);
     if (!preview->Ok())
     {
         delete preview;
-        wxMessageBox(std2wx("There was a problem previewing.\n"
-			    "Perhaps your current printer is not"
-			    " set correctly?"),
-		     std2wx("Previewing"), wxOK);
+        wxMessageBox(_T("There was a problem previewing.\nPerhaps your current printer is not set correctly?"), _T("Previewing"), wxOK);
         return;
     }
 //
-    wxPreviewFrame *frame = new wxPreviewFrame(
-	    preview, this, std2wx("Print Preview"),
-	    wxPoint(100, 100), wxSize(600, 650));
+    wxPreviewFrame *frame = new wxPreviewFrame(preview, this, _T("Print Preview"), wxPoint(100, 100), wxSize(600, 650));
     frame->Centre(wxBOTH);
     frame->Initialize();
     frame->Show();
@@ -652,7 +625,7 @@ void MainFrame::OnTimeStepModSlider(wxScrollEvent& event) {
 	ostringstream oss;
 	oss << wxGetApp().timeStepMod << "ms";
 	wxGetApp().timeStepMod = timeStepModSlider->GetValue();
-	timeStepModVal->SetLabel(std2wx(oss.str()));
+	timeStepModVal->SetLabel( oss.str().c_str() );
 }
 
 

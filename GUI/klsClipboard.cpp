@@ -11,9 +11,7 @@
 #include "klsClipboard.h"
 #include <fstream>
 #include <map>
-#include <ext/hash_map>
-
-using namespace __gnu_cxx;
+#include <hash_map.h>
 
 DECLARE_APP(MainApp)
 

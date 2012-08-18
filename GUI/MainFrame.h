@@ -24,7 +24,7 @@
 #include "GUICircuit.h"
 #include "OscopeFrame.h"
 #include "klsMiniMap.h"
-#include "str-convs.h"
+
 enum
 {
 	Edit_Export = 5901, // out of range of wxWidgets constants
@@ -45,10 +45,9 @@ enum
 class MainFrame : public wxFrame {
 public:
     // ctor(s)
-	MainFrame(const wxString& title, wxString cmdFilename = std2wx(""));
+    MainFrame(const wxString& title, string cmdFilename = "");
 	~MainFrame();
 	
-	void create_toolbar();
     // event handlers (these functions should _not_ be virtual)
     void OnClose(wxCloseEvent& event);
     void OnQuit(wxCommandEvent& event);
@@ -98,6 +97,7 @@ private:
 	
 	// Instance variables
 	bool sizeChanged;
+	bool toolbarCreated;
 	bool doOpenFile;
 	wxString lastDirectory;
 	wxString openedFilename;

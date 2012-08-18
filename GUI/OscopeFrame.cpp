@@ -20,7 +20,7 @@
 #include "wx/clipbrd.h"
 #include "wx/filedlg.h"
 #include <fstream>
-#include "str-convs.h"
+
 #define ID_EXPORT 5950
 #define ID_COMBOBOX 5951
 #define ID_TEXTCTRL 5951
@@ -60,10 +60,10 @@ OscopeFrame::OscopeFrame(wxWindow *parent, const wxString& title, GUICircuit* gC
 	//starts new array of strings
 	wxArrayString strings;
 
-	strings.Add(std2wx("[None]"));
-	strings.Add(std2wx("[Remove]"));
+	strings.Add(wxT("[None]"));
+	strings.Add(wxT("[Remove]"));
 	
-	comboBoxVector.push_back(new wxComboBox(this, ID_COMBOBOX, std2wx("[None]"), wxDefaultPosition, wxDefaultSize, strings, 
+	comboBoxVector.push_back(new wxComboBox(this, ID_COMBOBOX, wxT("[None]"), wxDefaultPosition, wxDefaultSize, strings, 
 	      wxCB_READONLY | wxCB_DROPDOWN	| wxCB_SORT));
 
 	//Adds vertical box to canvas
@@ -78,17 +78,17 @@ OscopeFrame::OscopeFrame(wxWindow *parent, const wxString& title, GUICircuit* gC
 
 	buttonSizer = new wxGridSizer( 1 );
 
-	pauseButton = new wxToggleButton(this, ID_PAUSE_BUTTON, std2wx("Pause"), wxDefaultPosition, wxDefaultSize);
+	pauseButton = new wxToggleButton(this, ID_PAUSE_BUTTON, wxT("Pause"), wxDefaultPosition, wxDefaultSize);
 	pauseButton->SetValue(false);
 	buttonSizer->Add(pauseButton, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0) );
 
-	exportButton = new wxButton(this, ID_EXPORT, std2wx("Export"), wxDefaultPosition, wxDefaultSize);
+	exportButton = new wxButton(this, ID_EXPORT, wxT("Export"), wxDefaultPosition, wxDefaultSize);
 	buttonSizer->Add(exportButton, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0) );
 
-	loadButton = new wxButton(this, ID_LOAD, std2wx("Load"), wxDefaultPosition, wxDefaultSize);
+	loadButton = new wxButton(this, ID_LOAD, wxT("Load"), wxDefaultPosition, wxDefaultSize);
 	buttonSizer->Add(loadButton, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0) );
 
-	saveButton = new wxButton(this, ID_SAVE, std2wx("Save"), wxDefaultPosition, wxDefaultSize);
+	saveButton = new wxButton(this, ID_SAVE, wxT("Save"), wxDefaultPosition, wxDefaultSize);
 	buttonSizer->Add(saveButton, wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0) );
 
 	oSizer->Add(buttonSizer, wxSizerFlags(0).Expand().Border(wxALL, 5) );
@@ -121,19 +121,19 @@ void OscopeFrame::OnClose( wxCloseEvent& event ) {
 void OscopeFrame::OnToggleButton( wxCommandEvent& event ) {
 	if( !(pauseButton->GetValue()) ) {
 		theCanvas->clearData();
-		pauseButton->SetLabel(std2wx("Pause"));
+		pauseButton->SetLabel("Pause");
 	} else {
-		pauseButton->SetLabel(std2wx("Reset"));
+		pauseButton->SetLabel("Reset");
 	}
 }
 
 void OscopeFrame::OnComboUpdate( wxCommandEvent& event ) {
-	if (comboBoxVector[comboBoxVector.size()-1]->GetValue() != std2wx("[None]")) {		
+	if (comboBoxVector[comboBoxVector.size()-1]->GetValue() != "[None]") {		
 		//starts new array of strings
 		wxArrayString strings;
-		strings.Add(std2wx("[None]"));
+		strings.Add(wxT("[None]"));
 	
-		comboBoxVector.push_back(new wxComboBox(this, ID_COMBOBOX, std2wx("[None]"), wxDefaultPosition, wxDefaultSize, strings, 
+		comboBoxVector.push_back(new wxComboBox(this, ID_COMBOBOX, wxT("[None]"), wxDefaultPosition, wxDefaultSize, strings, 
 	      wxCB_READONLY | wxCB_DROPDOWN	| wxCB_SORT));
 	      
 		//Adds selection box to vSizer
@@ -146,15 +146,15 @@ void OscopeFrame::OnComboUpdate( wxCommandEvent& event ) {
 	vector < unsigned int > deleteComboIDs;
 	// Are last two set to [None] - if so then remove last one
 	if (comboBoxVector.size() > 1 && 
-	    comboBoxVector[comboBoxVector.size()-1]->GetValue() == std2wx("[None]") &&
-	    comboBoxVector[comboBoxVector.size()-2]->GetValue() == std2wx("[None]")) {
+		comboBoxVector[comboBoxVector.size()-1]->GetValue() == "[None]" &&
+		comboBoxVector[comboBoxVector.size()-2]->GetValue() == "[None]") {
 		
 		deleteComboIDs.push_back(comboBoxVector.size()-1);
 	}
 
 	//For loop to test if a [Remove] is selected (except on last)
 	for(unsigned int x = 0; x < comboBoxVector.size()-1; x++) {
-		if(comboBoxVector[x]->GetValue() == std2wx("[Remove]")){
+		if(comboBoxVector[x]->GetValue() == "[Remove]"){
 			deleteComboIDs.push_back(x);
 		}
 	}
@@ -208,14 +208,14 @@ void OscopeFrame::OnExport( wxCommandEvent& event ) {
 }
 
 void OscopeFrame::OnLoad( wxCommandEvent& event ) {
-	wxString caption = std2wx("Open an O-scope Layout");
-	wxString wildcard = std2wx("CEDAR O-scope Layout files (*.cdo)|*.cdo");
-	wxString defaultFilename = std2wx("");
+	wxString caption = wxT("Open an O-scope Layout");
+	wxString wildcard = wxT("CEDAR O-scope Layout files (*.cdo)|*.cdo");
+	wxString defaultFilename = wxT("");
 	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxOPEN | wxFILE_MUST_EXIST);
 	
 	if (dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
-		ifstream inFile(wx2std(path).c_str());
+		ifstream inFile(path.c_str());
 		string lineFile;
 		getline(inFile, lineFile, '\n');
 		if (lineFile != "OSCOPE LAYOUT FILE") return;
@@ -234,14 +234,11 @@ void OscopeFrame::OnLoad( wxCommandEvent& event ) {
 			getline(inFile, lineFile, '\n');
 			//starts new array of strings
 			wxArrayString strings;
-			strings.Add(std2wx("[None]"));
-			strings.Add(std2wx(lineFile));
+			strings.Add(wxT("[None]"));
+			strings.Add(wxT(lineFile.c_str()));
 			
-			comboBoxVector.push_back(
-				new wxComboBox(
-					this, ID_COMBOBOX, std2wx(lineFile),
-					wxDefaultPosition, wxDefaultSize, strings, 
-					wxCB_READONLY | wxCB_DROPDOWN	| wxCB_SORT));
+			comboBoxVector.push_back(new wxComboBox(this, ID_COMBOBOX, wxT(lineFile.c_str()), wxDefaultPosition, wxDefaultSize, strings, 
+		      wxCB_READONLY | wxCB_DROPDOWN	| wxCB_SORT));
 		    
 			//Adds selection box to vSizer
 			vSizer->Add(comboBoxVector[comboBoxVector.size()-1], wxSizerFlags(0).Align(wxALIGN_CENTER_VERTICAL).Border(wxALL, 0) );
@@ -254,13 +251,13 @@ void OscopeFrame::OnLoad( wxCommandEvent& event ) {
 }
 
 void OscopeFrame::OnSave( wxCommandEvent& event ) {
-	wxString caption = std2wx("Save o-scope layout");
-	wxString wildcard = std2wx("CEDAR O-scope Layout files (*.cdo)|*.cdo");
-	wxString defaultFilename = std2wx("");
+	wxString caption = wxT("Save o-scope layout");
+	wxString wildcard = wxT("CEDAR O-scope Layout files (*.cdo)|*.cdo");
+	wxString defaultFilename = wxT("");
 	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxSAVE | wxOVERWRITE_PROMPT);
 	if (dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
-		string openedFilename = wx2std(path);
+		string openedFilename = path.c_str();
 		ofstream outFile(openedFilename.c_str());
 		outFile << "OSCOPE LAYOUT FILE" << endl;
 		outFile << comboBoxVector.size() << " : following lines are order of inputs" << endl;
