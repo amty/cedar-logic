@@ -243,7 +243,8 @@ void OscopeFrame::OnExport( wxCommandEvent& event ){
 	memDC.SetTextBackground(*wxWHITE);
 	//JoshEdit 3/15/07
 	for( unsigned int i = 0; i < numberOfFeeds()-1; ++i ){
-		memDC.DrawText( getFeedName( i ).c_str(), wxPoint( 5, getFeedYPos( i ) ) );
+		memDC.DrawText(std2wx(getFeedName(i)),
+			       wxPoint(5,getFeedYPos(i)));
 	}
 	memDC.DrawBitmap(circuitBitmap, theCanvas->GetPosition().x, 0, false);
 	
@@ -253,7 +254,6 @@ void OscopeFrame::OnExport( wxCommandEvent& event ){
 	}
  }
 
-<<<<<<< HEAD
 void OscopeFrame::OnLoad( wxCommandEvent& event ) {
 	wxString caption = std2wx("Open an O-scope Layout");
 	wxString wildcard = std2wx("CEDAR O-scope Layout files (*.cdo)|*.cdo");
@@ -286,7 +286,6 @@ void OscopeFrame::OnLoad( wxCommandEvent& event ) {
 	}
  }
 
-<<<<<<< HEAD
 void OscopeFrame::OnSave( wxCommandEvent& event ) {
 	wxString caption = std2wx("Save o-scope layout");
 	wxString wildcard = std2wx("CEDAR O-scope Layout files (*.cdo)|*.cdo");
@@ -336,13 +335,15 @@ void OscopeFrame::verifyReferenceOrder(){
 //and appends it to the end.
 void OscopeFrame::appendNewFeed( string newName ){
 	wxArrayString strings;
-	strings.Add(encodeFeedName( wxT( NONE_STR ) ).c_str() );
+	strings.Add(std2wx(encodeFeedName(NONE_STR)));
 	if( numberOfFeeds() > 0 ){
-		strings.Add(encodeFeedName( wxT(RMOVE_STR) ).c_str() );
+		strings.Add(std2wx(encodeFeedName(RMOVE_STR)));
 	}
 	
-	wxComboBox* newCombo = new wxComboBox(this, ID_COMBOBOX, encodeFeedName( newName ).c_str(), wxDefaultPosition, wxDefaultSize, strings, 
-	      wxCB_READONLY  | wxCB_DROPDOWN | wxCB_SORT );
+	wxComboBox* newCombo = new wxComboBox(
+		this, ID_COMBOBOX, std2wx(encodeFeedName(newName)),
+		wxDefaultPosition, wxDefaultSize, strings, 
+		wxCB_READONLY  | wxCB_DROPDOWN | wxCB_SORT );
 	comboBoxes.push_back( newCombo );
 
 	//Adds vertical box to canvas
@@ -351,7 +352,7 @@ void OscopeFrame::appendNewFeed( string newName ){
 
 //this renames an existing feed
 void OscopeFrame::setFeedName( int i, string newName ){
-	comboBoxes[i]->SetValue( encodeFeedName( newName ).c_str() );
+	comboBoxes[i]->SetValue(std2wx(encodeFeedName(newName)));
 	//feedNames[i] = newName;
 }
 
@@ -370,8 +371,8 @@ void OscopeFrame::removeFeed( int i ){
 
 //Returns the name of feed i.  i.e. the current
 //contents in the ith combo box
-string OscopeFrame::getFeedName( int i ){
-	return decodeFeedName( comboBoxes[i]->GetValue().c_str() );
+string OscopeFrame::getFeedName(int i){
+	return decodeFeedName(wx2std(comboBoxes[i]->GetValue()));
 }
 
 //Removes the feed from the list.
@@ -406,15 +407,16 @@ void OscopeFrame::updatePossableFeeds( vector< string >* newPossabilities ){
 		//box and checking if any of them match the current name which is being
 		//used as the feed.
 		for( vector< string >::iterator I = newPossabilities->begin(); I != newPossabilities->end(); ++I ){
-			comboBoxes[i]->Append( encodeFeedName( *I ).c_str() );
+			comboBoxes[i]->Append(std2wx(encodeFeedName(*I)));
 			if( (*I) == currentFeedName ){
 				valueValid = true;
 			}
 		}
 		
-		comboBoxes[i]->Append( encodeFeedName( NONE_STR ).c_str() );
+		comboBoxes[i]->Append(std2wx(encodeFeedName(NONE_STR)));
 		if( numberOfFeeds() > 1 ){
-			comboBoxes[i]->Append( encodeFeedName( RMOVE_STR ).c_str() );
+			comboBoxes[i]->Append(
+				std2wx(encodeFeedName(RMOVE_STR)));
 		}
 		
 		//if the value wasn't valid anymore, then we set it to [None]

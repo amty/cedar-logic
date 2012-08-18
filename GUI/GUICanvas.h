@@ -18,14 +18,16 @@
 #include <sstream>
 #include <string>
 #include <deque>
-using namespace std;
-using namespace __gnu_cxx;
 class cmdPasteBlock;
-
-#include "MainApp.h"
+struct GateState;
+struct WireState;
+//#include "commands.h"
+//#include "MainApp.h"
 #include "klsGLCanvas.h"
 #include "GUICircuit.h"
 #include "klsCollisionChecker.h"
+using namespace std;
+using namespace __gnu_cxx;
 
 // Struct GateState
 //		stores the position and id of a gate so we know where we moved from
@@ -57,8 +59,6 @@ struct ConnectionSource {
 	ConnectionSource( bool ig, unsigned long id, string conn ) : isGate(ig), objectID(id), connection(conn) {};
 	ConnectionSource() {};
 };
-
-#include "commands.h"
 
 #define MAX_UNDO_STATES 256
 

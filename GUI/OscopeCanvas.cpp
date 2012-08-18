@@ -7,6 +7,7 @@
 
    OscopeCanvas: renders the waveform for the oscope
 *****************************************************************************/
+#include <algorithm>
 
 #include "OscopeCanvas.h"
 #include "MainApp.h"
@@ -18,8 +19,6 @@
 #include "glmem.hh"
 #include "str-convs.h"
 // Included to use the min() and max() templates:
-#include <algorithm>
-using namespace std;
 
 DECLARE_APP(MainApp)
 
@@ -107,10 +106,11 @@ void OscopeCanvas::OnRender(){
 	glEnd();
 
 	for (unsigned int i = 0; i < numberOfWires; i++) {
-		if (parentFrame->getFeedName(i) == std2wx(NONE_STR)) //<-Josh Edit using access method
+		if (parentFrame->getFeedName(i) == NONE_STR) //<-Josh Edit using access method
 			wireNum++; continue;
 
-		map< string, deque< StateType > >::iterator thisWire = stateValues.find(wx2std(parentFrame->getFeedName(i)));  //<-Josh Edit using access method
+		map< string, deque< StateType > >::iterator thisWire =
+			stateValues.find(parentFrame->getFeedName(i));  //<-Josh Edit using access method
 		if (thisWire == stateValues.end()) { wireNum++; continue; }
 		deque< StateType >::reverse_iterator wireVal = (thisWire->second).rbegin();
 		GLdouble horizLoc = OSCOPE_HORIZONTAL;
@@ -255,7 +255,7 @@ void OscopeCanvas::UpdateData(void){
 	map< string, bool > hasBeenAdded; 
 	
 	for (unsigned int i = 0; i < parentFrame->numberOfFeeds()-1; i++) {
-		string junctionName = wx2std(parentFrame->getFeedName(i));
+		string junctionName = parentFrame->getFeedName(i);
 		if (junctionName == NONE_STR || junctionName == RMOVE_STR || junctionName == "")
 			continue;	
 		if(hasBeenAdded.find(junctionName) == hasBeenAdded.end()) {
@@ -463,7 +463,6 @@ wxImage OscopeCanvas::generateImage()
 		glClearColor (1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);
 		
-<<<<<<< HEAD
 		//TODO: Check if alpha is hardware supported, and
 		// don't enable it if not!
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

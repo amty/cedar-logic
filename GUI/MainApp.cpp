@@ -40,7 +40,8 @@ bool MainApp::OnInit()
 	helpController = new wxHelpController;
 	wxString c_str = 
 #ifndef _PRODUCTION_
-		wxGetApp().pathToExe + std2wx("../KLS_Logic.chm");
+		std2wx(wxGetApp().pathToExe +
+		       "../KLS_Logic.chm");
 #else
 		std2wx(appSettings.helpFile);
 #endif
@@ -67,7 +68,7 @@ bool MainApp::OnInit()
     //}	
     string cmdFilename;
 	if( argc >= 2 ){
-		cmdFilename = argv[1];
+		cmdFilename = wx2std(argv[1]);
 //		logfile << "cmdFilename = " << cmdFilename << endl;
 	}
 	//End of edit
@@ -75,7 +76,8 @@ bool MainApp::OnInit()
 	
 
     // create the main application window
-    MainFrame *frame = new MainFrame(std2wx("CEDAR Logic Simulator"), cmdFilename.c_str());
+    MainFrame *frame = new MainFrame(std2wx("CEDAR Logic Simulator"),
+				     std2wx(cmdFilename));
     // and show it (the frames, unlike simple controls, are not shown when
     // created initially)
     frame->Show(true);

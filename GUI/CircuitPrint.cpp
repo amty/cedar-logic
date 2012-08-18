@@ -104,7 +104,7 @@ void CircuitPrint::DrawPageOne(wxDC *dc)
     dc->SetDeviceOrigin( (long)posX, (long)posY );
 */
 
-	wxImage viewShot = sourceCanvas->renderToImage((int)imageWidth, (int)imageHeight);
+	wxImage viewShot = sourceCanvas->renderToImage((int)imageWidth, (int)imageHeight, 32);
 	wxBitmap printBmp(viewShot);
 
 	float posX = ((float) w / 2.0) - imageWidth / 2.0;

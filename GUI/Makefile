@@ -9,32 +9,42 @@ CXXFLAGS+=-ggdb3
 
 OBJS= CircuitParse.o guiGate.o LibraryParse.o paramDialog.o
 OBJS+= CircuitPrint.o  guiText.o MainApp.o threadLogic.o
-OBJS+= commands.o guiWire.o MainFrame.o
+OBJS+= commands.o guiWire.o MainFrame.o gl_defs.o
 OBJS+= gateImage.o klsClipboard.o OscopeCanvas.o
-OBJS+= glf.o klsCollisionChecker.o  OscopeFrame.o wx-glmem.o
+OBJS+= GLFont/glfont2.o klsCollisionChecker.o  OscopeFrame.o
 OBJS+= GUICanvas.o klsGLCanvas.o PaletteCanvas.o XMLParser.o
-OBJS+= GUICircuit.o klsMiniMap.o PaletteFrame.o algebra.o
-
-OBJS+= unix-glmem.o
+OBJS+= GUICircuit.o klsMiniMap.o PaletteFrame.o
+OBJS+= RamPopupDialog.o Z80PopupDialog.o ADCPopupDialog.o EditRegDialog.o
+OBJS+= unix-glmem.o wx-glmem.o algebra.o images.o
 
 all: $(OBJS)
 
 %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
-image_names=new.xpm open.xpm save.xpm undo.xpm redo.xpm copy.xpm cut.xpm
-image_names+=paste.xpm print.xpm help.xpm pause.xpm step.xpm zoomin.xpm zoomout.xpm
-image_files= $(addprefix xpm_bitmaps/,$(image_names))
+mf_image_names=new.xpm open.xpm save.xpm undo.xpm redo.xpm copy.xpm cut.xpm
+mf_image_names+=paste.xpm print.xpm help.xpm pause.xpm step.xpm zoomin.xpm
+mf_image_names+=zoomout.xpm locked.xpm
+mf_image_files= $(addprefix xpm_bitmaps/,$(mf_image_names))
+z80_image_names+=cont.xpm step.xpm
+z80_image_files= $(addprefix xpm_bitmaps/,$(z80_image_names))
 
-MainFrame.o: | images.cc
+MainFrame.o: | mf-images.cpp
+Z80PopupDialog.o: | z80-images.cpp
 
-images.cc: $(image_files)
+mf-images.cpp: $(mf_image_files)
 	for i in $^; do \
 		echo "#include \"$$i\""; \
-	done >images.cc
+	done >mf-images.cpp
+	sed -i 's|static char|static const char|' $^
+z80-images.cpp: $(z80_image_files)
+	for i in $^; do \
+		echo "#include \"$$i\""; \
+	done >z80-images.cpp
+	sed -i 's|static char|static const char|' $^
 
-$(image_files):
-	make -C xpm_bitmaps $(image_names)
+$(mf_image_files) $(z80_image_files):
+	make -C xpm_bitmaps $(mf_image_names) $(z80_image_names)
 
 MainFrame.s:
 	g++ -S MainFrame.cpp $(INCLUDES) -fverbose-asm

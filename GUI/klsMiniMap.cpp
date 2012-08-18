@@ -110,7 +110,6 @@ void klsMiniMap::generateImage() {
 		// Reset the glViewport to the size of the bitmap:
 		glViewport(0, 0, (GLint) sz.GetWidth(), (GLint) sz.GetHeight());
 		
-<<<<<<< HEAD
 		// Set the bitmap clear color:
 		glClearColor (1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);

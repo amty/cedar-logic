@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject>
+<storageModule moduleId="org.eclipse.cdt.core.settings">
+<cconfiguration id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1419878264">
+<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1419878264" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+<configuration artifactExtension="exe" artifactName="wxWidgetsBasePrj" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1419878264" name="Debug" parent="cdt.managedbuild.config.gnu.cygwin.exe.debug">
+<folderInfo id="cdt.managedbuild.config.gnu.cygwin.exe.debug.1419878264.711789736" name="/" resourcePath="">
+<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.exe.debug.642411956" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.cygwin.exe.debug">
+<targetPlatform id="cdt.managedbuild.target.gnu.platform.cygwin.exe.debug.762010539" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.cygwin.exe.debug"/>
+<builder arguments="-f makefile" buildPath="${workspace_loc:/wxWidgetsBasePrj/Debug}" command="mingw32-make" id="cdt.managedbuild.target.gnu.builder.cygwin.exe.debug.756071002" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug.2019492274" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.debug">
+<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.cygwin.exe.debug.option.optimization.level.1046349158" name="Optimization Level" superClass="gnu.c.compiler.cygwin.exe.debug.option.optimization.level" valueType="enumerated"/>
+<option id="gnu.c.compiler.cygwin.exe.debug.option.debugging.level.519803716" name="Debug Level" superClass="gnu.c.compiler.cygwin.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.1698268507" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug.470983158" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.debug">
+<option id="gnu.cpp.compiler.option.preprocessor.def.1025060836" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="__GNUWIN32__"/>
+<listOptionValue builtIn="false" value="STRICT"/>
+<listOptionValue builtIn="false" value="__WXMSW__"/>
+<listOptionValue builtIn="false" value="__WINDOWS__"/>
+<listOptionValue builtIn="false" value="__WXDEBUG__"/>
+</option>
+<option id="gnu.cpp.compiler.option.include.paths.183082978" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/include"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/src/regex"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/src/png"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/src/jpeg"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/src/zlib"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/src/tiff"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/contrib/include"/>
+</option>
+<option id="gnu.cpp.compiler.option.other.other.1984720196" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-rtti -fno-exceptions" valueType="string"/>
+<option id="gnu.cpp.compiler.cygwin.exe.debug.option.optimization.level.790372346" name="Optimization Level" superClass="gnu.cpp.compiler.cygwin.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.cygwin.exe.debug.option.debugging.level.677549204" name="Debug Level" superClass="gnu.cpp.compiler.cygwin.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.1985894084" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
+<option id="gnu.cpp.compiler.option.preprocessor.preprocess.2011198951" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
+<option id="gnu.cpp.compiler.option.preprocessor.undef.1418729428" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
+<option id="gnu.cpp.compiler.option.optimization.flags.186193616" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags"/>
+<option id="gnu.cpp.compiler.option.debugging.other.834901796" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
+<option id="gnu.cpp.compiler.option.debugging.prof.1140788459" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
+<option id="gnu.cpp.compiler.option.debugging.gprof.384976602" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
+<option id="gnu.cpp.compiler.option.warnings.syntax.1527058660" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
+<option id="gnu.cpp.compiler.option.warnings.pedantic.2109468729" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
+<option id="gnu.cpp.compiler.option.warnings.pedantic.error.1740983079" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
+<option id="gnu.cpp.compiler.option.warnings.nowarn.887401413" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn"/>
+<option id="gnu.cpp.compiler.option.warnings.allwarn.1346538734" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn"/>
+<option id="gnu.cpp.compiler.option.warnings.toerrors.415973419" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors"/>
+<option id="gnu.cpp.compiler.option.other.verbose.441943986" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
+<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.1382952801" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug.2113184012" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.debug"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug.32183153" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.debug">
+<option id="gnu.cpp.link.option.libs.667400943" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="stdc++"/>
+<listOptionValue builtIn="false" value="wxregexd"/>
+<listOptionValue builtIn="false" value="wxmsw26d_gl"/>
+<listOptionValue builtIn="false" value="wxpngd"/>
+<listOptionValue builtIn="false" value="wxjpegd"/>
+<listOptionValue builtIn="false" value="wxzlibd"/>
+<listOptionValue builtIn="false" value="wxtiffd"/>
+<listOptionValue builtIn="false" value="gcc"/>
+<listOptionValue builtIn="false" value="odbc32"/>
+<listOptionValue builtIn="false" value="wsock32"/>
+<listOptionValue builtIn="false" value="winspool"/>
+<listOptionValue builtIn="false" value="winmm"/>
+<listOptionValue builtIn="false" value="shell32"/>
+<listOptionValue builtIn="false" value="comctl32"/>
+<listOptionValue builtIn="false" value="ctl3d32"/>
+<listOptionValue builtIn="false" value="advapi32"/>
+<listOptionValue builtIn="false" value="opengl32"/>
+<listOptionValue builtIn="false" value="glu32"/>
+<listOptionValue builtIn="false" value="ole32"/>
+<listOptionValue builtIn="false" value="oleaut32"/>
+<listOptionValue builtIn="false" value="uuid"/>
+</option>
+<option id="gnu.cpp.link.option.paths.2001912325" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="stringList">
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/lib/debug"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/contrib/lib"/>
+</option>
+<option id="gnu.cpp.link.option.flags.816911331" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mwindows" valueType="string"/>
+<option id="gnu.cpp.link.option.userobjs.1346388834" name="Other objects" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs">
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/lib/debug/libwxmsw26d_core.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/lib/debug/libwxbase26d_net.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/lib/debug/libwxmsw26d_adv.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/lib/debug/libwxbase26d.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.6.2/lib/debug/libwxmsw26d_xrc.a"/>
+</option>
+<option id="gnu.cpp.link.option.nostart.1587384395" name="Do not use standard start files (-nostartfiles)" superClass="gnu.cpp.link.option.nostart"/>
+<option id="gnu.cpp.link.option.nodeflibs.1443391780" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs"/>
+<option id="gnu.cpp.link.option.nostdlibs.423321594" name="No startup or default libs (-nostdlib)" superClass="gnu.cpp.link.option.nostdlibs"/>
+<option id="gnu.cpp.link.option.strip.1357723893" name="Omit all symbol information (-s)" superClass="gnu.cpp.link.option.strip"/>
+<option id="gnu.cpp.link.option.other.1173609543" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other"/>
+<option id="gnu.cpp.link.option.shared.1845587596" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared"/>
+<option id="gnu.cpp.link.option.soname.1803406069" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname"/>
+<option id="gnu.cpp.link.option.implname.1981333917" name="Import Library name (-Wl,--out-implib=)" superClass="gnu.cpp.link.option.implname"/>
+<option id="gnu.cpp.link.option.defname.1302874024" name="DEF file name (-Wl,--output-def=)" superClass="gnu.cpp.link.option.defname"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug.435888742" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.debug">
+<option id="gnu.both.asm.option.flags.304407347" superClass="gnu.both.asm.option.flags"/>
+<option id="gnu.both.asm.option.include.paths.804762394" superClass="gnu.both.asm.option.include.paths"/>
+<option id="gnu.both.asm.option.warnings.nowarn.603835969" superClass="gnu.both.asm.option.warnings.nowarn"/>
+<option id="gnu.both.asm.option.version.533696412" superClass="gnu.both.asm.option.version"/>
+<inputType id="cdt.managedbuild.tool.gnu.assembler.input.213274165" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.1641930489" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
+</toolChain>
+</folderInfo>
+</configuration>
+</storageModule>
+<storageModule moduleId="scannerConfiguration"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+</cconfiguration>
+<cconfiguration id="cdt.managedbuild.config.gnu.cygwin.exe.release.1371460371">
+<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.cygwin.exe.release.1371460371" moduleId="org.eclipse.cdt.core.settings" name="Release">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.Cygwin_PE" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+</extensions>
+</storageModule>
+<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+<configuration artifactExtension="exe" artifactName="cedarls" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="cdt.managedbuild.config.gnu.cygwin.exe.release.1371460371" name="Release" parent="cdt.managedbuild.config.gnu.cygwin.exe.release" postannouncebuildStep="" postbuildStep="" preannouncebuildStep="Builds the resource file" prebuildStep="windres -Ic:/proj/environment/wxWidgets-2.8.7/include -i ../GUI/resources.rc -o resources.o">
+<folderInfo id="cdt.managedbuild.config.gnu.cygwin.exe.release.1371460371.542154781" name="/" resourcePath="">
+<toolChain id="cdt.managedbuild.toolchain.gnu.cygwin.exe.release.848671608" name="GCC Tool Chain" superClass="cdt.managedbuild.toolchain.gnu.cygwin.exe.release">
+<targetPlatform id="cdt.managedbuild.target.gnu.platform.cygwin.exe.release.1115351150" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.cygwin.exe.release"/>
+<builder arguments="-f makefile" buildPath="${workspace_loc:/CedarLogic/Release}" command="mingw32-make" id="cdt.managedbuild.target.gnu.builder.cygwin.exe.release.1808844764" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release.1959811542" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.cygwin.exe.release">
+<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.cygwin.exe.release.option.optimization.level.1589026335" name="Optimization Level" superClass="gnu.c.compiler.cygwin.exe.release.option.optimization.level" valueType="enumerated"/>
+<option id="gnu.c.compiler.cygwin.exe.release.option.debugging.level.748206052" name="Debug Level" superClass="gnu.c.compiler.cygwin.exe.release.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin.675816075" superClass="cdt.managedbuild.tool.gnu.c.compiler.input.cygwin"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release.1323324272" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.cygwin.exe.release">
+<option id="gnu.cpp.compiler.option.preprocessor.def.25504687" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="STRICT"/>
+<listOptionValue builtIn="false" value="__GNUWIN32__"/>
+<listOptionValue builtIn="false" value="__WXMSW__"/>
+<listOptionValue builtIn="false" value="__WINDOWS__"/>
+</option>
+<option id="gnu.cpp.compiler.option.include.paths.1310899204" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+<listOptionValue builtIn="false" value="C:\proj\environment\wxWidgets-2.8.7\lib\gcc_lib\msw"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/include"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/contrib/include"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/src/regex"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/src/png"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/src/jpeg"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/src/zlib"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/src/tiff"/>
+</option>
+<option id="gnu.cpp.compiler.option.other.other.1060730709" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -fno-rtti -fno-exceptions -Wno-deprecated" valueType="string"/>
+<option id="gnu.cpp.compiler.cygwin.exe.release.option.optimization.level.1513530089" name="Optimization Level" superClass="gnu.cpp.compiler.cygwin.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.cygwin.exe.release.option.debugging.level.747745831" name="Debug Level" superClass="gnu.cpp.compiler.cygwin.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
+<option id="gnu.cpp.compiler.option.preprocessor.nostdinc.1587355142" name="Do not search system directories (-nostdinc)" superClass="gnu.cpp.compiler.option.preprocessor.nostdinc"/>
+<option id="gnu.cpp.compiler.option.preprocessor.preprocess.200084663" name="Preprocess only (-E)" superClass="gnu.cpp.compiler.option.preprocessor.preprocess"/>
+<option id="gnu.cpp.compiler.option.preprocessor.undef.1749021966" name="Undefined symbols (-U)" superClass="gnu.cpp.compiler.option.preprocessor.undef"/>
+<option id="gnu.cpp.compiler.option.optimization.flags.1790900325" name="Other optimization flags" superClass="gnu.cpp.compiler.option.optimization.flags"/>
+<option id="gnu.cpp.compiler.option.debugging.other.1578354078" name="Other debugging flags" superClass="gnu.cpp.compiler.option.debugging.other"/>
+<option id="gnu.cpp.compiler.option.debugging.prof.1960651338" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof"/>
+<option id="gnu.cpp.compiler.option.debugging.gprof.516400397" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof"/>
+<option id="gnu.cpp.compiler.option.warnings.syntax.1126596393" name="Check syntax only (-fsyntax-only)" superClass="gnu.cpp.compiler.option.warnings.syntax"/>
+<option id="gnu.cpp.compiler.option.warnings.pedantic.1051657661" name="Pedantic (-pedantic)" superClass="gnu.cpp.compiler.option.warnings.pedantic"/>
+<option id="gnu.cpp.compiler.option.warnings.pedantic.error.476079052" name="Pedantic warnings as errors (-pedantic-errors)" superClass="gnu.cpp.compiler.option.warnings.pedantic.error"/>
+<option id="gnu.cpp.compiler.option.warnings.nowarn.2121908827" name="Inhibit all warnings (-w)" superClass="gnu.cpp.compiler.option.warnings.nowarn"/>
+<option id="gnu.cpp.compiler.option.warnings.allwarn.1533132529" name="All warnings (-Wall)" superClass="gnu.cpp.compiler.option.warnings.allwarn"/>
+<option id="gnu.cpp.compiler.option.warnings.toerrors.1239129444" name="Warnings as errors (-Werror)" superClass="gnu.cpp.compiler.option.warnings.toerrors"/>
+<option id="gnu.cpp.compiler.option.other.verbose.2014658308" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose"/>
+<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin.62493378" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input.cygwin"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release.1468505612" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.cygwin.exe.release"/>
+<tool id="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release.2115210902" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.cygwin.exe.release">
+<option id="gnu.cpp.link.option.libs.1147121790" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+<listOptionValue builtIn="false" value="stdc++"/>
+<listOptionValue builtIn="false" value="freetype"/>
+<listOptionValue builtIn="false" value="wxregex"/>
+<listOptionValue builtIn="false" value="wxmsw28_gl"/>
+<listOptionValue builtIn="false" value="wxpng"/>
+<listOptionValue builtIn="false" value="wxjpeg"/>
+<listOptionValue builtIn="false" value="wxzlib"/>
+<listOptionValue builtIn="false" value="wxtiff"/>
+<listOptionValue builtIn="false" value="gcc"/>
+<listOptionValue builtIn="false" value="odbc32"/>
+<listOptionValue builtIn="false" value="wsock32"/>
+<listOptionValue builtIn="false" value="winspool"/>
+<listOptionValue builtIn="false" value="winmm"/>
+<listOptionValue builtIn="false" value="shell32"/>
+<listOptionValue builtIn="false" value="comctl32"/>
+<listOptionValue builtIn="false" value="ctl3d32"/>
+<listOptionValue builtIn="false" value="advapi32"/>
+<listOptionValue builtIn="false" value="opengl32"/>
+<listOptionValue builtIn="false" value="glu32"/>
+<listOptionValue builtIn="false" value="ole32"/>
+<listOptionValue builtIn="false" value="oleaut32"/>
+<listOptionValue builtIn="false" value="uuid"/>
+</option>
+<option id="gnu.cpp.link.option.paths.1237369103" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="stringList">
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/lib/gcc_lib"/>
+</option>
+<option id="gnu.cpp.link.option.other.1927717310" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other"/>
+<option id="gnu.cpp.link.option.userobjs.1440155448" name="Other objects" superClass="gnu.cpp.link.option.userobjs" valueType="userObjs">
+<listOptionValue builtIn="false" value="c:/proj/mingw/lib/libfreetype.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/lib/gcc_lib/libwxmsw28_core.a"/>
+<listOptionValue builtIn="false" value="./resources.o"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/lib/gcc_lib/libwxbase28_net.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/lib/gcc_lib/libwxbase28.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/lib/gcc_lib/libwxmsw28_adv.a"/>
+<listOptionValue builtIn="false" value="C:/proj/environment/wxWidgets-2.8.7/lib/gcc_lib/libwxmsw28_xrc.a"/>
+</option>
+<option id="gnu.cpp.link.option.flags.476935284" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-mwindows" valueType="string"/>
+<option id="gnu.cpp.link.option.nostart.1047782251" name="Do not use standard start files (-nostartfiles)" superClass="gnu.cpp.link.option.nostart"/>
+<option id="gnu.cpp.link.option.nodeflibs.1759893108" name="Do not use default libraries (-nodefaultlibs)" superClass="gnu.cpp.link.option.nodeflibs"/>
+<option id="gnu.cpp.link.option.nostdlibs.1875998178" name="No startup or default libs (-nostdlib)" superClass="gnu.cpp.link.option.nostdlibs"/>
+<option id="gnu.cpp.link.option.strip.210661542" name="Omit all symbol information (-s)" superClass="gnu.cpp.link.option.strip"/>
+<option id="gnu.cpp.link.option.shared.1293521291" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared"/>
+<option id="gnu.cpp.link.option.soname.1607913905" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname"/>
+<option id="gnu.cpp.link.option.implname.1169293378" name="Import Library name (-Wl,--out-implib=)" superClass="gnu.cpp.link.option.implname"/>
+<option id="gnu.cpp.link.option.defname.554365253" name="DEF file name (-Wl,--output-def=)" superClass="gnu.cpp.link.option.defname"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.release.931894186" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.cygwin.exe.release">
+<option id="gnu.both.asm.option.flags.793078331" name="Assembler flags" superClass="gnu.both.asm.option.flags"/>
+<option id="gnu.both.asm.option.include.paths.1152656502" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths"/>
+<option id="gnu.both.asm.option.warnings.nowarn.1428456451" name="Suppress warnings (-W)" superClass="gnu.both.asm.option.warnings.nowarn"/>
+<option id="gnu.both.asm.option.version.103206374" name="Announce version (-v)" superClass="gnu.both.asm.option.version"/>
+<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1407200786" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+</tool>
+<tool id="cdt.managedbuild.tool.gnu.archiver.cygwin.base.524877557" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.cygwin.base"/>
+</toolChain>
+</folderInfo>
+</configuration>
+</storageModule>
+<storageModule moduleId="scannerConfiguration"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+</cconfiguration>
+</storageModule>
+<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+<project id="wxWidgetsBasePrj.cdt.managedbuild.target.gnu.cygwin.exe.1924769308" name="Executable (Gnu on Windows)" projectType="cdt.managedbuild.target.gnu.cygwin.exe"/>
+</storageModule>
+</cproject>

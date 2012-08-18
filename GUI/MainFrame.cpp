@@ -145,7 +145,7 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
     // parse a gate library
 	//////////////////////////////////////////////////////////////////////////
 #ifndef _PRODUCTION_
-	string libPath = wx2std(wxGetApp().pathToExe) + "../GUI/cl_gatedefs.lib";
+	string libPath = wxGetApp().pathToExe + "../GUI/cl_gatedefs.lib";
 #else
 	string libPath(wxGetApp().appSettings.gateLibFile);
 #endif
@@ -271,11 +271,6 @@ void MainFrame::create_toolbar()
 {
 	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0),
 				wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
-=======
-	//////////////////////////////////////////////////////////////////////////
-    // create a toolbar
-	//////////////////////////////////////////////////////////////////////////
-	toolBar = new wxToolBar(this, TOOLBAR_ID, wxPoint(0,0), wxDefaultSize, wxTB_HORIZONTAL|wxNO_BORDER);
 	
 	wxBitmap bmpNew(wxBITMAP(new));
 	wxBitmap bmpOpen(wxBITMAP(open));
@@ -316,9 +311,12 @@ void MainFrame::create_toolbar()
 	timeStepModSlider = new wxSlider(toolBar, wxID_ANY, wxGetApp().timeStepMod, 1, 500, wxDefaultPosition, wxSize(125,-1), wxSL_HORIZONTAL|wxSL_AUTOTICKS);
 	ostringstream oss;
 	oss << wxGetApp().timeStepMod << "ms";
-	timeStepModVal = new wxStaticText(toolBar, wxID_ANY, oss.str().c_str(), wxDefaultPosition, wxSize(45,-1), wxSUNKEN_BORDER|wxALIGN_RIGHT|wxST_NO_AUTORESIZE);
-	toolBar->AddControl( timeStepModSlider );
-	toolBar->AddControl( timeStepModVal );
+	timeStepModVal = new wxStaticText(
+		toolBar, wxID_ANY, std2wx(oss.str()), wxDefaultPosition,
+		wxSize(45,-1),
+		wxSUNKEN_BORDER | wxALIGN_RIGHT | wxST_NO_AUTORESIZE);
+	toolBar->AddControl(timeStepModSlider);
+	toolBar->AddControl(timeStepModVal);
 	toolBar->AddSeparator();
 	toolBar->AddTool(Tool_Lock, std2wx("Lock state"), bmpLocked, std2wx("Lock state"), wxITEM_CHECK);
 	toolBar->AddSeparator();
@@ -500,7 +498,7 @@ void MainFrame::OnOpen(wxCommandEvent& event) {
 	
 	if (dialog.ShowModal() == wxID_OK) {
 		lastDirectory = dialog.GetDirectory();
-		loadCircuitFile(std2wx(dialog.GetPath()));
+		loadCircuitFile(wx2std(dialog.GetPath()));
 	}
     currentCanvas->Update(); // Render();
 	currentCanvas->getCircuit()->setSimulate(true);
@@ -518,7 +516,7 @@ void MainFrame::OnOpen(wxCommandEvent& event) {
 //it starts, that cedarls can load that file
 //by calling this method.
 void MainFrame::loadCircuitFile( string fileName ){
-	wxString path = fileName.c_str();
+	wxString path = std2wx(fileName);
 	openedFilename = path;
 	this->SetTitle( _T("CEDAR Logic Simulator - ") + path );
 	while (!(wxGetApp().dGUItoLOGIC.empty())) wxGetApp().dGUItoLOGIC.pop_front();
@@ -527,7 +525,7 @@ void MainFrame::loadCircuitFile( string fileName ){
 	gCircuit->reInitializeLogicCircuit();
 	commandProcessor->ClearCommands();
 	commandProcessor->SetMenuStrings();
-    CircuitParse cirp((string)path.c_str(), canvases);
+	CircuitParse cirp(wx2std(path), canvases);
 	cirp.parseFile();
 }
 
@@ -630,8 +628,8 @@ void MainFrame::OnIdle(wxTimerEvent& event) {
 		gCircuit->panic = false;
 		toolBar->ToggleTool( Tool_Pause, true );
 		mTimer->Stop();
-		wxGetApp().appSystemTime->Start(0);
-		wxGetApp().appSystemTime->Pause();
+		wxGetApp().appSystemTime.Start(0);
+		wxGetApp().appSystemTime.Pause();
 		//Edit by Joshua Lansford 11/24/06
 		//I have overloaded the meaning of panic
 		//panic is now also used to pause the system.
@@ -754,7 +752,7 @@ void MainFrame::OnExportBitmapBW(wxCommandEvent& event) {
 	wxGetApp().doingBitmapExport = true;
 	// render the image
 	wxSize imageSize = currentCanvas->GetClientSize();
-	wxImage circuitImage = currentCanvas->renderToImage(imageSize.GetWidth()*2, imageSize.GetHeight()*2, 32, true);
+	wxImage circuitImage = currentCanvas->renderToImage(imageSize.GetWidth()*2, imageSize.GetHeight()*2, 32);
 	wxBitmap circuitBitmap(circuitImage);
 	if (wxTheClipboard->Open()) {
 		wxTheClipboard->SetData(new wxBitmapDataObject(circuitBitmap));

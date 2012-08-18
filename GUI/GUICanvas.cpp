@@ -313,7 +313,6 @@ void GUICanvas::mouseLeftDown(wxMouseEvent& event) {
 	mBox.extendRight( delta );
 	mouse->setBBox( mBox );
 	
->>>>>>> v1.5
 	// Do a collision detection on all first-level objects.
 	// The map collisionChecker.overlaps now contains
 	// all of the objects involved in any collisions.

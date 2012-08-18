@@ -31,7 +31,7 @@
 
 class MainFrame;
 
-using namespace std;
+//using namespace std;
 
 struct ApplicationSettings {
 	string gateLibFile;

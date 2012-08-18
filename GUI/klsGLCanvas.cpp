@@ -106,7 +106,7 @@ void klsGLCanvas::updateMiniMap() {
 }
 
 // Print the canvas contents to a bitmap:
-wxImage klsGLCanvas::renderToImage( unsigned long width, unsigned long height, unsigned long colorDepth ) {
+wxImage klsGLCanvas::renderToImage( unsigned long width, unsigned long height, unsigned long colorDepth) {
 	wxImage ret(width, height, false);
 	WITH_wxImage(ret) {
 		// Setup the viewport for rendering:
@@ -556,7 +556,8 @@ void klsGLCanvas::wxOnMouseEvent(wxMouseEvent& event) {
 			// for writing documentation.	
 			// Render the canvas to a bitmap and save it:
 			wxSize sz = GetClientSize();
-			wxImage screenShot = renderToImage(sz.GetWidth(), sz.GetHeight());
+			wxImage screenShot = renderToImage(
+				sz.GetWidth(), sz.GetHeight(), 32);
 			wxBitmap myBMP( screenShot );
 			myBMP.SaveFile(std2wx("screen_shot.bmp"), wxBITMAP_TYPE_BMP );
 		}

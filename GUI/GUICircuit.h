@@ -39,6 +39,7 @@ class OscopeFrame;
 #include <fstream>
 #include <sstream>
 #include <string>
+
 using namespace std;
 
 class GUICircuit : public wxDocument

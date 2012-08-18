@@ -7,7 +7,7 @@ LDLIBS+=-lGL -lGLU
 all: tinyxml2/tinyxml2.o
 	make -C logic
 	make -C GUI
-	g++ -o cedar GUI/*.o logic/*.o tinyxml2/tinyxml2.o $(LDLIBS) -ggdb3
+	g++ -o cedar GUI/GLFont/*.o GUI/*.o logic/*.o tinyxml2/tinyxml2.o $(LDLIBS) -ggdb3
 
 
 

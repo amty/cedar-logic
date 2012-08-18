@@ -13,7 +13,7 @@
 #include <sstream>
 #include <iomanip>
 #include <wx/sizer.h>
-
+#include "str-convs.h"
 
 #define ID_SLIDER (wxID_HIGHEST + 1)
 
@@ -27,30 +27,31 @@ BEGIN_EVENT_TABLE(ADCPopupDialog, wxDialog)
 END_EVENT_TABLE()
 
 ADCPopupDialog::ADCPopupDialog( guiGateADC* newguiGateADC, GUICircuit* newGUICircuit )
-	:wxDialog( wxGetApp().GetTopWindow(), -1, ADC_TITLE, 
+	:wxDialog(wxGetApp().GetTopWindow(), -1, ADC_TITLE, 
 	    wxPoint(ADC_X_POS, ADC_Y_POS), 
 	    wxSize(ADC_WIDTH, ADC_HEIGHT),
-	    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER ){
+	    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+{
 	m_guiGateADC = newguiGateADC;
 	gUICircuit = newGUICircuit;
 	
-	wxBoxSizer* topSizer = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* topSizer = new wxBoxSizer(wxHORIZONTAL);
 
-	slider = new wxSlider( this, ID_SLIDER, ADC_INIT_VALUE, 0, 255 );
-	label = new wxStaticText( this, -1, "XXX"  );
+	slider = new wxSlider(this, ID_SLIDER, ADC_INIT_VALUE, 0, 255);
+	label = new wxStaticText(this, -1, std2wx("XXX"));
 	
-	topSizer->Add( slider, wxSizerFlags(0).Align(0).Border(wxALL, 5 ) );
-	topSizer->Add( label, wxSizerFlags(0).Align(0).Border(wxALL, 5 ) );
+	topSizer->Add(slider, wxSizerFlags(0).Align(0).Border(wxALL, 5));
+	topSizer->Add(label, wxSizerFlags(0).Align(0).Border(wxALL, 5));
 	
-	SetSizer( topSizer );
-	topSizer->SetSizeHints( this );
+	SetSizer(topSizer);
+	topSizer->SetSizeHints(this);
 	
 	notifyValueChanged();
 }
 
 //event which is called when the slider is changed
-void ADCPopupDialog::OnSliderChanged( wxScrollEvent& event ){
-	
+void ADCPopupDialog::OnSliderChanged( wxScrollEvent& event )
+{
 	//here we send the command to the core.  The label gets updated
 	//when the change gets poped back up to us
 	gUICircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(m_guiGateADC->getID(), "VALUE", slider->GetValue())));
@@ -58,15 +59,16 @@ void ADCPopupDialog::OnSliderChanged( wxScrollEvent& event ){
 }
 
 //this is so we can update the pop-up about the current value
-void ADCPopupDialog::notifyValueChanged(){
+void ADCPopupDialog::notifyValueChanged()
+{
 	string currentValueAsString = m_guiGateADC->getLogicParam( "VALUE" );
-	if( currentValueAsString == "" ){
+	if(currentValueAsString == "")
 		currentValueAsString = ADC_INIT_VALUE_STR;
-	}
+
 	int currentValue = 0;
-	istringstream valueReader( currentValueAsString );
+	istringstream valueReader(currentValueAsString);
 	valueReader >> currentValue;
-	label->SetLabel( currentValueAsString.c_str() );
+	label->SetLabel(std2wx(currentValueAsString));
 	if( slider->GetValue() != currentValue ){
 		slider->SetValue( currentValue );
 	}

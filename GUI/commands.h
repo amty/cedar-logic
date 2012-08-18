@@ -11,18 +11,20 @@
 #ifndef COMMANDS_H_
 #define COMMANDS_H_
 
-#include "MainApp.h"
-#include "GUICircuit.h"
-#include "GUICanvas.h"
-#include "guiGate.h"
-#include "guiWire.h"
-#include "wx/cmdproc.h"
 #include <string>
 #include <stack>
 #include <sstream>
 
 using namespace std;
 using namespace __gnu_cxx;
+
+#include "MainApp.h"
+#include "GUICircuit.h"
+#include "GUICanvas.h"
+#include "guiGate.h"
+#include "guiWire.h"
+#include "wx/cmdproc.h"
+
 // Holds pointers to all of a gate's parameters
 struct paramSet {
 	map < string, string >* gParams;
