@@ -419,11 +419,15 @@ bool XMLUtil::ToBool( const char* str, bool* value )
 		*value = (ival==0) ? false : true;
 		return true;
 	}
-	if ( StringEqual( str, "true" ) ) {
+	if(StringEqual(str, "true")
+	    || StringEqual(str, "yes")
+	    || StringEqual(str, "on")) {
 		*value = true;
 		return true;
 	}
-	else if ( StringEqual( str, "false" ) ) {
+	else if(StringEqual(str, "false")
+		|| StringEqual(str, "no")
+		|| StringEqual(str, "off")) {
 		*value = false;
 		return true;
 	}
