@@ -22,7 +22,7 @@
 #include "commands.h"
 #include "CircuitPrint.h"
 
-#include "images.cc"
+#include "mf-images.cpp"
 DECLARE_APP(MainApp)
 
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
