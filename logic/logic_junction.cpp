@@ -15,7 +15,7 @@
 #include <iostream>
 using namespace std;
 
-Junction::Junction( IDType newID )
+Junction::Junction(IDType newID)
 {
 	// Junctions default to enabled state:
 	isEnabled = true;
@@ -27,28 +27,28 @@ Junction::~Junction()
 }
 
 // Set enable state of the junction:
-void Junction::setEnableState( bool newState ) {
+void Junction::setEnableState(bool newState) {
 	isEnabled = newState;
 }
 
 // Connect a wire to this junction:
-void Junction::connectWire( IDType wireID ) {
+void Junction::connectWire(IDType wireID) {
 	// Connect the junction to the wire:
-	wireList.insert( wireID );
+	wireList.insert(wireID);
 }
 
 // Disconnect a wire to this junction:
 // Return true if this wire needs disconnected from
 // the junction because there are no more connections of it
 // plugged to this junction.
-bool Junction::disconnectWire( IDType wireID ) {
-	if( wireList.find( wireID ) == wireList.end() ) {
+bool Junction::disconnectWire(IDType wireID) {
+	if(wireList.find( wireID) == wireList.end() ) {
 		WARNING("Junction::disconnectWire() - wireID not found in junction.");
 		return false;
 	}
 
 	// Take the first instance of this wire out of this junction:
-	wireList.erase( wireList.find( wireID ) );
+	wireList.erase(wireList.find( wireID) );
 
-	return ( wireList.find( wireID ) == wireList.end() );
+	return(wireList.find( wireID) == wireList.end() );
 }

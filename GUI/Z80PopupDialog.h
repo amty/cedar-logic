@@ -22,57 +22,57 @@ class GUICircuit;
 class Z80PopupDialog : public wxDialog{
 public:
  	/** Constructor. Creates a new Z80PopupDialog */
-	Z80PopupDialog( guiGateZ80* newM_z80GuiGate, GUICircuit* newGUICircuit );
+	Z80PopupDialog(guiGateZ80* newM_z80GuiGate, GUICircuit* newGUICircuit);
 
 
-	void OnBtnClose( wxCommandEvent& event );
-	void StepEdit_CONTINUOUS( wxCommandEvent& event );
-	void StepEdit_ISTEP( wxCommandEvent& event );	
-	void StepEdit_TSTEP( wxCommandEvent& event );
+	void OnBtnClose(wxCommandEvent& event);
+	void StepEdit_CONTINUOUS(wxCommandEvent& event);
+	void StepEdit_ISTEP(wxCommandEvent& event);	
+	void StepEdit_TSTEP(wxCommandEvent& event);
 	
-	void KPButton0_Action ( wxCommandEvent& event );
-	void KPButton1_Action ( wxCommandEvent& event );
-	void KPButton2_Action ( wxCommandEvent& event );
-	void KPButton3_Action ( wxCommandEvent& event );
-	void KPButton4_Action ( wxCommandEvent& event );
-	void KPButton5_Action ( wxCommandEvent& event );
-	void KPButton6_Action ( wxCommandEvent& event );
-	void KPButton7_Action ( wxCommandEvent& event );
-	void KPButton8_Action ( wxCommandEvent& event );
-	void KPButton9_Action ( wxCommandEvent& event );
-	void KPButtonA_Action ( wxCommandEvent& event );
-	void KPButtonB_Action ( wxCommandEvent& event );
-	void KPButtonC_Action ( wxCommandEvent& event );
-	void KPButtonD_Action ( wxCommandEvent& event );
-	void KPButtonE_Action ( wxCommandEvent& event );
-	void KPButtonF_Action ( wxCommandEvent& event );
-	void KPButtonReset_Action ( wxCommandEvent& event );
-	void KPButtonGo_Action    ( wxCommandEvent& event );
-	void KPButtonNext_Action  ( wxCommandEvent& event );
-	void KPButtonPrev_Action  ( wxCommandEvent& event );
-	void KPButtonStep_Action  ( wxCommandEvent& event );
+	void KPButton0_Action(wxCommandEvent& event);
+	void KPButton1_Action(wxCommandEvent& event);
+	void KPButton2_Action(wxCommandEvent& event);
+	void KPButton3_Action(wxCommandEvent& event);
+	void KPButton4_Action(wxCommandEvent& event);
+	void KPButton5_Action(wxCommandEvent& event);
+	void KPButton6_Action(wxCommandEvent& event);
+	void KPButton7_Action(wxCommandEvent& event);
+	void KPButton8_Action(wxCommandEvent& event);
+	void KPButton9_Action(wxCommandEvent& event);
+	void KPButtonA_Action(wxCommandEvent& event);
+	void KPButtonB_Action(wxCommandEvent& event);
+	void KPButtonC_Action(wxCommandEvent& event);
+	void KPButtonD_Action(wxCommandEvent& event);
+	void KPButtonE_Action(wxCommandEvent& event);
+	void KPButtonF_Action(wxCommandEvent& event);
+	void KPButtonReset_Action(wxCommandEvent& event);
+	void KPButtonGo_Action   (wxCommandEvent& event);
+	void KPButtonNext_Action (wxCommandEvent& event);
+	void KPButtonPrev_Action (wxCommandEvent& event);
+	void KPButtonStep_Action (wxCommandEvent& event);
 	
-	void REGModeAction ( wxCommandEvent& event );
-	void ZADModeAction ( wxCommandEvent& event );	
-	void SMARTModeAction ( wxCommandEvent& event );
+	void REGModeAction(wxCommandEvent& event);
+	void ZADModeAction(wxCommandEvent& event);	
+	void SMARTModeAction(wxCommandEvent& event);
 	
-	void EditReg ( wxCommandEvent& event );
+	void EditReg(wxCommandEvent& event);
 	
 	//This will notify the popup of a change in a parameter and call a
 	//method to retreive the updated param info from the hash
-	void NotifyOfRegChange ();
+	void NotifyOfRegChange();
 	
-	int parseHex( string value );
+	int parseHex(string value);
 	
 	//This method is taken from Z_80LogicGate.
 	//It will decode the parameter from the hash
 	//into it's proper format for display in the
 	//pop-up window.
-//	string decodeParam( string param );
+//	string decodeParam(string param);
 	
 	
 	//This is called by the guiGateZ80 when an item changes
-//	void notifyItemChange( long itemIndex, long lastItemIndex );
+//	void notifyItemChange(long itemIndex, long lastItemIndex);
 //	void notifyAllChanged();
 
 protected:
@@ -81,7 +81,7 @@ protected:
 private:
 	//this utility makes it so that the wxStaticText
 	//gets red text if the value actually chantges
-	void setLabel( wxStaticText* who, wxString* what );
+	void setLabel(wxStaticText* who, wxString* what);
 	
 	//This changes the labels back to black
 	//for the next round of simulation;

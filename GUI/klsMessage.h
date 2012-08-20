@@ -34,20 +34,20 @@ namespace klsMessage {
 	public:
 		MessageType mType;
 		void* mStruct;
-		Message( MessageType t, void* s = NULL ) : mType(t), mStruct(s) {};
+		Message(MessageType t, void* s = NULL) : mType(t), mStruct(s) {};
 	};
 	
 	class Message_SET_WIRE_STATE {
 	public:
 		int wireId;
 		int state;
-		Message_SET_WIRE_STATE( int wid, int s ) : wireId(wid), state(s) {};
+		Message_SET_WIRE_STATE(int wid, int s) : wireId(wid), state(s) {};
 	};
 
 	class Message_DONESTEP {
 	public:
 		int logicTime;
-		Message_DONESTEP( int lt ) : logicTime(lt) {};
+		Message_DONESTEP(int lt) : logicTime(lt) {};
 	};
 
 	// no parameters for COMPLETE_INTERIM_STEP
@@ -58,25 +58,25 @@ namespace klsMessage {
 	public:
 		string gateType;
 		int gateId;
-		Message_CREATE_GATE( string gt, int gid ) : gateType(gt), gateId(gid) {};
+		Message_CREATE_GATE(string gt, int gid) : gateType(gt), gateId(gid) {};
 	};
 
 	class Message_CREATE_WIRE {
 	public:
 		int wireId;
-		Message_CREATE_WIRE( int wid ) : wireId(wid) {};
+		Message_CREATE_WIRE(int wid) : wireId(wid) {};
 	};
 
 	class Message_DELETE_GATE {
 	public:
 		int gateId;
-		Message_DELETE_GATE( int gid ) : gateId(gid) {};
+		Message_DELETE_GATE(int gid) : gateId(gid) {};
 	};
 
 	class Message_DELETE_WIRE {
 	public:
 		int wireId;
-		Message_DELETE_WIRE( int wid ) : wireId(wid) {};
+		Message_DELETE_WIRE(int wid) : wireId(wid) {};
 	};
 
 	class Message_SET_GATE_INPUT {
@@ -85,7 +85,7 @@ namespace klsMessage {
 		string inputId;
 		int wireId;
 		bool disconnect;
-		Message_SET_GATE_INPUT( int gid, string iid, int wid, bool d = false ) : gateId(gid), inputId(iid), wireId(wid), disconnect(d) {};
+		Message_SET_GATE_INPUT(int gid, string iid, int wid, bool d = false) : gateId(gid), inputId(iid), wireId(wid), disconnect(d) {};
 	};
 
 	class Message_SET_GATE_INPUT_PARAM {
@@ -94,7 +94,7 @@ namespace klsMessage {
 		string inputId;
 		string paramName;
 		string paramValue;
-		Message_SET_GATE_INPUT_PARAM( int gid, string iid, string pN, string pV ) : gateId(gid), inputId(iid), paramName(pN), paramValue(pV) {};
+		Message_SET_GATE_INPUT_PARAM(int gid, string iid, string pN, string pV) : gateId(gid), inputId(iid), paramName(pN), paramValue(pV) {};
 	};
 
 	class Message_SET_GATE_OUTPUT {
@@ -103,7 +103,7 @@ namespace klsMessage {
 		string outputId;
 		int wireId;
 		bool disconnect;
-		Message_SET_GATE_OUTPUT( int gid, string oid, int wid, bool d = false ) : gateId(gid), outputId(oid), wireId(wid), disconnect(d) {};
+		Message_SET_GATE_OUTPUT(int gid, string oid, int wid, bool d = false) : gateId(gid), outputId(oid), wireId(wid), disconnect(d) {};
 	};
 
 	class Message_SET_GATE_OUTPUT_PARAM {
@@ -112,7 +112,7 @@ namespace klsMessage {
 		string outputId;
 		string paramName;
 		string paramValue;
-		Message_SET_GATE_OUTPUT_PARAM( int gid, string oid, string pN, string pV ) : gateId(gid), outputId(oid), paramName(pN), paramValue(pV) {};
+		Message_SET_GATE_OUTPUT_PARAM(int gid, string oid, string pN, string pV) : gateId(gid), outputId(oid), paramName(pN), paramValue(pV) {};
 	};
 
 	class Message_SET_GATE_PARAM {
@@ -120,16 +120,16 @@ namespace klsMessage {
 		int gateId;
 		string paramName;
 		string paramValue;
-		Message_SET_GATE_PARAM( int gid, string pN, string pV ) : gateId(gid), paramName(pN), paramValue(pV) {};
-		Message_SET_GATE_PARAM( int gid, string pN, long pV, bool useHex = false ) : gateId(gid), paramName(pN) {
-			ostringstream oss; oss << (useHex ? std::hex : std::dec) << pV; paramValue = oss.str();
+		Message_SET_GATE_PARAM(int gid, string pN, string pV) : gateId(gid), paramName(pN), paramValue(pV) {};
+		Message_SET_GATE_PARAM(int gid, string pN, long pV, bool useHex = false) : gateId(gid), paramName(pN) {
+			ostringstream oss; oss <<(useHex ? std::hex : std::dec) << pV; paramValue = oss.str();
 		};
 	};
 
 	class Message_STEPSIM {
 	public:
 		int numSteps;
-		Message_STEPSIM( int n ) : numSteps(n) {};
+		Message_STEPSIM(int n) : numSteps(n) {};
 	};
 	
 	// no parameters for UPDATE_GATES

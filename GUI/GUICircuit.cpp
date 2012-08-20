@@ -35,12 +35,12 @@ void GUICircuit::reInitializeLogicCircuit() {
 	sendMessageToCore(klsMessage::Message(klsMessage::MT_REINITIALIZE));
 	waitToSendMessage = iswaiting;
 	hash_map< unsigned long, guiWire* >::iterator thisWire = wireList.begin();
-	while( thisWire != wireList.end() ) {
+	while(thisWire != wireList.end()) {
 		delete thisWire->second;
 		thisWire++;
 	}
 	hash_map< unsigned long, guiGate* >::iterator thisGate = gateList.begin();
-	while( thisGate != gateList.end() ) {
+	while(thisGate != gateList.end()) {
 		delete thisGate->second;
 		thisGate++;
 	} 
@@ -54,7 +54,7 @@ void GUICircuit::reInitializeLogicCircuit() {
 guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 	string libName = wxGetApp().gateNameToLibrary[gateName];
 	
-	if (id == -1) id = getNextAvailableGateID();
+	if(id == -1) id = getNextAvailableGateID();
 	guiGate* newGate = NULL;
 	LibraryGate gateDef = wxGetApp().libraries[libName][gateName];
 	//wxGetApp().libraries[libName].getGate(gateName, gateDef);
@@ -62,27 +62,27 @@ guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 
 	string ggt = gateDef.guiType;
 	
-	if (ggt == "REGISTER")
-		newGate = (guiGate*)(new guiGateREGISTER());
-	else if (ggt == "TO" || ggt == "FROM")
-		newGate = (guiGate*)(new guiTO_FROM());
-	else if (ggt == "LABEL")
-		newGate = (guiGate*)(new guiLabel());
-	else if (ggt == "LED")
-		newGate = (guiGate*)(new guiGateLED());
-	else if (ggt == "TOGGLE")
-		newGate = (guiGate*)(new guiGateTOGGLE());
-	else if (ggt == "KEYPAD")
-		newGate = (guiGate*)(new guiGateKEYPAD());
-	else if (ggt == "PULSE")
-		newGate = (guiGate*)(new guiGatePULSE());
+	if(ggt == "REGISTER")
+		newGate =(guiGate*)(new guiGateREGISTER());
+	else if(ggt == "TO" || ggt == "FROM")
+		newGate =(guiGate*)(new guiTO_FROM());
+	else if(ggt == "LABEL")
+		newGate =(guiGate*)(new guiLabel());
+	else if(ggt == "LED")
+		newGate =(guiGate*)(new guiGateLED());
+	else if(ggt == "TOGGLE")
+		newGate =(guiGate*)(new guiGateTOGGLE());
+	else if(ggt == "KEYPAD")
+		newGate =(guiGate*)(new guiGateKEYPAD());
+	else if(ggt == "PULSE")
+		newGate =(guiGate*)(new guiGatePULSE());
 		
 //*************************************************
 //Edit by Joshua Lansford 12/25/2006
 //I am creating a guiGate for the RAM so that
 //the ram can have its own special pop-up window
-	else if (ggt == "RAM"){
-		newGate = (guiGate*)(new guiGateRAM());
+	else if(ggt == "RAM"){
+		newGate =(guiGate*)(new guiGateRAM());
 	}
 
 //End of edit
@@ -92,8 +92,8 @@ guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 //Edit by Nathan Harro 01/13/2007
 //This will recognize the Z80 type
 //and call the correct guiGate method
-	else if (ggt == "Z80"){
-		newGate = (guiGate*)(new guiGateZ80());
+	else if(ggt == "Z80"){
+		newGate =(guiGate*)(new guiGateZ80());
 	}
 
 //End of edit
@@ -102,8 +102,8 @@ guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 //*******************************************
 //Edit by Joshua Lansford 05/10/2007
 //This is for the ADC as you might have guessed
-	else if (ggt == "ADC"){
-		newGate = (guiGate*)(new guiGateADC());
+	else if(ggt == "ADC"){
+		newGate =(guiGate*)(new guiGateADC());
 	}
 //End of edit
 //******************************************
@@ -111,25 +111,25 @@ guiGate* GUICircuit::createGate(string gateName, long id, bool noOscope) {
 	else
 		newGate = new guiGate();
 
-	newGate->setLibraryName( libName, gateName );
+	newGate->setLibraryName(libName, gateName);
 
-	for (unsigned int i = 0; i < gateDef.shape.size(); i++) {
+	for(unsigned int i = 0; i < gateDef.shape.size(); i++) {
 		lgLine tempLine = gateDef.shape[i];
 		newGate->insertLine(tempLine.x1, tempLine.y1, tempLine.x2, tempLine.y2);
 	}
-	for (unsigned int i = 0; i < gateDef.hotspots.size(); i++) {
+	for(unsigned int i = 0; i < gateDef.hotspots.size(); i++) {
 		lgHotspot tempHS = gateDef.hotspots[i];
 		newGate->insertHotspot(tempHS.x, tempHS.y, tempHS.name);
-		if (tempHS.isInput) newGate->declareInput(tempHS.name);
+		if(tempHS.isInput) newGate->declareInput(tempHS.name);
 		else newGate->declareOutput(tempHS.name);
 	}
 	map < string, string >::iterator paramWalk = gateDef.guiParams.begin();
-	while (paramWalk != gateDef.guiParams.end()) {
+	while(paramWalk != gateDef.guiParams.end()) {
 		newGate->setGUIParam(paramWalk->first, paramWalk->second);
 		paramWalk++;
 	}
 	paramWalk = gateDef.logicParams.begin();
-	while (paramWalk != gateDef.logicParams.end()) {
+	while(paramWalk != gateDef.logicParams.end()) {
 		newGate->setLogicParam(paramWalk->first, paramWalk->second);
 		paramWalk++;
 	}
@@ -150,7 +150,7 @@ void GUICircuit::deleteGate(unsigned long gid, bool waitToUpdate) {
 	//Declaration Of Variables
 	bool updateMenu = false;
 	
-	if (gateList.find(gid) == gateList.end()) return;
+	if(gateList.find(gid) == gateList.end()) return;
 
 	//Update Oscope
 	if(!waitToUpdate && gateList[gid]->getGUIType() == "TO") {
@@ -168,7 +168,7 @@ void GUICircuit::deleteGate(unsigned long gid, bool waitToUpdate) {
 }
 
 guiWire* GUICircuit::createWire(long wid) {
-	if (wireList.find(wid) == wireList.end()) { // wire does not exist yet
+	if(wireList.find(wid) == wireList.end()) { // wire does not exist yet
 		wireList[wid] = new guiWire();
 	}
 	return wireList[wid];
@@ -176,14 +176,14 @@ guiWire* GUICircuit::createWire(long wid) {
 
 void GUICircuit::deleteWire(unsigned long wid) {
 	hash_map < unsigned long, guiWire* >::iterator thisWire = wireList.find(wid);
-	if (thisWire != wireList.end()) {
+	if(thisWire != wireList.end()) {
 		delete thisWire->second;
 		wireList.erase(thisWire);
 	}
 }
 
 guiWire* GUICircuit::setWireConnection(long wid, long gid, string connection, bool openMode) {
-	if (gateList.find(gid) == gateList.end()) return NULL; // error: gate not found
+	if(gateList.find(gid) == gateList.end()) return NULL; // error: gate not found
 	createWire(wid); // do we need to init the wire first? if not then no effect.
 	wireList[wid]->setID(wid);
 	wireList[wid]->addConnection(gateList[gid], connection, openMode);
@@ -198,11 +198,11 @@ void GUICircuit::Render() {
 void GUICircuit::parseMessage(klsMessage::Message message) {
 	string temp, type;
 	static bool shouldRender = false;
-	switch (message.mType) {
+	switch(message.mType) {
 		case klsMessage::MT_SET_WIRE_STATE: {
 			// SET WIRE id STATE TO state
 			shouldRender = true;
-			klsMessage::Message_SET_WIRE_STATE* msgSetWireState = (klsMessage::Message_SET_WIRE_STATE*)(message.mStruct);
+			klsMessage::Message_SET_WIRE_STATE* msgSetWireState =(klsMessage::Message_SET_WIRE_STATE*)(message.mStruct);
 			setWireState(msgSetWireState->wireId, msgSetWireState->state);
 			delete msgSetWireState;
 			break;
@@ -210,8 +210,8 @@ void GUICircuit::parseMessage(klsMessage::Message message) {
 		case klsMessage::MT_SET_GATE_PARAM: {
 			// SET GATE id PARAMETER name val
 			shouldRender = true;
-			klsMessage::Message_SET_GATE_PARAM* msgSetGateParam = (klsMessage::Message_SET_GATE_PARAM*)(message.mStruct);
-			if (gateList.find(msgSetGateParam->gateId) != gateList.end()) gateList[msgSetGateParam->gateId]->setLogicParam(msgSetGateParam->paramName, msgSetGateParam->paramValue);
+			klsMessage::Message_SET_GATE_PARAM* msgSetGateParam =(klsMessage::Message_SET_GATE_PARAM*)(message.mStruct);
+			if(gateList.find(msgSetGateParam->gateId) != gateList.end()) gateList[msgSetGateParam->gateId]->setLogicParam(msgSetGateParam->paramName, msgSetGateParam->paramValue);
 			//************************************************************
 			//Edit by Joshua Lansford 11/24/06
 			//the perpose of this edit is to allow logic gates to be able
@@ -229,7 +229,7 @@ void GUICircuit::parseMessage(klsMessage::Message message) {
 			//
 			//This spacific edit is so that the GUI thread will
 			//hit the pause button
-			if( msgSetGateParam->paramName == "PAUSE_SIM" ){
+			if(msgSetGateParam->paramName == "PAUSE_SIM"){
 				pausing = true;
 				panic = true;
 			}
@@ -239,16 +239,16 @@ void GUICircuit::parseMessage(klsMessage::Message message) {
 		}
 		case klsMessage::MT_DONESTEP: { // DONESTEP
 			simulate = true;
-			int logicTime = ((klsMessage::Message_DONESTEP*)(message.mStruct))->logicTime;
+			int logicTime =((klsMessage::Message_DONESTEP*)(message.mStruct))->logicTime;
 			// Panic if core isn't keeping up, keep a 3ms buffer...
-			panic = (logicTime > lastTime+3) || panic;
+			panic =(logicTime > lastTime+3) || panic;
 			// Now we can send the waiting messages
-			for (unsigned int i = 0; i < messageQueue.size(); i++) sendMessageToCore(messageQueue[i]);
+			for(unsigned int i = 0; i < messageQueue.size(); i++) sendMessageToCore(messageQueue[i]);
 			messageQueue.clear();
 			// Only render at the end of a step and only if necessary
-			if (shouldRender) gCanvas->Refresh();
+			if(shouldRender) gCanvas->Refresh();
 			shouldRender = false;
-			delete ((klsMessage::Message_DONESTEP*)(message.mStruct));
+			delete((klsMessage::Message_DONESTEP*)(message.mStruct));
 			break;
 		}
 		case klsMessage::MT_COMPLETE_INTERIM_STEP: {// COMPLETE INTERIM STEP - UPDATE OSCOPE
@@ -263,9 +263,9 @@ void GUICircuit::parseMessage(klsMessage::Message message) {
 void GUICircuit::sendMessageToCore(klsMessage::Message message) {
 	wxMutexLocker lock(wxGetApp().mexMessages);
 
-	if (waitToSendMessage) {
+	if(waitToSendMessage) {
 		
-		if (simulate) {
+		if(simulate) {
 			wxGetApp().dGUItoLOGIC.push_back(message);
 		} else{
 			messageQueue.push_back(message);
@@ -275,9 +275,9 @@ void GUICircuit::sendMessageToCore(klsMessage::Message message) {
 	}	
 }
 
-void GUICircuit::setWireState( long wid, long state ) {
+void GUICircuit::setWireState(long wid, long state) {
 	// If the wire doesn't exist, then don't set it's state!
-	if( wireList.find(wid) == wireList.end() ) return;
+	if(wireList.find(wid) == wireList.end()) return;
 	
 	wireList[wid]->setState(state);
 	gCanvas->Refresh();
@@ -287,12 +287,12 @@ void GUICircuit::setWireState( long wid, long state ) {
 void GUICircuit::printState() {
 	wxGetApp().logfile << "print state" << endl << flush;
 	hash_map < unsigned long, guiWire* >::iterator thisWire = wireList.begin();
-	while (thisWire != wireList.end()) {
+	while(thisWire != wireList.end()) {
 		wxGetApp().logfile << "wire " << thisWire->first << endl << flush;
 		thisWire++;
 	}
 	hash_map < unsigned long, guiGate* >::iterator thisGate = gateList.begin();
-	while (thisGate != gateList.end()) {
+	while(thisGate != gateList.end()) {
 		wxGetApp().logfile << "gate " << thisGate->first << endl << flush;
 		thisGate++;
 	}

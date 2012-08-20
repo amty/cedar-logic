@@ -21,25 +21,25 @@ DECLARE_APP(MainApp)
 
 BEGIN_EVENT_TABLE(gateImage, wxWindow) //wxStaticBitmap)
 	EVT_PAINT(gateImage::OnPaint)
-	EVT_ENTER_WINDOW( gateImage::OnEnterWindow )
-	EVT_LEAVE_WINDOW( gateImage::OnLeaveWindow )
-	EVT_MOUSE_EVENTS( gateImage::mouseCallback )
+	EVT_ENTER_WINDOW(gateImage::OnEnterWindow)
+	EVT_LEAVE_WINDOW(gateImage::OnLeaveWindow)
+	EVT_MOUSE_EVENTS(gateImage::mouseCallback)
 	EVT_ERASE_BACKGROUND(gateImage::OnEraseBackground)
 END_EVENT_TABLE()
 
 DECLARE_APP(MainApp)
 
-gateImage::gateImage( string gateName, wxWindow *parent, wxWindowID id,
+gateImage::gateImage(string gateName, wxWindow *parent, wxWindowID id,
         const wxPoint& pos,
         const wxSize& size,
-        long style, const wxString& name ) : 
+        long style, const wxString& name) : 
 	gImage(GATEIMAGESIZE, GATEIMAGESIZE, false),
-        wxWindow(parent, id, pos, size, style|wxFULL_REPAINT_ON_RESIZE, name ) {
+        wxWindow(parent, id, pos, size, style|wxFULL_REPAINT_ON_RESIZE, name) {
 	m_init = false;
 	inImage = false;
 
 	m_gate = GUICircuit().createGate(gateName, 0, true);
-	if (m_gate == NULL) return;
+	if(m_gate == NULL) return;
 	m_gate->setGLcoords(0,0);
 	m_gate->calcBBox();
 	this->gateName = gateName;
@@ -56,7 +56,7 @@ void gateImage::OnPaint(wxPaintEvent &event) {
 	wxPaintDC dc(this);
 	wxBitmap gatebitmap(gImage);
 	dc.DrawBitmap(gatebitmap, 0, 0, true);	
-	if (inImage) {
+	if(inImage) {
 		dc.SetPen(wxPen(*wxBLUE, 2, wxSOLID));
 	} else {
 		dc.SetPen(wxPen(*wxWHITE, 2, wxSOLID));
@@ -66,64 +66,64 @@ void gateImage::OnPaint(wxPaintEvent &event) {
 	//event.Skip();
 }
 
-void gateImage::mouseCallback( wxMouseEvent& event) {
-	if (event.LeftDown()) {
+void gateImage::mouseCallback(wxMouseEvent& event) {
+	if(event.LeftDown()) {
 		wxGetApp().newGateToDrag = gateName;
-	} // else if (event.LeftUp()) {
+	} // else if(event.LeftUp()) {
 	// 	wxGetApp().newGateToDrag = "";
 	// }
 }
 
-void gateImage::OnEraseBackground( wxEraseEvent& event ) {
+void gateImage::OnEraseBackground(wxEraseEvent& event) {
 	// Do nothing, so that the palette doesn't flicker!
 }
 
 void gateImage::setViewport() {
 	// Set the projection matrix:	
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
 	wxSize sz = GetClientSize();
 	klsBBox m_gatebox = m_gate->getModelBBox();
 	GLPoint2f minCorner = GLPoint2f(m_gatebox.getLeft()-0.5,m_gatebox.getTop()+0.5);
 	GLPoint2f maxCorner = GLPoint2f(m_gatebox.getRight()+0.5,m_gatebox.getBottom()-0.5);
 
-	double screenAspect = (double) sz.GetHeight() / (double) sz.GetWidth();
+	double screenAspect =(double) sz.GetHeight() / (double) sz.GetWidth();
 	double mapWidth = maxCorner.x - minCorner.x;
 	double mapHeight = minCorner.y - maxCorner.y; // max and min corner's defs are weird...
 	
 	GLPoint2f orthoBoxTL, orthoBoxBR;
 	
 	// If the map's width is the limiting factor:
-	if( screenAspect * mapWidth >= mapHeight ) {
+	if(screenAspect * mapWidth >= mapHeight) {
 		// Fit to width:
 		double imageHeight = screenAspect * mapWidth;
 
 		// Set the ortho box width equal to the map width, and center the
 		// height in the box:
-		orthoBoxTL = GLPoint2f( minCorner.x, minCorner.y + 0.5*(imageHeight - mapHeight) );
-		orthoBoxBR = GLPoint2f( maxCorner.x, maxCorner.y - 0.5*(imageHeight - mapHeight) );
+		orthoBoxTL = GLPoint2f(minCorner.x, minCorner.y + 0.5*(imageHeight - mapHeight));
+		orthoBoxBR = GLPoint2f(maxCorner.x, maxCorner.y - 0.5*(imageHeight - mapHeight));
 	} else {
 		// Fit to height:
 		double imageWidth = mapHeight / screenAspect;
 
 		// Set the ortho box height equal to the map height, and center the
 		// width in the box:
-		orthoBoxTL = GLPoint2f( minCorner.x - 0.5*(imageWidth - mapWidth), minCorner.y );
-		orthoBoxBR = GLPoint2f( maxCorner.x + 0.5*(imageWidth - mapWidth), maxCorner.y );
+		orthoBoxTL = GLPoint2f(minCorner.x - 0.5*(imageWidth - mapWidth), minCorner.y);
+		orthoBoxBR = GLPoint2f(maxCorner.x + 0.5*(imageWidth - mapWidth), maxCorner.y);
 	}
 
-	// gluOrtho2D(left, right, bottom, top); (In world-space coords.)
+	// gluOrtho2D(left, right, bottom, top);(In world-space coords.)
 	gluOrtho2D(orthoBoxTL.x, orthoBoxBR.x, orthoBoxBR.y, orthoBoxTL.y);
-	glViewport(0, 0, (GLint) sz.GetWidth(), (GLint) sz.GetHeight());
+	glViewport(0, 0,(GLint) sz.GetWidth(), (GLint) sz.GetHeight());
 
 	// Store minCorner and maxCorner for use in mouse handler:
 	minCorner = orthoBoxTL;
 	maxCorner = orthoBoxBR; 
 
 	// Set the model matrix:
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }
 
 // Print the canvas contents to a bitmap:
@@ -135,22 +135,22 @@ void gateImage::generateImage() {
 		glViewport(0, 0, GATEIMAGESIZE, GATEIMAGESIZE);
 		
 		// Set the bitmap clear color:
-		glClearColor (1.0, 1.0, 1.0, 0.0);
+		glClearColor(1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);
 		
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		
 		//TODO: Check if alpha is hardware supported, and
 		// don't enable it if not!
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 		
-		glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
+		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		
 		//*********************************
 		//Edit by Joshua Lansford 4/09/07
 		//anti-alis ing is nice
-		//glEnable( GL_LINE_SMOOTH );
+		//glEnable(GL_LINE_SMOOTH);
 		//End of edit
 		
 		// Load the font texture
@@ -166,10 +166,10 @@ void gateImage::generateImage() {
 void gateImage::renderMap() {
 	//clear window
 	glClear(GL_COLOR_BUFFER_BIT);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 		
-	if (m_gate != NULL) m_gate->draw();
+	if(m_gate != NULL) m_gate->draw();
 }
 
 void gateImage::update() {

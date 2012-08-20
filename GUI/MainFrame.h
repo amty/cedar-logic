@@ -54,7 +54,7 @@ public:
 	~MainFrame();
 	
 	void create_toolbar();
-    // event handlers (these functions should _not_ be virtual)
+    // event handlers(these functions should _not_ be virtual)
     void OnClose(wxCloseEvent& event);
     void OnQuit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
@@ -86,16 +86,16 @@ public:
 	void OnTimeStepModSlider(wxScrollEvent& event);
 	void OnLock(wxCommandEvent& event);
 	
-	void saveSettings( void );
+	void saveSettings(void);
 	
-	void ResumeExecution ( void );
+	void ResumeExecution(void);
 	
-	void PauseSim( void );
+	void PauseSim(void);
 	
-	void loadCircuitFile( string fileName );
+	void loadCircuitFile(string fileName);
 	
 private:
-    // helper function - creates a new thread (but doesn't run it)
+    // helper function - creates a new thread(but doesn't run it)
 	threadLogic *CreateThread();
 
 	vector< GUICanvas* > canvases;

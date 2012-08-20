@@ -23,10 +23,10 @@ typedef unsigned long DatabusType;
 //make them paramiter transportable.
 //(i.e. they remove all the spaces
 //and encode them as something else)
-string encodeParam( string param );
-string decodeParam( string param );
-string toHex( int value );
-string toDec( int value );
+string encodeParam(string param);
+string decodeParam(string param);
+string toHex(int value);
+string toDec(int value);
 
 
 class Z_80LogicGate : public Gate{
@@ -38,7 +38,7 @@ private:
 	
 	//a handy method for turning a bool into a ONE
 	//or ZERO
-	StateType getLowActiveState( bool isActive );
+	StateType getLowActiveState(bool isActive);
 	
 	//if the gate hasn't recieved a rise event
 	//it should process any fall events.
@@ -102,7 +102,7 @@ private:
 	//will then be iterated next time gateProcess is called.
 	//This method is private because only methods in Z_80LogicGate
 	//should tecknically know the names of properties.
-	void safeListChangedParam( string paramName );
+	void safeListChangedParam(string paramName);
 	
 	//this is called from gateProcess to go ahead and list all the
 	//paramiters which were listed by safeListParam which didn't get logged
@@ -122,17 +122,17 @@ public:
 	
 	//these methods are used by WaveformFSM
 	//to set the gates inputs and outputs
-	void setAddressBus( AddressType address );
+	void setAddressBus(AddressType address);
 	void floatAddressBus();
-	void setBUSACKActive( bool isActive, TimeType delay );
-	void setDataBus( DatabusType data, TimeType delay );
+	void setBUSACKActive(bool isActive, TimeType delay);
+	void setDataBus(DatabusType data, TimeType delay);
 	void floatDataBus();
-	void setHALTActive( bool isActive, TimeType delay );
-	void setIORQActive( bool isActive, TimeType delay );
-	void setM1Active( bool isActive, TimeType delay );
-	void setMREQActive( bool isActive, TimeType delay );
-	void setRDActive( bool isActive, TimeType delay );
-	void setWRActive( bool isActive, TimeType delay );
+	void setHALTActive(bool isActive, TimeType delay);
+	void setIORQActive(bool isActive, TimeType delay);
+	void setM1Active(bool isActive, TimeType delay);
+	void setMREQActive(bool isActive, TimeType delay);
+	void setRDActive(bool isActive, TimeType delay);
+	void setWRActive(bool isActive, TimeType delay);
 	
 	
 	//these methods are used by WavefromFSM
@@ -144,8 +144,8 @@ public:
 	
 	//a handy method for returning true if a mentioned
 	//method is active
-	StateType isLowActiveState( StateType state );
-	StateType isHighActiveState( StateType state );
+	StateType isLowActiveState(StateType state);
+	StateType isHighActiveState(StateType state);
 	
 	//this method is called by the waveformFSM or InstructionManager
 	//when they need to cause the simulation to stop because
@@ -155,7 +155,7 @@ public:
 	//this method is called by Z_80Registers when a register changes
 	//this is so that the GUI is noteified of the current content
 	//of the registers.
-	void notifyOfRegisterChange( string regName );
+	void notifyOfRegisterChange(string regName);
 	
 	//this method is called by instrucitonManager to let this class
 	//know that it has changed the zad mode and it wants this class
@@ -166,14 +166,14 @@ public:
 	//is in the pop-up window.  It is called by the instruction
 	//manager when it is emulating the ZAD KBRD and SCAN
 	//functions
-	void setHexDisplay( string newValue );
+	void setHexDisplay(string newValue);
 	
 	//this method is used to change the info string that
 	//is in the pop-up window.  It is called by the
 	//instruction manager when it is on instruction
-	//level stepping and (TODO) by the WaveformFSM when
+	//level stepping and(TODO) by the WaveformFSM when
 	//going through T-state level stepping
-	void setInfoString( string newValue );
+	void setInfoString(string newValue);
 	
 	//this is used by the emulated ZAD functions KBRD and SCAN
 	//inside of the instructionManager to determine what
@@ -197,8 +197,8 @@ public:
 	bool isPowered();
 	
 	//these methods are the gates interface to the rest of the world
-	bool setParameter( string paramName, string value );
-	string getParameter( string paramName );
+	bool setParameter(string paramName, string value);
+	string getParameter(string paramName);
 	void gateProcess();
 	
 

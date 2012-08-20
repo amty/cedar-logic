@@ -52,50 +52,50 @@ class Gate
 public:
 
 	// Update the gate's outputs:
-	void updateGate( IDType myID, Circuit * theCircuit );
+	void updateGate(IDType myID, Circuit * theCircuit);
 
-	// Resend the last event to a (probably newly connected) wire:	
-	void resendLastEvent( IDType myID, string outputID, Circuit * theCircuit );
+	// Resend the last event to a(probably newly connected) wire:	
+	void resendLastEvent(IDType myID, string outputID, Circuit * theCircuit);
 
 	// Set a gate parameter:
-	// (If the parameter change requires the gate to be updated to change its
+	//(If the parameter change requires the gate to be updated to change its
 	// output state, then return "true".)
-	virtual bool setParameter( string paramName, string value );
-	virtual bool setInputParameter( string inputID, string paramName, string value );
-	virtual bool setOutputParameter( string outputID, string paramName, string value );
+	virtual bool setParameter(string paramName, string value);
+	virtual bool setInputParameter(string inputID, string paramName, string value);
+	virtual bool setOutputParameter(string outputID, string paramName, string value);
 
 	// Get the value of a gate parameter:
-	virtual string getParameter( string paramName );
+	virtual string getParameter(string paramName);
 
 	// ********* Standard Gate mutator functions ************
 
 	// Connect a wire to the input of this gate:
-	virtual void connectInput( string inputID, IDType wireID );
+	virtual void connectInput(string inputID, IDType wireID);
 
 	// Connect a wire to the output of this gate:
-	virtual void connectOutput( string outputID, IDType wireID );
+	virtual void connectOutput(string outputID, IDType wireID);
 
 	// Return the wire ID of a connected wire, or ID_NONE:
-	virtual IDType getInputWire( string inputID ) {
-		return (inputList.find( inputID ) == inputList.end()) ? ID_NONE : inputList[inputID].wireID;
+	virtual IDType getInputWire(string inputID) {
+		return(inputList.find(inputID) == inputList.end()) ? ID_NONE : inputList[inputID].wireID;
 	};
-	virtual IDType getOutputWire( string outputID ) {
-		return (outputList.find( outputID ) == outputList.end()) ? ID_NONE : outputList[outputID].wireID;
+	virtual IDType getOutputWire(string outputID) {
+		return(outputList.find(outputID) == outputList.end()) ? ID_NONE : outputList[outputID].wireID;
 	};
 
 	// Disconnect a wire from the input of this gate:
-	// (Returns the wireID of the wire that was connected.)
-	virtual IDType disconnectInput( string inputID );
+	//(Returns the wireID of the wire that was connected.)
+	virtual IDType disconnectInput(string inputID);
 
 	// Disconnect a wire from the output of this gate:
-	// (Returns the wireID of the wire that was connected.)
-	virtual IDType disconnectOutput( string outputID );
+	//(Returns the wireID of the wire that was connected.)
+	virtual IDType disconnectOutput(string outputID);
 
 	// Get the first input of the gate:
-	string getFirstConnectedInput( void );
+	string getFirstConnectedInput(void);
 
 	// Get the first output of the gate that has a wire attached to it:
-	string getFirstConnectedOutput( void );
+	string getFirstConnectedOutput(void);
 
 	Gate();
 	virtual ~Gate();
@@ -106,54 +106,54 @@ protected:
 	// Register an input for this gate:
 	// Possibly declare the input as edge triggered, which will cause it
 	// to be tracked to be able to check rising and falling edges.
-	void declareInput( string inputID, bool edgeTriggered = false );
+	void declareInput(string inputID, bool edgeTriggered = false);
 
 	// Return true if an input has been declared. False otherwise.
-	bool inputExists( string inputID ) {
-		return (inputList.find(inputID) != inputList.end());
+	bool inputExists(string inputID) {
+		return(inputList.find(inputID) != inputList.end());
 	};
 
 	// Register a bus of inputs for this gate. They will be named
 	// "busName_0" through "busName_<busWidth-1>". They cannot be
 	// set as edge-triggered.
-	void declareInputBus( string busName, unsigned long busWidth ) {
+	void declareInputBus(string busName, unsigned long busWidth) {
 		ostringstream oss;
-		for( unsigned long i = 0; i < busWidth; i++ ) {
+		for(unsigned long i = 0; i < busWidth; i++) {
 			oss.str("");
 			oss.clear();
 			oss << busName << "_" << i;
-			declareInput( oss.str() );
+			declareInput(oss.str());
 		}
 	};
 
 
 
 	// Register an output for this gate :
-	void declareOutput( string name );
+	void declareOutput(string name);
 
 	// Return true if an input has been declared. False otherwise.
-	bool outputExists( string outputID ) {
-		return (outputList.find(outputID) != outputList.end());
+	bool outputExists(string outputID) {
+		return(outputList.find(outputID) != outputList.end());
 	};
 
 	// Register a bus of outputs for this gate. They will be named
 	// "busName_0" through "busName_<busWidth-1>". They cannot be
 	// set as edge-triggered.
-	void declareOutputBus( string busName, unsigned long busWidth ) {
+	void declareOutputBus(string busName, unsigned long busWidth) {
 		ostringstream oss;
-		for( unsigned long i = 0; i < busWidth; i++ ) {
+		for(unsigned long i = 0; i < busWidth; i++) {
 			oss.str("");
 			oss.clear();
 			oss << busName << "_" << i;
-			declareOutput( oss.str() );
+			declareOutput(oss.str());
 		}
 	};
 
 	// Set the input to be automatically inverted:
-	void  setInputInverted( string inputID, bool newInv = true ) {
+	void  setInputInverted(string inputID, bool newInv = true) {
 		if(inputList.find(inputID) == inputList.end()) {
 			WARNING("Gate::setInputState() - Invalid input name.");
-			assert( false );
+			assert(false);
 			return;
 		}
 
@@ -163,10 +163,10 @@ protected:
 
 
 	// Set the output to be automatically inverted:
-	void  setOutputInverted( string outputID, bool newInv = true ) {
+	void  setOutputInverted(string outputID, bool newInv = true) {
 		if(outputList.find(outputID) == outputList.end()) {
 			WARNING("Gate::setOutputState() - Invalid output name.");
-			assert( false );
+			assert(false);
 			return;
 		}
 
@@ -176,16 +176,16 @@ protected:
 
 
 	// Set the output to be automatically inverted:
-	void  setOutputEnablePin( string outputID, string inputID ) {
+	void  setOutputEnablePin(string outputID, string inputID) {
 		if(outputList.find(outputID) == outputList.end()) {
 			WARNING("Gate::setOutputEnablePin() - Invalid output name.");
-			assert( false );
+			assert(false);
 			return;
 		}
 
 		if(inputList.find(inputID) == inputList.end()) {
 			WARNING("Gate::setOutputEnablePin() - Invalid input name.");
-			assert( false );
+			assert(false);
 			return;
 		}
 
@@ -194,47 +194,47 @@ protected:
 	};
 
 	// A helper function that allows you to convert a bus into a unsigned long:
-	// (HI_Z, etc. is interpreted as ZERO.)
-	unsigned long bus_to_ulong( vector< StateType > busStates );
+	//(HI_Z, etc. is interpreted as ZERO.)
+	unsigned long bus_to_ulong(vector< StateType > busStates);
 
 	// A helper function that allows you to convert an unsigned long number into a bus:
-	vector< StateType > ulong_to_bus( unsigned long number, unsigned long numBits );
+	vector< StateType > ulong_to_bus(unsigned long number, unsigned long numBits);
 
 	// Gate "Process" activity methods:
 	// The process activity that this specific gate will perform. Note that
 	// class "Gate" must be subclassed and gateProcess() defined for a proper
 	// gate to be created.
-	virtual void gateProcess( void ) = 0;
+	virtual void gateProcess(void) = 0;
 	
 	// Get the current time in the simulation:
-	TimeType getSimTime( void );
+	TimeType getSimTime(void);
 	
 	// Check the state of the named input and return it.
-	StateType getInputState( string name );
+	StateType getInputState(string name);
 	
 	// Get the input states of a bus of inputs named "busName_0" through
 	// "busName_x" and return their states as a vector.
-	vector< StateType > getInputBusState( string busName );
+	vector< StateType > getInputBusState(string busName);
 
 	// Get the types of inputs that are represented.
-	vector< bool > groupInputStates( void );
+	vector< bool > groupInputStates(void);
 	
 	// Compare the "this" state with the "last" state and say if this is a rising or falling edge. 
-	bool isRisingEdge( string name ); 
-	bool isFallingEdge( string name ); 
+	bool isRisingEdge(string name); 
+	bool isFallingEdge(string name); 
 
 	// Send an output event to one of the outputs of this gate. 
 	// Compare the last sent event with the newState and decide whether or not to 
 	// really send the event. Also, log the last sent event so that it can be 
 	// repeated later if necessary. 
-	void setOutputState( string outID, StateType newState, TimeType delay = TIME_NONE );
+	void setOutputState(string outID, StateType newState, TimeType delay = TIME_NONE);
 	
 	// Set the output states of a bus of outputs named "busName_0" through
 	// "busName_x" using a vector of states:
-	void setOutputBusState( string outID, vector< StateType > newState, TimeType delay = TIME_NONE );
+	void setOutputBusState(string outID, vector< StateType > newState, TimeType delay = TIME_NONE);
 
 	// List a parameter in the Circuit as having been changed:
-	void listChangedParam( string paramName );
+	void listChangedParam(string paramName);
 
 protected:
 	// The default gate delay used for gates if
@@ -286,13 +286,13 @@ public:
 	Gate_N_INPUT();
 	
 	// Handle gate events:
-	void gateProcess( void ) {};
+	void gateProcess(void) {};
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the parameters:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 protected:
 	// The number of input bits:
@@ -301,7 +301,7 @@ protected:
 
 
 // ******************* PASS Gate *********************
-// (It basically takes all inputs and passes them to the outputs.)
+//(It basically takes all inputs and passes them to the outputs.)
 class Gate_PASS : public Gate_N_INPUT
 {
 public:
@@ -309,10 +309,10 @@ public:
 	Gate_PASS();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 };
 
 
@@ -324,7 +324,7 @@ public:
 	Gate_OR();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 };
 
 
@@ -336,7 +336,7 @@ public:
 	Gate_AND();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 };
 
 // ****************** EQUIVALENCE Gate **************
@@ -347,7 +347,7 @@ public:
 	Gate_EQUIVALENCE();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 };
 	
 
@@ -359,7 +359,7 @@ public:
 	Gate_XOR();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 };
 
 
@@ -370,19 +370,19 @@ public:
 	Gate_REGISTER();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the parameters:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 protected:
 	bool syncSet, syncClear, syncLoad, disableHold, unknownOutputs;
 
-	// The maximum count of this counter (maximum value).
-	// (BCD is 9, 4-bit binary is 15.)
+	// The maximum count of this counter(maximum value).
+	//(BCD is 9, 4-bit binary is 15.)
 	unsigned long maxCount;
 
 	unsigned long currentValue;
@@ -398,16 +398,16 @@ class Gate_CLOCK : public Gate
 {
 public:
 	// Initialize the clock:
-	Gate_CLOCK( TimeType newHalfCycle = 0 );
+	Gate_CLOCK(TimeType newHalfCycle = 0);
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the clock rate:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the clock rate:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 private:
 	TimeType halfCycle;
@@ -423,10 +423,10 @@ public:
 	Gate_PULSE();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the pulse:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 private:
 	TimeType pulseRemaining;
 };
@@ -439,10 +439,10 @@ public:
 	Gate_MUX();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 protected:
 	unsigned long selBits;
@@ -456,10 +456,10 @@ public:
 	Gate_DECODER();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 protected:
 	unsigned long outBits;
@@ -476,13 +476,13 @@ public:
 	Gate_DRIVER();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the current state:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the current state:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 private:
 	unsigned long output_num;
@@ -502,10 +502,10 @@ public:
 	Gate_ADDER();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 };
 
 
@@ -522,10 +522,10 @@ public:
 	Gate_COMPARE();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 };
 
 
@@ -539,13 +539,13 @@ public:
 	Gate_JKFF();
 	
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the parameters:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 protected:
 	StateType currentState;
@@ -561,29 +561,29 @@ public:
 	Gate_RAM();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the parameters:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 	// Write a file containing the memory data:
-	void outputMemoryFile( string fName );
+	void outputMemoryFile(string fName);
 
 	// Read a file and load the memory data:
-	void inputMemoryFile( string fName );
+	void inputMemoryFile(string fName);
 	
 //*************************************************
 //Edit by Joshua Lansford 1/22/06
 //This will make it so that the logic gate can
 //also load Intel Hex files.  This is a format
 //which is exported by the zad assembler.
-	void inputMemoryFileFromIntelHex( string fName );
+	void inputMemoryFileFromIntelHex(string fName);
 	
 	//a helper function
-	int readInHex( ifstream* fin, int numChars );
+	int readInHex(ifstream* fin, int numChars);
 //End of edit**************************************
 
 protected:
@@ -609,33 +609,33 @@ public:
 	// Note: Because this gate does some really funky stuff,
 	// it needs a pointer to the circuit to manipulate the Junction
 	// objects.
-	Gate_JUNCTION( Circuit *newCircuit );
+	Gate_JUNCTION(Circuit *newCircuit);
 
 	// Remove this junction's claim on the junction ID:
 	~Gate_JUNCTION();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the junction's ID:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the junction's ID:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 	// Connect a wire to the input of this gate:
-	void connectInput( string inputID, IDType wireID );
+	void connectInput(string inputID, IDType wireID);
 
 	// Disconnect a wire from the input of this gate:
-	// (Returns the wireID of the wire that was connected.)
-	IDType disconnectInput( string inputID );
+	//(Returns the wireID of the wire that was connected.)
+	IDType disconnectInput(string inputID);
 
 private:
 	string myID;
 	Circuit * myCircuit;
 
 	// All the wires hooked up to this particular junction gate:
-	// (Needs the counted wire deal in case you hook up a wire twice,
+	//(Needs the counted wire deal in case you hook up a wire twice,
 	// and then unhook it once. We don't want to remove it from the set yet then.)
 	ID_SET< IDType > myWires;
 	ID_MAP< IDType, unsigned long > myWireCounts;
@@ -650,7 +650,7 @@ private:
 // This class uses the circuit's Junctioning capabilities
 // to enable and disable a junction and splice the inputs
 // into the junction, to allow T-gates.
-// Note: All of the connections are INPUTS! (That way, they default to HI_Z.)
+// Note: All of the connections are INPUTS!(That way, they default to HI_Z.)
 // Input 0 = T-Gate input
 // Input 1 = T-Gate input2/output
 // Input 2 = Control input
@@ -662,21 +662,21 @@ public:
 	// Note: Because this gate does some really funky stuff,
 	// it needs a pointer to the circuit to manipulate the Junction
 	// objects.
-	Gate_T( Circuit *newCircuit );
+	Gate_T(Circuit *newCircuit);
 	
 	// Destroy the gate, and remove the Junction object from the
 	// Circuit:
 	~Gate_T();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Connect a wire to the input of this gate:
-	void connectInput( string inputID, IDType wireID );
+	void connectInput(string inputID, IDType wireID);
 
 	// Disconnect a wire from the input of this gate:
-	// (Returns the wireID of the wire that was connected.)
-	IDType disconnectInput( string inputID );
+	//(Returns the wireID of the wire that was connected.)
+	IDType disconnectInput(string inputID);
 
 private:
 	Circuit * myCircuit;
@@ -692,7 +692,7 @@ private:
 // ******************* NODE Gate *********************
 // This class uses the circuit's Junctioning capabilities
 // to splice the inputs into the junction, to allow nodes.
-// Note: All of the connections are INPUTS! (That way, they default to HI_Z.)
+// Note: All of the connections are INPUTS!(That way, they default to HI_Z.)
 // Input 0-7 = NODE gate input/output
 
 class Gate_NODE : public Gate
@@ -702,21 +702,21 @@ public:
 	// Note: Because this gate does some really funky stuff,
 	// it needs a pointer to the circuit to manipulate the Junction
 	// objects.
-	Gate_NODE( Circuit *newCircuit );
+	Gate_NODE(Circuit *newCircuit);
 	
 	// Destroy the gate, and remove the Junction object from the
 	// Circuit:
 	~Gate_NODE();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Connect a wire to the input of this gate:
-	void connectInput( string inputID, IDType wireID );
+	void connectInput(string inputID, IDType wireID);
 
 	// Disconnect a wire from the input of this gate:
-	// (Returns the wireID of the wire that was connected.)
-	IDType disconnectInput( string inputID );
+	//(Returns the wireID of the wire that was connected.)
+	IDType disconnectInput(string inputID);
 
 private:
 	Circuit * myCircuit;
@@ -740,13 +740,13 @@ public:
 	Gate_ADC();
 
 	// Handle gate events:
-	void gateProcess( void );
+	void gateProcess(void);
 
 	// Set the parameters:
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
 	// Get the parameters:
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 
 protected:
 	unsigned long analogValue;
@@ -767,11 +767,11 @@ public:
 	Gate_pauseulator();
 	
 	
-	void gateProcess( void );
+	void gateProcess(void);
 
-	bool setParameter( string paramName, string value );
+	bool setParameter(string paramName, string value);
 
-	string getParameter( string paramName );
+	string getParameter(string paramName);
 };
 //End of edit****************************************************
 

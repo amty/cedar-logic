@@ -152,19 +152,19 @@ private:
 
 	//this function pointer maintains the state of
 	//this finite state machine
-	void (WaveformFSM::*nextTState)( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+	void(WaveformFSM::*nextTState)(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
 		
 	//This gets called from the constructor and when the waveformFSM
 	//gets reset in gateProcess
-	void resetSignals( Z_80LogicGate* z_80LogicGate );
+	void resetSignals(Z_80LogicGate* z_80LogicGate);
 	
 	//This is called by each state to update the user on what is going
 	//on on that T-State
-	void describeState( string name, int num, string description, Z_80LogicGate* z_80LogicGate );
+	void describeState(string name, int num, string description, Z_80LogicGate* z_80LogicGate);
 
 	//This is the state that the waveformFSM is set to by the
 	//constructor.  It starts everything off
-    void bootState( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+    void bootState(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
 	
 
 	//instruction fetch waveform TStates
@@ -172,43 +172,43 @@ private:
 	//(with exception of the first) but are
 	//called by using the nextTState function pointer
 	//That pointer is called by nextState()
-    void IFT1( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-    void IFT2( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-    void IFT3( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-    void IFT4( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+    void IFT1(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+    void IFT2(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+    void IFT3(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+    void IFT4(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     
     //memory read or write TStates
-    void MEMT1( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-    void MEMT2( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-    void MEMT3( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+    void MEMT1(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+    void MEMT2(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+    void MEMT3(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     //the MEM waveform doesn't realy have a state four.  However
     //it needs to dispatch some events during the next waveform's
     //first cycle. The 4thish state will recall nextTState
     //to keep the next wavefrom from getting behind
-    void MEMT4ish( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+    void MEMT4ish(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     
-	void IO1( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void IO2( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void IO3( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+	void IO1(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void IO2(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void IO3(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     
-	void INT1( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void INT2( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void INT3( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void INT4( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+	void INT1(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void INT2(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void INT3(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void INT4(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
 	
-	void NMI1( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void NMI2( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void NMI3( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void NMI4( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void NMI5( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+	void NMI1(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void NMI2(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void NMI3(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void NMI4(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void NMI5(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     
     //this is the waveform that we do when we are in a halt
     //this takes care of all 4 Tstates of one halt cycle
-    void HALT1_4( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+    void HALT1_4(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     
-    void RESET1( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void RESET2( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
-	void RESET3( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+    void RESET1(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void RESET2(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
+	void RESET3(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
     
 
 public:
@@ -216,7 +216,7 @@ public:
 	//the z_80LogicGate pointer is being passed in to the registers
 	//so that they can tell the Z_80LogicGate when their values change 
 	//so that it can tell the GUI
-	WaveformFSM( Z_80LogicGate* z_80LogicGate );
+	WaveformFSM(Z_80LogicGate* z_80LogicGate);
 
 	//This function is called by the InstructionManager
 	//to get the waveformFSM to fetch an opcode from
@@ -225,7 +225,7 @@ public:
 	//truncated.
 	//wavefromFSM will contact the InstructionManager
 	//when it is done fetching the opcode
-	void fetchOpcode( AddressType PC );
+	void fetchOpcode(AddressType PC);
 	
 	
 	//This function is called by the InstructionManager
@@ -241,7 +241,7 @@ public:
 	//truncated.
 	//wavefromFSM will contact the InstructionManager
 	//when it is done
-	void preformMemoryOperation( AddressType newAddress, bool newIsWrite, int newData = 0 );
+	void preformMemoryOperation(AddressType newAddress, bool newIsWrite, int newData = 0);
 	
 	
 	//Copied out "1982/83 Data Book" page 42
@@ -249,20 +249,20 @@ public:
 	//Input or Output Cycles.  Figure 7 shows the
 	//timing for and I/O read or I/O write operation.
 	//During I/O operations, the CPU automatically
-	//inserts a single Wait state (T_w).  This extra Wait
+	//inserts a single Wait state(T_w).  This extra Wait
 	//state allows sufficient time for an I/O port to
 	//decond the address from the port address lines.
 	
 	//This functino is how the InstructionManager can order
 	//an Input or Output Cycle
-	void preformIOInput( int portNum );
-	void preformIOOutput( int portNum, int value );
+	void preformIOInput(int portNum);
+	void preformIOOutput(int portNum, int value);
 	
 	//Copied out "1982/83 Data Book" page 43
 	//Interrupt Request/Acknowledge Cycle.  The
 	//CPU samples the interrupt signal with the ris-
 	//ing edge of the last clock cycle at the end of
-	//andy instruction (Figure 8).  When an interrupt
+	//andy instruction(Figure 8).  When an interrupt
 	//is accepted, a special /M1 cycle is generated.
 	//During this /M1 cycle, /IORQ becomes active
 	//(instead of /MREQ> to indicate that inter-
@@ -272,7 +272,7 @@ public:
 	
 	//This function is how the InstructionMachine can order
 	//an Interupt Request/Acknowledge Cycle
-	void preformINTRequestCycle( int pcValue );
+	void preformINTRequestCycle(int pcValue);
 	
 	//Copied out "1982/83 Data Book" page 43
 	//Non-Maskable Interrupt Request Cycle.
@@ -284,11 +284,11 @@ public:
 	//that data put on the bus by the memory is
 	//ignored.  The CPU instead executes a restart
 	//(RST) operation and jumps to the /NMI service
-	//routine located at address 00566H (Figure 9)
+	//routine located at address 00566H(Figure 9)
 	
 	//This function is how the InstructionMachine can order
 	//an Interupt Request/Acknowledge Cycle
-	void preformNMIRequestCycle( int pcValue );
+	void preformNMIRequestCycle(int pcValue);
 	
 	
 	//This instruction is called by the InstructionManager to preform a halt
@@ -298,7 +298,7 @@ public:
 	//the instructionManager knowns if an interupt has accured by
 	//quering the waveformFSM in the same way as it does at the end
 	//of every instruction.
-	void preformHalt( Z_80LogicGate* z_80LogicGate );
+	void preformHalt(Z_80LogicGate* z_80LogicGate);
 	
 	//This function is how the reset cycle is ordered.
 	//Because the when it is called does not depend
@@ -312,19 +312,19 @@ public:
 	//This function then forwards the call to the 
 	//private function that is responsible for handling 
 	//the current T state.  
-	void nextState( Z_80LogicGate* z_80LogicGate, bool isRisingEdge );
+	void nextState(Z_80LogicGate* z_80LogicGate, bool isRisingEdge);
 	
 	//this function returns the current value of a named
 	//register.  This function is called by Z_80LogicGate::getParameter
-	string getReg( string name );
+	string getReg(string name);
 	
 	//this method is so that the user can manipulate the values of the
 	//registers
-	void setReg( string regName, string newValue );
+	void setReg(string regName, string newValue);
 	
 	//this function is how the Z_80LogicGate sets the run-mode
 	//of both the waveformFSM and the InstructionManager
-	void setRunMode( int run_mode );
+	void setRunMode(int run_mode);
 	
 	//this function is how the Z_80LogicGate notifies the waveformFSM
 	//when it has received a NMI
@@ -333,14 +333,14 @@ public:
 	//this function is called when the the reset key in the popup
 	//is called or the WaveformFSM counts three clocks worths
 	//of the reset being held active
-	void notifyInstructionManagerOfReset( Z_80LogicGate* z_80LogicGate );
+	void notifyInstructionManagerOfReset(Z_80LogicGate* z_80LogicGate);
 	
 	
 	//this is how the z_80LogicGate tells the instruction manager
 	//what the zad mode is.  The ZAD mode represents how the 
 	//system responds when visiting addresses 'ocupied' by ZAD
 	//operating system functions.
-	void setZADMode( ZAD_MODE zadMode, Z_80LogicGate* z_80LogicGate );
+	void setZADMode(ZAD_MODE zadMode, Z_80LogicGate* z_80LogicGate);
 	
 	//this is how the z_80LogicGate tells the instruction manager
 	//what the zad mode is.  The ZAD mode represents how the 

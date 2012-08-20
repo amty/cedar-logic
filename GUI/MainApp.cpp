@@ -33,11 +33,11 @@ MainApp::MainApp()
 bool MainApp::OnInit()
 {
 #ifndef _PRODUCTION_
-    logfile.open( "guilog.log" );
+    logfile.open("guilog.log");
 #endif
 	loadSettings();
 	
-    wxFileSystem::AddHandler( new wxZipFSHandler );
+    wxFileSystem::AddHandler(new wxZipFSHandler);
 	helpController = new wxHelpController;
 	helpController->Initialize(std2wx(appSettings.helpFile));
 
@@ -54,14 +54,14 @@ bool MainApp::OnInit()
 	//
 	//wxString cmdFilename;
 	//wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv);
-	//if (cmdParser.GetParamCount() > 0) {
+	//if(cmdParser.GetParamCount() > 0) {
 	//	cmdFilename = cmdParser.GetParam(0);
 	//	wxFileName fName(cmdFilename);
 	//	fName.Normalize(wxPATH_NORM_LONG|wxPATH_NORM_DOTS|wxPATH_NORM_TILDE|wxPATH_NORM_ABSOLUTE);
 	//	cmdFilename = fName.GetFullPath();
     //}	
     string cmdFilename;
-	if( argc >= 2 ){
+	if(argc >= 2){
 		cmdFilename = wx2std(argv[1]);
 //		logfile << "cmdFilename = " << cmdFilename << endl;
 	}
@@ -72,7 +72,7 @@ bool MainApp::OnInit()
     // create the main application window
     MainFrame *frame = new MainFrame(std2wx("CEDAR Logic Simulator"),
 				     std2wx(cmdFilename));
-    // and show it (the frames, unlike simple controls, are not shown when
+    // and show it(the frames, unlike simple controls, are not shown when
     // created initially)
     frame->Show(true);
     
@@ -100,13 +100,13 @@ void MainApp::loadSettings() {
 	//is not were the exe is
 	int lastCharToInclude = -1;
 	wxChar* arg0 = wxGetApp().argv[0];
-	for( int i = 0; arg0[i] != (char)NULL; ++i ){
+	for(int i = 0; arg0[i] !=(char)NULL; ++i){
 		if(arg0[i] == '\\' || arg0[i] == '/'){
 			lastCharToInclude = i;
 		}
 	}
-	for( int i = 0; i <= lastCharToInclude; ++i ){
-		pathToExe += (char)arg0[i];
+	for(int i = 0; i <= lastCharToInclude; ++i){
+		pathToExe +=(char)arg0[i];
 	}
 	appSettings.init(pathToExe);
 	timeStepMod = appSettings.timePerStep; /* если меня не гючит, то в
@@ -120,8 +120,8 @@ void MainApp::loadSettings() {
 						* эту заметку. */
 		// check screen coords
 		wxScreenDC sdc;
-		if ( appSettings.mainFrameLeft + (signed int)(appSettings.mainFrameWidth) > (signed int)(sdc.GetSize().GetWidth()) ||
-			appSettings.mainFrameTop + (signed int)(appSettings.mainFrameHeight) > (signed int)(sdc.GetSize().GetHeight()) ) {
+		if(appSettings.mainFrameLeft +(signed int)(appSettings.mainFrameWidth) > (signed int)(sdc.GetSize().GetWidth()) ||
+			appSettings.mainFrameTop +(signed int)(appSettings.mainFrameHeight) >(signed int)(sdc.GetSize().GetHeight())) {
 		
 			appSettings.mainFrameWidth = appSettings.mainFrameHeight = 600;
 			appSettings.mainFrameLeft = appSettings.mainFrameTop = 20;	

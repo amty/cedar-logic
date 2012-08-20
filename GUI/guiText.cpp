@@ -25,17 +25,17 @@ DECLARE_APP(MainApp)
 static glfont::GLFont fontFace;
 
 guiText::guiText() {
-	// The text color (Default = black):
+	// The text color(Default = black):
 	color[0] = 0.2;
 	color[1] = 0.2;
 	color[2] = 0.2;
 	color[3] = 1.0;
 	
-	// X and Y scale factors (Default = none):
+	// X and Y scale factors(Default = none):
 	scale[0] = 1.0;
 	scale[1] = 1.0;
 	
-	// X and Y translation factors (Default = none):
+	// X and Y translation factors(Default = none):
 	translate[0] = 0.0;
 	translate[1] = 0.0;
 
@@ -50,19 +50,19 @@ guiText::~guiText() {
 // *************** Action methods *********************
 
 // Render using current settings on current canvas:
-void guiText::draw( void ) {
+void guiText::draw(void) {
 
 	// Store the old color to restore after we've drawn:
 	GLfloat oldColor[4];
-	glGetFloatv( GL_CURRENT_COLOR, oldColor );
-	glColor4f( color[0], color[1], color[2], color[3] );
+	glGetFloatv(GL_CURRENT_COLOR, oldColor);
+	glColor4f(color[0], color[1], color[2], color[3]);
 
 	// Isolate our matrix changes by adding to the current
 	// matrix and then reverting back to it afterward:
 	glPushMatrix();
 		
 		// Set the translation and scaling:
-		glTranslatef( translate[0], translate[1], 0.0 );
+		glTranslatef(translate[0], translate[1], 0.0);
 		glScalef(scale[0], scale[1], 1);
 
 		// Draw the text:
@@ -73,16 +73,16 @@ void guiText::draw( void ) {
 	glPopMatrix();
 
 	// Set the color back to the old color:
-	glColor4f( oldColor[0], oldColor[1], oldColor[2], oldColor[3] );
+	glColor4f(oldColor[0], oldColor[1], oldColor[2], oldColor[3]);
 	
 } // draw()
 
-// Return the bounding box of the text object (in local-space coordinates + scale and translation):
-GLbox guiText::getBoundingBox( void ) {
+// Return the bounding box of the text object(in local-space coordinates + scale and translation):
+GLbox guiText::getBoundingBox(void) {
 	GLbox tempBox;
 
 	std::pair<int, int> size;
-	fontFace.GetStringSize( textString, &size );
+	fontFace.GetStringSize(textString, &size);
 	tempBox.left = 0;
 	tempBox.right = size.first*scale[0];
 	tempBox.top = -size.second*0.1667*scale[1];
@@ -92,9 +92,9 @@ GLbox guiText::getBoundingBox( void ) {
 
 // *************** Mutator methods ****************************
 	
-// Set the scale factor by setting a text height and aspect ratio (w / h).
+// Set the scale factor by setting a text height and aspect ratio(w / h).
 // NOTE: You can't get these values back from this class, or any direct scale info.
-void guiText::setSize( GLdouble textHeight, GLdouble aspect ) {
+void guiText::setSize(GLdouble textHeight, GLdouble aspect) {
 	// Height:
 	scale[1] = textHeight * TEXT_SCALE_FACTOR;
 	

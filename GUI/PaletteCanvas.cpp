@@ -21,8 +21,8 @@ BEGIN_EVENT_TABLE(PaletteCanvas, wxScrolledWindow)
 END_EVENT_TABLE()
 
 
-PaletteCanvas::PaletteCanvas( wxWindow *parent, wxWindowID id, wxString &libName, const wxPoint &pos, const wxSize &size ) 
-	: wxScrolledWindow( parent, id, pos, size, wxSUNKEN_BORDER|wxVSCROLL|wxFULL_REPAINT_ON_RESIZE ) {
+PaletteCanvas::PaletteCanvas(wxWindow *parent, wxWindowID id, wxString &libName, const wxPoint &pos, const wxSize &size) 
+	: wxScrolledWindow(parent, id, pos, size, wxSUNKEN_BORDER|wxVSCROLL|wxFULL_REPAINT_ON_RESIZE) {
     SetBackgroundColour(* wxWHITE);
 
     SetCursor(wxCursor(wxCURSOR_ARROW));
@@ -36,33 +36,33 @@ PaletteCanvas::PaletteCanvas( wxWindow *parent, wxWindowID id, wxString &libName
 }
 
 PaletteCanvas::~PaletteCanvas() {
-	for (unsigned int i = 0; i < gates.size(); i++) delete gates[i];
+	for(unsigned int i = 0; i < gates.size(); i++) delete gates[i];
 }
 
-void PaletteCanvas::OnPaint( wxPaintEvent &event ) {
+void PaletteCanvas::OnPaint(wxPaintEvent &event) {
 	wxPaintDC dc(this);
-	if (!init) {
+	if(!init) {
 	   	map < string, LibraryGate >::iterator gateWalk = wxGetApp().libraries[libraryName].begin();
 		int counter = 0;
 		wxBoxSizer* lineSizer = NULL;
-		gateSizer = new wxBoxSizer( wxVERTICAL );
-		while (gateWalk != wxGetApp().libraries[libraryName].end()) {
-			if (!(counter%3)) {
-				lineSizer = new wxBoxSizer( wxHORIZONTAL );
-				gateSizer->Add( lineSizer, wxSizerFlags(0).Border(wxALL, 1) );			
+		gateSizer = new wxBoxSizer(wxVERTICAL);
+		while(gateWalk != wxGetApp().libraries[libraryName].end()) {
+			if(!(counter%3)) {
+				lineSizer = new wxBoxSizer(wxHORIZONTAL);
+				gateSizer->Add(lineSizer, wxSizerFlags(0).Border(wxALL, 1));			
 			}	
 			gateImage* newGate = new gateImage((gateWalk->first), this, wxID_ANY, wxDefaultPosition, wxSize(IMAGESIZE, IMAGESIZE));
 			gates.push_back(newGate);
-			lineSizer->Add( newGate, wxSizerFlags(0).Border(wxALL, 1) );
+			lineSizer->Add(newGate, wxSizerFlags(0).Border(wxALL, 1));
 			counter++;
 			gateWalk++;
 		}
-		this->SetSizer( gateSizer );
+		this->SetSizer(gateSizer);
 		this->SetScrollRate(0, IMAGESIZE + 1);
 		gateSizer->Layout();
 		init = true;
 	}
-	if (activate) {
+	if(activate) {
 		this->FitInside();
 		this->Scroll(0,0); // reset position because the sizer is dumb
 		gateSizer->Layout();

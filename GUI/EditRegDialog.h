@@ -27,14 +27,14 @@ class GUICircuit;
 class EditRegDialog : public wxDialog{
 public:
  	/** Constructor. Creates a new EditRegDialog */
-	EditRegDialog( Z80PopupDialog* newZ80Popup, guiGateZ80* newM_z80GuiGate, GUICircuit* newGUICircuit, string params[] );
+	EditRegDialog(Z80PopupDialog* newZ80Popup, guiGateZ80* newM_z80GuiGate, GUICircuit* newGUICircuit, string params[]);
 
 
-	void OnBtnCancel( wxCommandEvent& event );
-	void OnBtnClear( wxCommandEvent& event );
-	void OnBtnSave( wxCommandEvent& event );
+	void OnBtnCancel(wxCommandEvent& event);
+	void OnBtnClear(wxCommandEvent& event);
+	void OnBtnSave(wxCommandEvent& event);
 	
-	void ChangeRegValue( wxTextCtrl* currCtrl, string RegName, string RegVal, unsigned int RegSize );
+	void ChangeRegValue(wxTextCtrl* currCtrl, string RegName, string RegVal, unsigned int RegSize);
 
 protected:
 	DECLARE_EVENT_TABLE()

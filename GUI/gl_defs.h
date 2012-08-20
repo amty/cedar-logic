@@ -12,7 +12,7 @@
 #endif
 
 struct GLPoint2f {
-	GLPoint2f( GLfloat newX = 0.0, GLfloat newY = 0.0 ) : x(newX), y(newY) {};
+	GLPoint2f(GLfloat newX = 0.0, GLfloat newY = 0.0) : x(newX), y(newY) {};
 	GLfloat x, y;
 };
 

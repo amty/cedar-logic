@@ -50,7 +50,7 @@ public:
 		myCreationTime = globalCreationTime++;
 	};
 
-	unsigned long long getCreationTime( void ) const {
+	unsigned long long getCreationTime(void) const {
 		return myCreationTime;
 	};
 

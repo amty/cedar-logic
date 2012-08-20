@@ -13,7 +13,7 @@
 bool CircuitPrint::OnPrintPage(int page)
 {
     wxDC *dc = GetDC();
-    if (dc)
+    if(dc)
     {
 		DrawPageOne(dc);
 
@@ -28,7 +28,7 @@ bool CircuitPrint::OnPrintPage(int page)
 
 bool CircuitPrint::OnBeginDocument(int startPage, int endPage)
 {
-    if (!wxPrintout::OnBeginDocument(startPage, endPage))
+    if(!wxPrintout::OnBeginDocument(startPage, endPage))
         return false;
 
     return true;
@@ -44,7 +44,7 @@ void CircuitPrint::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int
 
 bool CircuitPrint::HasPage(int pageNum)
 {
-    return (pageNum == 1);
+    return(pageNum == 1);
 }
 
 void CircuitPrint::DrawPageOne(wxDC *dc)
@@ -66,24 +66,24 @@ void CircuitPrint::DrawPageOne(wxDC *dc)
     
     float marginX = 150;
     float marginY = 150;
-    int maxW = (int)(w - 2 * marginX);
-    int maxH = (int)(h - 2 * marginY);
+    int maxW =(int)(w - 2 * marginX);
+    int maxH =(int)(h - 2 * marginY);
 	
 	int cw, ch;
-	sourceCanvas->GetClientSize( &cw, &ch );
+	sourceCanvas->GetClientSize(&cw, &ch);
 	
-	float aspect = (float) ch / (float) cw;
+	float aspect =(float) ch / (float) cw;
 
 	float imageWidth = 0;
 	float imageHeight = 0;
 	
-	if( aspect * maxW <= maxH ) {
+	if(aspect * maxW <= maxH) {
 		// If we can fit the maximum width image in the given height,
 		// then do it, otherwise take the maximum height.
 		imageWidth = maxW;
 		imageHeight = aspect * maxW;
 	} else {
-		imageWidth = (float) maxH / aspect;
+		imageWidth =(float) maxH / aspect;
 		imageHeight = maxH;
 	}
 
@@ -96,19 +96,19 @@ void CircuitPrint::DrawPageOne(wxDC *dc)
     float actualScale = wxMin(scaleX,scaleY);
 
     // Calculate the position on the DC for centring the graphic
-    float posX = (float)((w - (200*actualScale))/2.0);
-    float posY = (float)((h - (200*actualScale))/2.0);
+    float posX =(float)((w - (200*actualScale))/2.0);
+    float posY =(float)((h - (200*actualScale))/2.0);
 
     // Set the scale and origin
     dc->SetUserScale(actualScale, actualScale);
-    dc->SetDeviceOrigin( (long)posX, (long)posY );
+    dc->SetDeviceOrigin((long)posX, (long)posY);
 */
 
-	wxImage viewShot = sourceCanvas->renderToImage((int)imageWidth, (int)imageHeight, 32);
+	wxImage viewShot = sourceCanvas->renderToImage((int)imageWidth,(int)imageHeight, 32);
 	wxBitmap printBmp(viewShot);
 
-	float posX = ((float) w / 2.0) - imageWidth / 2.0;
-	float posY = ((float) h / 2.0) - imageHeight / 2.0;
+	float posX =((float) w / 2.0) - imageWidth / 2.0;
+	float posY =((float) h / 2.0) - imageHeight / 2.0;
 
-	dc->DrawBitmap( printBmp, (int)posX, (int)posY );
+	dc->DrawBitmap(printBmp,(int)posX, (int)posY);
 }

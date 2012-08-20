@@ -34,8 +34,8 @@ public:
 	XMLTokenType tokenType;
 	string data;
 	// constructor:
-	Token( XMLTokenType a, string& strData ) : tokenType(a), data(strData) {};
-	Token( const Token& x ) { tokenType = x.tokenType; data = x.data; };
+	Token(XMLTokenType a, string& strData) : tokenType(a), data(strData) {};
+	Token(const Token& x) { tokenType = x.tokenType; data = x.data; };
 	Token() {};
 };
 
@@ -71,15 +71,15 @@ public:
 	void printAllLines(ostream&);
 	
 private:
-	// Returns nextToken and advances the token (in that order).
+	// Returns nextToken and advances the token(in that order).
 	Token getNextToken();
-	// Runs the FSM to get the next token in the file (EOF if end).
+	// Runs the FSM to get the next token in the file(EOF if end).
 	Token scanNextToken();
 	// Look at the next char of the file without munching it.
-	//	Returns (char)-1 if EOF.
+	//	Returns(char)-1 if EOF.
 	char peekNextChar();
 	// Munch the next char of the file.
-	//	Returns (char)-1 if EOF.
+	//	Returns(char)-1 if EOF.
 	char getNextChar();
 	
 	// Keep track of position in file

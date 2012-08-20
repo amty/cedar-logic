@@ -30,11 +30,11 @@ END_EVENT_TABLE()
 
 OscopeCanvas::OscopeCanvas(wxWindow *parent, GUICircuit* gCircuit, wxWindowID id,
     const wxPoint& pos, const wxSize& size, long style, const wxString& name)
-	: wxGLCanvas( parent, id, pos, size, style|wxFULL_REPAINT_ON_RESIZE|wxSUNKEN_BORDER ) {
+	: wxGLCanvas(parent, id, pos, size, style|wxFULL_REPAINT_ON_RESIZE|wxSUNKEN_BORDER) {
 
 	this->gCircuit = gCircuit;
 	m_init = false;
-	parentFrame = (OscopeFrame*) parent;
+	parentFrame =(OscopeFrame*) parent;
 }
 
 OscopeCanvas::~OscopeCanvas(){ 
@@ -53,125 +53,125 @@ void OscopeCanvas::OnRender(){
 	glClear(GL_COLOR_BUFFER_BIT); 
 
 	// Set the projection matrix:	
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 
 	wxSize sz = GetClientSize();
-	// gluOrtho2D(left, right, bottom, top); (In world-space coords.)
+	// gluOrtho2D(left, right, bottom, top);(In world-space coords.)
 	
 	
 	gluOrtho2D(0, OSCOPE_HORIZONTAL, numberOfWires * 1.5, -0.25);
-	glViewport(0, 0, (GLint) sz.GetWidth(), (GLint) sz.GetHeight());
+	glViewport(0, 0,(GLint) sz.GetWidth(), (GLint) sz.GetHeight());
 
 	// Set the model matrix:
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 	
-	glColor4f( 0.0, 0.0, 0.0, 1.0 );
+	glColor4f(0.0, 0.0, 0.0, 1.0);
 	float intensity = GRID_INTENSITY;
-	glColor4f( 0.0, 0.0, intensity, intensity );
+	glColor4f(0.0, 0.0, intensity, intensity);
 
 	
 	//Drawing Vertical Lines
 	glBegin(GL_LINES);
-		glVertex2f( OSCOPE_HORIZONTAL/10, -0.5 );
-		glVertex2f( OSCOPE_HORIZONTAL/10, numberOfWires * 1.5 );
+		glVertex2f(OSCOPE_HORIZONTAL/10, -0.5);
+		glVertex2f(OSCOPE_HORIZONTAL/10, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*2, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*2, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*2, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*2, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*3, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*3, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*3, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*3, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*4, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*4, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*4, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*4, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*5, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*5, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*5, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*5, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*6, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*6, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*6, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*6, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*7, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*7, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*7, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*7, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*8, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*8, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*8, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*8, numberOfWires * 1.5);
 		
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*9, -0.5 );
-		glVertex2f( (OSCOPE_HORIZONTAL/10)*9, numberOfWires * 1.5 );
+		glVertex2f((OSCOPE_HORIZONTAL/10)*9, -0.5);
+		glVertex2f((OSCOPE_HORIZONTAL/10)*9, numberOfWires * 1.5);
 		
-		glVertex2f( 0, -0.5 );
-		glVertex2f( 0, numberOfWires * 1.5 );
+		glVertex2f(0, -0.5);
+		glVertex2f(0, numberOfWires * 1.5);
 	glEnd();
 
-	for (unsigned int i = 0; i < numberOfWires; i++) {
-		if (parentFrame->getFeedName(i) == NONE_STR) //<-Josh Edit using access method
+	for(unsigned int i = 0; i < numberOfWires; i++) {
+		if(parentFrame->getFeedName(i) == NONE_STR) //<-Josh Edit using access method
 			wireNum++; continue;
 
 		map< string, deque< StateType > >::iterator thisWire =
 			stateValues.find(parentFrame->getFeedName(i));  //<-Josh Edit using access method
-		if (thisWire == stateValues.end()) { wireNum++; continue; }
-		deque< StateType >::reverse_iterator wireVal = (thisWire->second).rbegin();
+		if(thisWire == stateValues.end()) { wireNum++; continue; }
+		deque< StateType >::reverse_iterator wireVal =(thisWire->second).rbegin();
 		GLdouble horizLoc = OSCOPE_HORIZONTAL;
 		GLdouble y = 0.0, lastY = 0.0;
 		StateType theState;
 		
 		float intensity = GRID_INTENSITY;
-		glColor4f( 0.0, 0.0, intensity, intensity );
+		glColor4f(0.0, 0.0, intensity, intensity);
 
 		//Draws Horizontal for wire
 		glBegin(GL_LINES);
-			glVertex2f( 0, (wireNum * 1.5) + 1);
-			glVertex2f( OSCOPE_HORIZONTAL, (wireNum * 1.5) + 1);
+			glVertex2f(0,(wireNum * 1.5) + 1);
+			glVertex2f(OSCOPE_HORIZONTAL,(wireNum * 1.5) + 1);
 		glEnd();
 	
 		bool firstTime = true;
 		bool solid = false;
 	
-		while(wireVal != ((thisWire->second).rend())) {
+		while(wireVal !=((thisWire->second).rend())) {
 			theState = *wireVal;
 	
 			solid = false;
-			switch( theState ) {
+			switch(theState) {
 			case ZERO:
-				glColor4f( 0.0, 0.0, 0.0, 1.0 );
+				glColor4f(0.0, 0.0, 0.0, 1.0);
 				y = 1.0 + wireNum * 1.5;
 				break;
 			case ONE:
-				glColor4f( 1.0, 0.0, 0.0, 1.0 );
+				glColor4f(1.0, 0.0, 0.0, 1.0);
 				y = 0.0 + wireNum * 1.5;
 				break;
 			case HI_Z:
-				glColor4f( 0.0, 0.78, 0.0, 1.0 );
+				glColor4f(0.0, 0.78, 0.0, 1.0);
 				y = 0.5 + wireNum * 1.5;
 				break;
 			case UNKNOWN:
-				glColor4f( 0.3, 0.3, 1.0, 1.0 );
+				glColor4f(0.3, 0.3, 1.0, 1.0);
 				y = 0.75 + wireNum * 1.5;
 				solid = true;
 				break;
 			case CONFLICT:
-				glColor4f( 0.0, 1.0, 1.0, 1.0 );
+				glColor4f(0.0, 1.0, 1.0, 1.0);
 				y = 0.75 + wireNum * 1.5;
 				solid = true;
 				break;
 			}
 			
-			if( solid ) {
-				glRectd( horizLoc, y, horizLoc - 1.0, 0 + wireNum * 1.5) ;
+			if(solid) {
+				glRectd(horizLoc, y, horizLoc - 1.0, 0 + wireNum * 1.5) ;
 			} else {
 				glBegin(GL_LINES);
-				if(!firstTime && (lastY != y) ) {
+				if(!firstTime &&(lastY != y)) {
 					// Rise:
-					glVertex2f( horizLoc, lastY );
-					glVertex2f( horizLoc, y );
+					glVertex2f(horizLoc, lastY);
+					glVertex2f(horizLoc, y);
 				}
 				firstTime = false;
 	
 				// Run:
-				glVertex2f( horizLoc, y );
-				glVertex2f( horizLoc - 1.0, y );
+				glVertex2f(horizLoc, y);
+				glVertex2f(horizLoc - 1.0, y);
 				glEnd();
 			}
 			
@@ -187,23 +187,23 @@ void OscopeCanvas::OnRender(){
 void OscopeCanvas::OnPaint(wxPaintEvent& event){ 
 	wxPaintDC dc(this);
 #ifndef __WXMOTIF__
-	if (!GetContext()) return;
+	if(!GetContext()) return;
 #endif
 
 	SetCurrent();
 	// Init OpenGL once, but after SetCurrent
-	if (!m_init)
+	if(!m_init)
 	{
 		//InitGL();
 		m_init = true;
-		glClearColor (1.0, 1.0, 1.0, 0.0);
+		glClearColor(1.0, 1.0, 1.0, 0.0);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_BLEND);
 		
 		//*********************************
 		//Edit by Joshua Lansford 4/09/07
 		//anti-alis ing is nice
-		glEnable( GL_LINE_SMOOTH );
+		glEnable(GL_LINE_SMOOTH);
 		//End of edit
 
 	}
@@ -220,9 +220,9 @@ void OscopeCanvas::OnSize(wxSizeEvent& event)
     // this is also necessary to update the context on some platforms
     wxGLCanvas::OnSize(event);
 
-    // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
+    // set GL viewport(not called by wxGLCanvas::OnSize on all platforms...)
 #ifndef __WXMOTIF__
-    if (GetContext())
+    if(GetContext())
 #endif
     {
         Refresh();
@@ -242,11 +242,11 @@ void OscopeCanvas::UpdateData(void){
 	
 	set< string > liveTOs;
 	vector < guiGate* > toGates;
-	if (parentFrame->numberOfFeeds() > 1) {
+	if(parentFrame->numberOfFeeds() > 1) {
 		// Set up a list of TO gates so I only search the whole gate list once.
 		theGate = gateList->begin();
-		while (theGate != gateList->end()) {
-			if ((theGate->second)->getGUIType() == "TO") toGates.push_back(theGate->second);
+		while(theGate != gateList->end()) {
+			if((theGate->second)->getGUIType() == "TO") toGates.push_back(theGate->second);
 			theGate++;
 		}
 	}
@@ -254,9 +254,9 @@ void OscopeCanvas::UpdateData(void){
 	//Check to see if wire has already been added to OSCOPE
 	map< string, bool > hasBeenAdded; 
 	
-	for (unsigned int i = 0; i < parentFrame->numberOfFeeds()-1; i++) {
+	for(unsigned int i = 0; i < parentFrame->numberOfFeeds()-1; i++) {
 		string junctionName = parentFrame->getFeedName(i);
-		if (junctionName == NONE_STR || junctionName == RMOVE_STR || junctionName == "")
+		if(junctionName == NONE_STR || junctionName == RMOVE_STR || junctionName == "")
 			continue;	
 		if(hasBeenAdded.find(junctionName) == hasBeenAdded.end()) {
 			hasBeenAdded[junctionName] = true;
@@ -266,28 +266,28 @@ void OscopeCanvas::UpdateData(void){
 			liveTOs.insert(junctionName);
 
 			// Create a new storage space for its data if we need it:
-			if( stateValues.find(junctionName) == stateValues.end() ) {
+			if(stateValues.find(junctionName) == stateValues.end()) {
 				stateValues[junctionName] = temp;
 			}
 			
 			// Get the first input in the TO's library description:
-			// (It only has one input, and that's its only connection.)
+			//(It only has one input, and that's its only connection.)
 			// Return the map of hotspot names to their coordinates:
 /*			theGate = gateList->begin();
-			while (theGate != gateList->end()) {
-				if ((theGate->second)->getGUIType() == "TO" && (theGate->second)->getLogicParam("JUNCTION_ID") == junctionName) break;
+			while(theGate != gateList->end()) {
+				if((theGate->second)->getGUIType() == "TO" && (theGate->second)->getLogicParam("JUNCTION_ID") == junctionName) break;
 				theGate++;
 			} */
 			// Search through our prebuilt TO gate list for this gate.
 			//	From UpdateMenu, the gate should exist.
 			guiGate* currentGate = NULL;
-			for (unsigned int j = 0; j < toGates.size(); j++) {
-				if (toGates[j]->getLogicParam("JUNCTION_ID") == junctionName) {
+			for(unsigned int j = 0; j < toGates.size(); j++) {
+				if(toGates[j]->getLogicParam("JUNCTION_ID") == junctionName) {
 					currentGate = toGates[j];
 					break;
 				}
 			}
-			if (currentGate == NULL) { // Just in case of error
+			if(currentGate == NULL) { // Just in case of error
 				stateValues.erase(junctionName);
 				parentFrame->cancelFeed(i);
 				//parentFrame->comboBoxVector[i]->SetValue(wxT("[None]"));
@@ -295,12 +295,12 @@ void OscopeCanvas::UpdateData(void){
 			}
 			
 			map<string, GLPoint2f> hsList = currentGate->getHotspotList();
-			if( hsList.size() != 0 ) {
-				string firstInput = (hsList.begin())->first;
+			if(hsList.size() != 0) {
+				string firstInput =(hsList.begin())->first;
 
 				// Get the wire connected to the TO's input:
-				if( currentGate->isConnected(firstInput) ) {
-					guiWire* myWire = currentGate->getConnection( firstInput );
+				if(currentGate->isConnected(firstInput)) {
+					guiWire* myWire = currentGate->getConnection(firstInput);
 					
 					// Push the current state onto this TO's data queue:
 					stateValues[junctionName].push_back(myWire->getState()); 
@@ -314,14 +314,14 @@ void OscopeCanvas::UpdateData(void){
 			// end of the queue to make it the right size:
 			if(stateValues[junctionName].size() > OSCOPE_HORIZONTAL) stateValues[junctionName].pop_front();
 		}
-	} // for ( not end of list )
+	} // for(not end of list)
 	
 	
 	// Clear out data queues for TOs that don't exist anymore:
 	map< string, deque< StateType > >::iterator checkData = stateValues.begin();
-	while( checkData != stateValues.end() ) {
-		if( liveTOs.find( checkData->first ) == liveTOs.end() ) {
-			stateValues.erase( checkData );
+	while(checkData != stateValues.end()) {
+		if(liveTOs.find( checkData->first) == liveTOs.end() ) {
+			stateValues.erase(checkData);
 			checkData = stateValues.begin();
 		}
 		else {
@@ -361,27 +361,27 @@ void OscopeCanvas::UpdateMenu()
 	map< string, bool > alreadyAdded;
 	
 	//iterate over all gates
-	for( hash_map< unsigned long, guiGate* >::iterator 
+	for(hash_map< unsigned long, guiGate* >::iterator 
 	       gateIterator = gateList->begin(); 
 	       gateIterator != gateList->end(); 
-	       gateIterator++ ){
+	       gateIterator++){
 	   guiGate* aGate = gateIterator->second;
 	   //select out the gates which are TOs
-	   if( aGate->getGUIType() == "TO" ){
+	   if(aGate->getGUIType() == "TO"){
 	   		string feedName;        
 	   		feedName = aGate->getLogicParam("JUNCTION_ID");
 	   		
 	   		//check if it has already been added
-	   		if( alreadyAdded.find( feedName ) == alreadyAdded.end() ){
+	   		if(alreadyAdded.find( feedName) == alreadyAdded.end() ){
 	   			
 	   			//add name to list
-	   			namesOfPossableFeeds.push_back( feedName );
+	   			namesOfPossableFeeds.push_back(feedName);
 	   			alreadyAdded[ feedName ] = true;
 	   		}
 	   }
 	}
 	
-	parentFrame->updatePossableFeeds( &namesOfPossableFeeds );
+	parentFrame->updatePossableFeeds(&namesOfPossableFeeds);
 	
 	/*
 	
@@ -390,13 +390,13 @@ void OscopeCanvas::UpdateMenu()
 	hash_map< unsigned long, guiGate* >::iterator theGate = gateList->begin();
 	
 	//Sets size
-	//unsigned int size = (parentFrame->comboBoxVector).size();
+	//unsigned int size =(parentFrame->comboBoxVector).size();
 	unsigned int size = parentFrame->numberOfFeeds();
 	
 	for(unsigned int x = 0; x < size; x++)
 	{
-		//wxString oldVal = (parentFrame->comboBoxVector[x])->GetValue();
-		string oldVal = parentFrame->getFeedName( x );
+		//wxString oldVal =(parentFrame->comboBoxVector[x])->GetValue();
+		string oldVal = parentFrame->getFeedName(x);
 		//Update Combo Box Data
 		(parentFrame->comboBoxVector[x])->Clear();
 	
@@ -406,13 +406,13 @@ void OscopeCanvas::UpdateMenu()
 		theGate = gateList->begin();
 
 		//Adds names to dialog box
-		while (theGate != gateList->end())
+		while(theGate != gateList->end())
 		{	
 			//Tests Gate ID
-			if((theGate->second)->getGUIType() == "TO" )
+			if((theGate->second)->getGUIType() == "TO")
 			{
 				//Gets gate ID
-				string junctionName = (theGate->second)->getLogicParam("JUNCTION_ID");
+				string junctionName =(theGate->second)->getLogicParam("JUNCTION_ID");
 			
 				(parentFrame->comboBoxVector[x])->Append(std2wx(junctionName.c_str()));
 			}
@@ -429,17 +429,17 @@ void OscopeCanvas::UpdateMenu()
 		//our old value  is still valid.  Therefore
 		//we must search manually
 		
-		//if ((parentFrame->comboBoxVector[x])->FindString(oldVal) != -1 ) {
+		//if((parentFrame->comboBoxVector[x])->FindString(oldVal) != -1) {
 		
 		bool foundIt = false;
-		for( int search = 0; 
-		     search < (parentFrame->comboBoxVector[x])->GetCount() && !foundIt;
-		     ++search ){
-			if( oldVal == (parentFrame->comboBoxVector[x])->GetString( search ) ){
+		for(int search = 0; 
+		     search <(parentFrame->comboBoxVector[x])->GetCount() && !foundIt;
+		     ++search){
+			if(oldVal ==(parentFrame->comboBoxVector[x])->GetString( search) ){
 				foundIt = true;
 			}
 		}
-		if( foundIt ){
+		if(foundIt){
 		//End of Edit************************************************
 		
 		
@@ -460,7 +460,7 @@ wxImage OscopeCanvas::generateImage()
 	
 	WITH_wxImage(ret) {
 		// Set the bitmap clear color:
-		glClearColor (1.0, 1.0, 1.0, 0.0);
+		glClearColor(1.0, 1.0, 1.0, 0.0);
 		glColor3b(0, 0, 0);
 		
 		//TODO: Check if alpha is hardware supported, and
@@ -471,7 +471,7 @@ wxImage OscopeCanvas::generateImage()
 		//*********************************
 		//Edit by Joshua Lansford 4/09/07
 		//anti-alis ing is nice
-		glEnable( GL_LINE_SMOOTH );
+		glEnable(GL_LINE_SMOOTH);
 		//End of edit
 		
 		// Do the rendering here.

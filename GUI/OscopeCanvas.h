@@ -34,10 +34,10 @@ class OscopeFrame;
 class OscopeCanvas: public wxGLCanvas
 {
 public:
-    OscopeCanvas( wxWindow *parent, GUICircuit* gCircuit, wxWindowID id = wxID_ANY,
+    OscopeCanvas(wxWindow *parent, GUICircuit* gCircuit, wxWindowID id = wxID_ANY,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
-        long style = 0, const wxString& name = _T("OscopeCanvas") );
+        long style = 0, const wxString& name = _T("OscopeCanvas"));
 
     ~OscopeCanvas();
 
@@ -52,7 +52,7 @@ public:
     void OnRender();
     wxImage generateImage();
     
-    void clearData( void ) {
+    void clearData(void) {
     	stateValues.clear();
     };
 

@@ -1,7 +1,7 @@
 #include "algebra.h"
 #include <string.h>
 #include <math.h>
-#define I(row,col) ((row) + 4 * (col))
+#define I(row,col)((row) + 4 * (col))
 
 void multm(GLdouble dst[16], const GLdouble src[16])
 {

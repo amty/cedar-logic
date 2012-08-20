@@ -26,10 +26,10 @@ public:
     paramDialog(const wxString& title, void* gCircuit, guiGate* gGate, wxCommandProcessor* wxcmd);
 	~paramDialog();
 	
-	void OnOK( wxCommandEvent &evt );
-	void OnLoad( wxCommandEvent &evt );
-	void OnSave( wxCommandEvent &evt );
-	void OnTextEntry( wxCommandEvent &evt) { validateData(); };
+	void OnOK(wxCommandEvent &evt);
+	void OnLoad(wxCommandEvent &evt);
+	void OnSave(wxCommandEvent &evt);
+	void OnTextEntry(wxCommandEvent &evt) { validateData(); };
 	
 private:
 	GUICircuit* gCircuit;

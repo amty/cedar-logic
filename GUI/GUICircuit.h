@@ -66,13 +66,15 @@ public:
 	// Delete components and sync the core
 	void deleteWire(unsigned long wid);
 	void deleteGate(unsigned long gid, bool waitToUpdate = false);
-	
+
+	typedef hash_map<unsigned long, guiGate*> gate_map;
+	typedef hash_map<unsigned long, guiWire*> wire_map;
 	// Maps of gates and wires to their IDs
-	hash_map< unsigned long, guiGate* >* getGates() { return &gateList; };
-	hash_map< unsigned long, guiWire* >* getWires() { return &wireList; };
+	gate_map* getGates() { return &gateList; };
+	wire_map* getWires() { return &wireList; };
 	
-	unsigned long getNextAvailableGateID() { nextGateID++; while (gateList.find(nextGateID) != gateList.end()) nextGateID++; return nextGateID; };
-	unsigned long getNextAvailableWireID() { nextWireID++; while (wireList.find(nextWireID) != wireList.end()) nextWireID++; return nextWireID; };
+	unsigned long getNextAvailableGateID() { nextGateID++; while(gateList.find(nextGateID) != gateList.end()) nextGateID++; return nextGateID; };
+	unsigned long getNextAvailableWireID() { nextWireID++; while(wireList.find(nextWireID) != wireList.end()) nextWireID++; return nextWireID; };
 
 	void sendMessageToCore(klsMessage::Message message);
 	void parseMessage(klsMessage::Message message);
@@ -94,8 +96,8 @@ public:
 	int lastTime;
 	
 private:
-	hash_map< unsigned long, guiGate* > gateList;
-	hash_map< unsigned long, guiWire* > wireList;
+	gate_map gateList;
+	wire_map wireList;
 
 	unsigned long nextGateID;
 	unsigned long nextWireID;

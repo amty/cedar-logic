@@ -13,19 +13,19 @@
 #include "guiGate.h"
 #include "GUICircuit.h"
 #include "str-convs.h"
-//#define LIST_ID (wxID_HIGHEST + 1)
+//#define LIST_ID(wxID_HIGHEST + 1)
 #define ID_CHECKBOX (wxID_HIGHEST + 1)
 #define ID_MEMCONTENTS (wxID_HIGHEST + 2)
-//#define ID_EDIT (wxID_HIGHEST + 4)
+//#define ID_EDIT(wxID_HIGHEST + 4)
 
 
 using namespace std;
 
 DECLARE_APP(MainApp)
 
-RamPopupDialog::RamPopupDialog( guiGateRAM* newM_guiGateRAM, 
-        unsigned long bitsInAddress, GUICircuit* newGUICircuit )
-	: wxDialog( wxGetApp().GetTopWindow(), -1, RAM_TITLE, 
+RamPopupDialog::RamPopupDialog(guiGateRAM* newM_guiGateRAM, 
+        unsigned long bitsInAddress, GUICircuit* newGUICircuit)
+	: wxDialog(wxGetApp().GetTopWindow(), -1, RAM_TITLE, 
 	    wxPoint(RAM_X_POS, RAM_Y_POS), 
 	    wxSize(RAM_WIDTH, RAM_HEIGHT),
 	    wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
@@ -43,8 +43,8 @@ RamPopupDialog::RamPopupDialog( guiGateRAM* newM_guiGateRAM,
 	int dataSize = bitsInData / 4; //convert to nibbles
 	int addressSize = bitsInAddress / 4;
 
-	wxBoxSizer* topSizer = new wxBoxSizer( wxVERTICAL );
-	wxBoxSizer* buttonSizer = new wxBoxSizer( wxHORIZONTAL );
+	wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 	
 	closeBtn = new wxButton(this, wxID_CLOSE);
 	loadBtn = new wxButton(this, wxID_OPEN);
@@ -56,56 +56,56 @@ RamPopupDialog::RamPopupDialog( guiGateRAM* newM_guiGateRAM,
 	memContents = new wxGrid(this, ID_MEMCONTENTS);
 	memContents->SetTable(gridTable , true);
 		
-	topSizer->Add( hexOrDecCB, wxSizerFlags(0).Align(0).Border(wxALL, 5 ));
+	topSizer->Add(hexOrDecCB, wxSizerFlags(0).Align(0).Border(wxALL, 5));
 	
-	topSizer->Add( memContents, wxSizerFlags(1).Align(0).Expand().Border(wxALL, 5 ));
+	topSizer->Add(memContents, wxSizerFlags(1).Align(0).Expand().Border(wxALL, 5));
 	
-	buttonSizer->Add( loadBtn, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxALL, 5 ));
-	buttonSizer->Add( saveBtn, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxALL, 5 ));
-	buttonSizer->Add( closeBtn,wxSizerFlags(0).Align(wxALIGN_RIGHT).Border(wxALL, 5 ));
+	buttonSizer->Add(loadBtn, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxALL, 5));
+	buttonSizer->Add(saveBtn, wxSizerFlags(0).Align(wxALIGN_LEFT).Border(wxALL, 5));
+	buttonSizer->Add(closeBtn,wxSizerFlags(0).Align(wxALIGN_RIGHT).Border(wxALL, 5));
 	
-	topSizer->Add( buttonSizer,wxSizerFlags(0).Align(0).Border(wxALL, 5 ));
+	topSizer->Add(buttonSizer,wxSizerFlags(0).Align(0).Border(wxALL, 5));
 	
-	SetSizer( topSizer );
-	topSizer->SetSizeHints( this );
+	SetSizer(topSizer);
+	topSizer->SetSizeHints(this);
 
 	notifyAllChanged();
 	memContents->AutoSizeColumns(true);
 }
 
-void RamPopupDialog::OnBtnClose( wxCommandEvent& event ){
+void RamPopupDialog::OnBtnClose(wxCommandEvent& event){
 	Close(false);
 }
-void RamPopupDialog::OnBtnLoad( wxCommandEvent& event ){
+void RamPopupDialog::OnBtnLoad(wxCommandEvent& event){
 	
 	wxString caption = wxT("Open a memory file");
-	wxString wildcard = wxT("CEDAR Memory files (*.cdm)|*.cdm|INTEL-HEX (*.hex)|*.hex");
+	wxString wildcard = wxT("CEDAR Memory files(*.cdm)|*.cdm|INTEL-HEX (*.hex)|*.hex");
 	wxString defaultFilename = wxT("");
 	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	
-	if (dialog.ShowModal() == wxID_OK) {
+	if(dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
 		string mempath = wx2std(path);
 		gUICircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(m_guiGateRAM->getID(), "READ_FILE", mempath)));
 		gUICircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_UPDATE_GATES)); //make sure we get an update of the new file
 	}
 }
-void RamPopupDialog::OnBtnSave( wxCommandEvent& event ){
+void RamPopupDialog::OnBtnSave(wxCommandEvent& event){
 
 	
 	wxString caption = wxT("Save a memory file");
-	wxString wildcard = wxT("CEDAR Memory files (*.cdm)|*.cdm");
+	wxString wildcard = wxT("CEDAR Memory files(*.cdm)|*.cdm");
 	wxString defaultFilename = wxT("");
 	wxFileDialog dialog(this, caption, wxEmptyString, defaultFilename, wildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 	
-	if (dialog.ShowModal() == wxID_OK) {
+	if(dialog.ShowModal() == wxID_OK) {
 		wxString path = dialog.GetPath();
 		string mempath = wx2std(path);
 		gUICircuit->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(m_guiGateRAM->getID(), "WRITE_FILE", mempath)));
 	}
 }
 
-void RamPopupDialog::OnChkBox ( wxCommandEvent &event) {
+void RamPopupDialog::OnChkBox(wxCommandEvent &event) {
 	notifyAllChanged();
 }
 
@@ -143,7 +143,7 @@ void RamPopupDialog::notifyAllChanged(){
 //*********************************************************************************
 //virtualGrid methods
 
-virtualGrid::virtualGrid (int addrSize, int dSize, guiGateRAM* newM_ramGuiGate, GUICircuit* newGUICircuit, wxCheckBox* hexOrDecCBArg) {
+virtualGrid::virtualGrid(int addrSize, int dSize, guiGateRAM* newM_ramGuiGate, GUICircuit* newGUICircuit, wxCheckBox* hexOrDecCBArg) {
 	hexOrDecCB = hexOrDecCBArg;
 	m_guiGateRAM = newM_ramGuiGate;
 	addressSize = addrSize;
@@ -152,36 +152,36 @@ virtualGrid::virtualGrid (int addrSize, int dSize, guiGateRAM* newM_ramGuiGate, 
 }
 
 
-int virtualGrid::GetNumberRows () {
-	return (int)pow((float)2,(int)addressSize*4)/16;
+int virtualGrid::GetNumberRows() {
+	return(int)pow((float)2,(int)addressSize*4)/16;
 }
 
-int virtualGrid::GetNumberCols () {
+int virtualGrid::GetNumberCols() {
 	return 16;
 }
 
-bool virtualGrid::IsEmptyCell (int row, int col) {
+bool virtualGrid::IsEmptyCell(int row, int col) {
 	return false;
 }
 
-wxString virtualGrid::GetValue (int row, int col) {
+wxString virtualGrid::GetValue(int row, int col) {
 	ostringstream stream;
 		
-	unsigned long data = m_guiGateRAM->getValueAt( row*16 + col );
-	if (hexOrDecCB->IsChecked()) {
+	unsigned long data = m_guiGateRAM->getValueAt(row*16 + col);
+	if(hexOrDecCB->IsChecked()) {
 		stream << dec << data;
 	} else {
-		stream << hex << uppercase << setw ( dataSize ) << setfill ( '0' ) << data;
+		stream << hex << uppercase << setw(dataSize) << setfill ( '0' ) << data;
 	}
 	return std2wx(stream.str());
 }
 
-void virtualGrid::SetValue (int row, int col, const wxString& value) {
+void virtualGrid::SetValue(int row, int col, const wxString& value) {
 	int newValue = 0;
 	istringstream istream(wx2std(value));
 	
 	//determine if we should interperate it as hex or decimal
-	if( hexOrDecCB->IsChecked() ){
+	if(hexOrDecCB->IsChecked()){
 		istream >> newValue;
 	}else{
 		istream >> hex >> newValue;
@@ -211,12 +211,12 @@ wxGridCellAttr* virtualGrid::GetAttr(int row, int col, wxGridCellAttr::wxAttrKin
 	
 	wxGridCellAttr* returnValue = new wxGridCellAttr();
 	
-	if( row == readRow && col == readCol ){
-		returnValue->SetBackgroundColour( *wxGREEN ); 
-	}else if( row == writtenRow && col == writtenCol ){
-		returnValue->SetBackgroundColour( *wxRED );
+	if(row == readRow && col == readCol){
+		returnValue->SetBackgroundColour(*wxGREEN); 
+	}else if(row == writtenRow && col == writtenCol){
+		returnValue->SetBackgroundColour(*wxRED);
 	}else{
-		returnValue->SetBackgroundColour( *wxWHITE );	
+		returnValue->SetBackgroundColour(*wxWHITE);	
 	}
 	
 	return returnValue;
@@ -231,7 +231,7 @@ void virtualGrid::SetAttr(wxGridCellAttr* attr, int row, int col) {
 wxString virtualGrid::GetRowLabelValue(int row) {
 	//set row titles
 	ostringstream stream;
-	stream << "0x" << hex << uppercase << setw( addressSize - 1 ) << setfill( '0' ) << row << 'X';
+	stream << "0x" << hex << uppercase << setw(addressSize - 1) << setfill( '0' ) << row << 'X';
 	return std2wx(stream.str());
 }
 

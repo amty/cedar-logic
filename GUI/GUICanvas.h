@@ -32,7 +32,7 @@ using namespace __gnu_cxx;
 // Struct GateState
 //		stores the position and id of a gate so we know where we moved from
 struct GateState {
-	GateState( unsigned int nID, float nX, float nY, bool nSel ) : id(nID), x(nX), y(nY), selected(nSel) {}
+	GateState(unsigned int nID, float nX, float nY, bool nSel) : id(nID), x(nX), y(nY), selected(nSel) {}
 	unsigned int id;
 	float x;
 	float y;
@@ -40,9 +40,9 @@ struct GateState {
 };
 
 // Struct WireState
-//		stores the relative position (to itself) of a wire so we know where we moved from
+//		stores the relative position(to itself) of a wire so we know where we moved from
 struct WireState {
-	WireState( unsigned int nID, GLPoint2f nPoint, map < long, wireSegment > nTree ) : 
+	WireState(unsigned int nID, GLPoint2f nPoint, map < long, wireSegment > nTree) : 
 		id(nID), point(nPoint), oldWireTree(nTree) {}
 	unsigned int id;
 	GLPoint2f point;
@@ -56,7 +56,7 @@ struct ConnectionSource {
 	unsigned long objectID;
 	string connection;
 	
-	ConnectionSource( bool ig, unsigned long id, string conn ) : isGate(ig), objectID(id), connection(conn) {};
+	ConnectionSource(bool ig, unsigned long id, string conn) : isGate(ig), objectID(id), connection(conn) {};
 	ConnectionSource() {};
 };
 
@@ -65,16 +65,16 @@ struct ConnectionSource {
 #define MIN_ZOOM 1.0/120.0
 #define MAX_ZOOM 1.0*1.0
 #define DEFAULT_ZOOM 1.0/10.0
-// The amount of zooming done per step (in %).
+// The amount of zooming done per step(in %).
 #define ZOOM_STEP 0.75
 
 #define MIN_PAN -1.0e10
 #define MAX_PAN 1.0e10
 
-// The amount of panning done per step for keypress (in pixels).
+// The amount of panning done per step for keypress(in pixels).
 #define PAN_STEP 30
 
-// The amount of panning done per step for autoscroll (in pixels).
+// The amount of panning done per step for autoscroll(in pixels).
 #define SCROLL_STEP 30
 #define SCROLL_TIMER_RATE 30
 #define SCROLL_TIMER_ID 1
@@ -106,31 +106,31 @@ enum DragState {
 class GUICanvas: public klsGLCanvas
 {
 public:
-    GUICanvas( wxWindow *parent, GUICircuit* gCircuit, wxWindowID id = wxID_ANY,
+    GUICanvas(wxWindow *parent, GUICircuit* gCircuit, wxWindowID id = wxID_ANY,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
-        long style = 0, const wxString& name = _T("GUICanvas") );
+        long style = 0, const wxString& name = _T("GUICanvas"));
 
     ~GUICanvas();
 
 	// Event handlers
-	void OnMouseDown( wxMouseEvent& event ) {
-		if( event.LeftDown() || event.LeftDClick() ) {
-			mouseLeftDown( event );
-		} else if( event.RightDown() || event.RightDClick() ) {
-			mouseRightDown( event );
+	void OnMouseDown(wxMouseEvent& event) {
+		if(event.LeftDown() || event.LeftDClick()) {
+			mouseLeftDown(event);
+		} else if(event.RightDown() || event.RightDClick()) {
+			mouseRightDown(event);
 		}
 	};
     void mouseLeftDown(wxMouseEvent& event);
     void mouseRightDown(wxMouseEvent& event);
 
     void OnMouseUp(wxMouseEvent& event);
-    void OnMouseMove( GLdouble glX, GLdouble glY, bool ShiftDown, bool CtrlDown );
+    void OnMouseMove(GLdouble glX, GLdouble glY, bool ShiftDown, bool CtrlDown);
     void OnMouseEnter(wxMouseEvent& event);
 
     void OnKeyDown(wxKeyEvent& event);
 	
-	void OnSize( void ) { Update(); };
+	void OnSize(void) { Update(); };
 	
 	// Clears the page
 	void clearCircuit();
@@ -139,7 +139,7 @@ public:
 	void deleteSelection();
 	
 	// Render this page
-    void OnRender( bool noColor = false );
+    void OnRender(bool noColor = false);
 
 	// Update the collision checker and refresh
 	void Update();
@@ -162,35 +162,35 @@ public:
 	GUICircuit* getCircuit() { return gCircuit; };
 	
 	// Handle copy and paste for this canvas
-	void copyBlockToClipboard( void );
-	void pasteBlockFromClipboard( void );
+	void copyBlockToClipboard(void);
+	void pasteBlockFromClipboard(void);
 
 	// Tell the canvas which minimap it should use; sets the minimaps pointers and lists
 	void setMinimap(klsMiniMap* minimap) {
 		this->minimap = minimap;
 		//Josh Edit 4/9/07
-		if( minimap != NULL ){
-			minimap->setCanvas( this );
-			minimap->setLists( &gateList, &wireList );
+		if(minimap != NULL){
+			minimap->setCanvas(this);
+			minimap->setLists(&gateList, &wireList);
 			updateMiniMap();
 		}
 	};
 	
 	// Zoom the canvas to fit all items within it:
-	void setZoomAll( void );
+	void setZoomAll(void);
 
 	// Zoom the canvas in or out:
-	void zoomInOrOut( bool in = true ) {
-		if( in ) {
+	void zoomInOrOut(bool in = true) {
+		if(in) {
 			// Only allow zooming during a non-dragging state!
-			if (currentDragState == DRAG_NONE) {
-				setZoom( getZoom() * ZOOM_STEP );
+			if(currentDragState == DRAG_NONE) {
+				setZoom(getZoom() * ZOOM_STEP);
 			}
 		} else {
 			// Zoom out:
 			// Only allow zooming during a non-dragging state!
-			if (currentDragState == DRAG_NONE) {
-				setZoom( getZoom() / ZOOM_STEP );
+			if(currentDragState == DRAG_NONE) {
+				setZoom(getZoom() / ZOOM_STEP);
 			}
 		}
 	};

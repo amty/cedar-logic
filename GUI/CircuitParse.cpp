@@ -41,11 +41,11 @@ void CircuitParse::loadFile(string fileName) {
 
 void CircuitParse::parseFile() {
 	// need to throw exception
-	if (mParse->readTag() != "circuit") return;
+	if(mParse->readTag() != "circuit") return;
 	
 	// Read the currentPage tag.
-	if( mParse->readTag() == "CurrentPage" ) {
-		string currentPage = mParse->readTagValue( "CurrentPage" );
+	if(mParse->readTag() == "CurrentPage") {
+		string currentPage = mParse->readTagValue("CurrentPage");
 		mParse->readCloseTag();
 	}
 	
@@ -55,24 +55,24 @@ void CircuitParse::parseFile() {
 		gCanvas = gCanvases[(int)pageNum];
 		string pageTag = temp;
 		// while next tag is not close page
- 		while (!mParse->isCloseTag(mParse->getCurrentIndex())) {
+ 		while(!mParse->isCloseTag(mParse->getCurrentIndex())) {
  			temp = mParse->readTag();
  			
- 			if( temp == "PageViewport" ) {
+ 			if(temp == "PageViewport") {
 	 			// Read the last page viewport:
-				string pageView = mParse->readTagValue( "PageViewport" );
+				string pageView = mParse->readTagValue("PageViewport");
 				
 				// Set the page viewport:
 				istringstream iss(pageView);
-				GLPoint2f topLeft( 0, 0 );
-				GLPoint2f bottomRight( 50, 50 );
+				GLPoint2f topLeft(0, 0);
+				GLPoint2f bottomRight(50, 50);
 				char dump;
 				iss >> topLeft.x >> dump >> topLeft.y >> dump >> bottomRight.x >> dump >> bottomRight.y;
 				gCanvas->setViewport(topLeft, bottomRight);
 
 				mParse->readCloseTag();
 			}
-			else if (temp == "gate") {
+			else if(temp == "gate") {
 				string type, ID, position;
 				vector < gateConnector > inputs, outputs;
 				vector < parameter > params;
@@ -80,9 +80,9 @@ void CircuitParse::parseFile() {
 				parameter* pParam;
 				do { // get full gate structure
 					temp = mParse->readTag(); // get tag
-					if (temp == "ID") { // get ID
+					if(temp == "ID") { // get ID
 						ID = mParse->readTagValue(temp);
-					} else if (temp == "type") { // get type
+					} else if(temp == "type") { // get type
 						type = mParse->readTagValue(temp);
 						
 						//***********************************
@@ -97,27 +97,27 @@ void CircuitParse::parseFile() {
 						//gate type of the outdated gate
 						//to a new gate type that is supported
 						//without crashing the program.
-						if( type == "AM_RAM_16x16_Single_Port" ){
+						if(type == "AM_RAM_16x16_Single_Port"){
 							//there is no different between these two types.
 							//the AM_RAM_16x16_Single_Port was an experiment
 							//before we converted all the gates.
 							//Thus no warning needs to be given.
 							type = "AM_RAM_16x16";
-						}else if( type == "AA_DFF" ){
+						}else if(type == "AA_DFF"){
 							wxMessageBox(_T("The High Active Reset D flip flop has been deprecated.  Automatically replacing with a Low active version"), _T("Old gate"), wxOK | wxICON_ASTERISK, NULL);
 							type = "AE_DFF_LOW";
-						}else if( type == "BA_JKFF" ){
+						}else if(type == "BA_JKFF"){
 							wxMessageBox(_T("The High Active Reset JK flip flop has been deprecated.  Automatically replacing with a Low active version"), _T("Old gate"), wxOK | wxICON_ASTERISK, NULL);
 							type = "BE_JKFF_LOW";
-						}else if( type == "BA_JKFF_NT" ){
+						}else if(type == "BA_JKFF_NT"){
 							wxMessageBox(_T("The High Active Reset negitive triggered JK flip flop has been deprecated.  Automatically replacing with a Low active version"), _T("Old gate"), wxOK | wxICON_ASTERISK, NULL);
 							type = "BE_JKFF_LOW_NT";
 						}
 						//**********************************
 						
-					} else if (temp == "position") { // get position
+					} else if(temp == "position") { // get position
 						position = mParse->readTagValue(temp);
-					} else if (temp == "input") { // get input
+					} else if(temp == "input") { // get input
 						temp = mParse->readTag(); // get input ID
 						gc = new gateConnector();
 						gc->connectionID = mParse->readTagValue(temp);
@@ -126,7 +126,7 @@ void CircuitParse::parseFile() {
 						iss >> gc->wireID;
 						inputs.push_back(*gc);
 						delete gc;
-					} else if (temp == "output") { // get output
+					} else if(temp == "output") { // get output
 						temp = mParse->readTag();
 						gc = new gateConnector();
 						gc->connectionID = mParse->readTagValue(temp);
@@ -135,37 +135,37 @@ void CircuitParse::parseFile() {
 						iss >> gc->wireID;
 						outputs.push_back(*gc);
 						delete gc;
-					} else if (temp == "gparam" || temp == "lparam") { // get parameter
+					} else if(temp == "gparam" || temp == "lparam") { // get parameter
 						string paramData = mParse->readTagValue(temp);
 						string x, y;
 						istringstream iss(paramData);
 						iss >> x;
 						getline(iss, y, '\n');
-						pParam = new parameter(x, y.substr(1,y.size()-1), (temp == "gparam"));
+						pParam = new parameter(x, y.substr(1,y.size()-1),(temp == "gparam"));
 						params.push_back(*pParam);
 						delete pParam;
 					}
 					// ADD OTHER TAGS FOR GATE HERE
 						// ALSO MODIFY parseGateToSend
 					mParse->readCloseTag(); // </>
-				} while (!mParse->isCloseTag(mParse->getCurrentIndex()));
+				} while(!mParse->isCloseTag(mParse->getCurrentIndex()));
 				mParse->readCloseTag(); // >gate
 				parseGateToSend(type, ID, position, inputs, outputs, params);
 			}
-			else if (temp == "wire") {
+			else if(temp == "wire") {
 				//**********************************
 				parseWireToSend();
 			}
 		}
 		mParse->readTagValue(pageTag);
 		mParse->readCloseTag();
-	} while (!mParse->isCloseTag(mParse->getCurrentIndex()));
+	} while(!mParse->isCloseTag(mParse->getCurrentIndex()));
 	gCanvas->getCircuit()->getOscope()->UpdateMenu();
 }
 
 void CircuitParse::parseGateToSend(string type, string ID, string position, vector < gateConnector > &inputs, vector < gateConnector > &outputs, vector < parameter > &params) {
 	// If no library was loaded, then don't try to make a gate from one
-	if (wxGetApp().libraries.size() == 0) return;
+	if(wxGetApp().libraries.size() == 0) return;
 	ostringstream oss;
 	// Check the gate ID to see if it is taken
 	long id;
@@ -173,32 +173,32 @@ void CircuitParse::parseGateToSend(string type, string ID, string position, vect
 	istringstream issb(ID);
 	issb >> id;
 	
-	string logicType = wxGetApp().libParser.getGateLogicType( type );
-	if ( logicType.size() > 0 )
+	string logicType = wxGetApp().libParser.getGateLogicType(type);
+	if(logicType.size() > 0)
 		gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_CREATE_GATE, new klsMessage::Message_CREATE_GATE(wxGetApp().libraries[wxGetApp().gateNameToLibrary[type]][type].logicType, id)));
 	// Create gate for GUI
 	istringstream issa(position.substr(0,position.find(",")+1));
 	issa >> x;
 	issa.str(position.substr(position.find(",")+1,position.size()-position.find(",")-1));
 	issa >> y;
-	guiGate* newGate = gCanvas->getCircuit()->createGate( type, id, true );
-	if (newGate == NULL) return; // IN CASE OF ERROR
+	guiGate* newGate = gCanvas->getCircuit()->createGate(type, id, true);
+	if(newGate == NULL) return; // IN CASE OF ERROR
 	gCanvas->insertGate(id, newGate, x, y);
-	for (unsigned int i = 0; i < params.size(); i++) {
-		if (!(params[i].isGUI)) {
-			newGate->setLogicParam( params[i].paramName, params[i].paramValue );
+	for(unsigned int i = 0; i < params.size(); i++) {
+		if(!(params[i].isGUI)) {
+			newGate->setLogicParam(params[i].paramName, params[i].paramValue);
 			gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_PARAM, new klsMessage::Message_SET_GATE_PARAM(id, params[i].paramName, params[i].paramValue)));
-		} else newGate->setGUIParam( params[i].paramName, params[i].paramValue );
+		} else newGate->setGUIParam(params[i].paramName, params[i].paramValue);
 	}
-	if( logicType.size() > 0 ) {
+	if(logicType.size() > 0) {
 		// Loop through the hotspots and pass logic core hotspot settings:
 		LibraryGate libGate;
 		wxGetApp().libParser.getGate(type, libGate);
-		for( unsigned int i = 0; i < libGate.hotspots.size(); i++ ) {
+		for(unsigned int i = 0; i < libGate.hotspots.size(); i++) {
 
 			// Send the isInverted message:
-			if( libGate.hotspots[i].isInverted ) {
-				if ( libGate.hotspots[i].isInput ) {
+			if(libGate.hotspots[i].isInverted) {
+				if(libGate.hotspots[i].isInput) {
 					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_INPUT_PARAM, new klsMessage::Message_SET_GATE_INPUT_PARAM(id, libGate.hotspots[i].name, "INVERTED", "TRUE")));
 				} else {
 					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_OUTPUT_PARAM, new klsMessage::Message_SET_GATE_OUTPUT_PARAM(id, libGate.hotspots[i].name, "INVERTED", "TRUE")));
@@ -206,31 +206,31 @@ void CircuitParse::parseGateToSend(string type, string ID, string position, vect
 			}
 
 			// Send the logicEInput message:
-			if( libGate.hotspots[i].logicEInput != "" ) {
-				if ( libGate.hotspots[i].isInput ) {
+			if(libGate.hotspots[i].logicEInput != "") {
+				if(libGate.hotspots[i].isInput) {
 					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_INPUT_PARAM, new klsMessage::Message_SET_GATE_INPUT_PARAM(id, libGate.hotspots[i].name, "E_INPUT", libGate.hotspots[i].logicEInput)));
 				} else {
 					gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_OUTPUT_PARAM, new klsMessage::Message_SET_GATE_OUTPUT_PARAM(id, libGate.hotspots[i].name, "E_INPUT", libGate.hotspots[i].logicEInput)));
 				}
 			}
-		} // for( loop through the hotspots )
-	} // if( logic type is non-null )
-	for (unsigned int i = 0; i < inputs.size(); i++) {
+		} // for(loop through the hotspots)
+	} // if(logic type is non-null)
+	for(unsigned int i = 0; i < inputs.size(); i++) {
 		gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_INPUT, new klsMessage::Message_SET_GATE_INPUT(id, inputs[i].connectionID, inputs[i].wireID)));
-		// Create gate input for GUI (setWireConnection returns a pointer to the wire)
-		gCanvas->insertWire(inputs[i].wireID, gCanvas->getCircuit()->setWireConnection( inputs[i].wireID, id, inputs[i].connectionID, true ));
+		// Create gate input for GUI(setWireConnection returns a pointer to the wire)
+		gCanvas->insertWire(inputs[i].wireID, gCanvas->getCircuit()->setWireConnection(inputs[i].wireID, id, inputs[i].connectionID, true));
 	}
-	for (unsigned int i = 0; i < outputs.size(); i++) {
+	for(unsigned int i = 0; i < outputs.size(); i++) {
 		gCanvas->getCircuit()->sendMessageToCore(klsMessage::Message(klsMessage::MT_SET_GATE_OUTPUT, new klsMessage::Message_SET_GATE_OUTPUT(id, outputs[i].connectionID, outputs[i].wireID)));		
-		// Create gate output for GUI (setWireConnection returns a pointer to the wire)
-		gCanvas->insertWire(outputs[i].wireID, gCanvas->getCircuit()->setWireConnection( outputs[i].wireID, id, outputs[i].connectionID, true ));
+		// Create gate output for GUI(setWireConnection returns a pointer to the wire)
+		gCanvas->insertWire(outputs[i].wireID, gCanvas->getCircuit()->setWireConnection(outputs[i].wireID, id, outputs[i].connectionID, true));
 	}
 }
 
 //********************************
-void CircuitParse::parseWireToSend( void ) {
+void CircuitParse::parseWireToSend(void) {
 	// If no library was loaded, then no gates were made for us
-	if (wxGetApp().libraries.size() == 0) return;
+	if(wxGetApp().libraries.size() == 0) return;
 	// Parse the wire right here, generate its map and set it
 	char dump;
 	// parse the ID
@@ -239,75 +239,75 @@ void CircuitParse::parseWireToSend( void ) {
 	do { // while next tag is not close wire
 		// tags in wire can be ID or shape
 		string temp = mParse->readTag(); // get tag
-		if (temp == "ID") { // get ID
+		if(temp == "ID") { // get ID
 			ID = mParse->readTagValue(temp);
 			mParse->readCloseTag(); // >ID
 			ostringstream oss;
 			istringstream iss(ID);
 			iss >> id;
-		} else if (temp == "shape") { //read tree
+		} else if(temp == "shape") { //read tree
 			do {
 				// tags in shape can be hsegment or vsegment; they are identical aside from orientation
 				bool isVertical = false;
 				long headSegmentID = -1; // hold the first segment's id.
 				temp = mParse->readTag();
-				if (temp == "vsegment") isVertical = true;
+				if(temp == "vsegment") isVertical = true;
 				wireSegment newSeg; newSeg.verticalSeg = isVertical;
 				do {
 					// Within segments you have ID, points, connection, and intersection tags
 					temp = mParse->readTag();
-					if (temp == "ID") {					
-						istringstream iss( mParse->readTagValue("ID") );
+					if(temp == "ID") {					
+						istringstream iss(mParse->readTagValue("ID"));
 						iss >> newSeg.id;
-						if (headSegmentID == -1) headSegmentID = newSeg.id;
+						if(headSegmentID == -1) headSegmentID = newSeg.id;
 						mParse->readCloseTag();
-					} else if (temp == "points") {
+					} else if(temp == "points") {
 						// points are begin.x, begin.y, end.x, end.y; comma delimited
 						GLPoint2f begin, end;
-						istringstream iss( mParse->readTagValue("points") );
+						istringstream iss(mParse->readTagValue("points"));
 						iss >> begin.x >> dump >> begin.y >> dump >> end.x >> dump >> end.y;
 						newSeg.begin = begin; newSeg.end = end;
-						newSeg.diffBegin = GLPoint2f( begin.x-wireShape[headSegmentID].begin.x, begin.y-wireShape[headSegmentID].begin.y );
-						newSeg.diffEnd = GLPoint2f( end.x-wireShape[headSegmentID].begin.x, end.y-wireShape[headSegmentID].begin.y );
+						newSeg.diffBegin = GLPoint2f(begin.x-wireShape[headSegmentID].begin.x, begin.y-wireShape[headSegmentID].begin.y);
+						newSeg.diffEnd = GLPoint2f(end.x-wireShape[headSegmentID].begin.x, end.y-wireShape[headSegmentID].begin.y);
 						newSeg.calcBBox();
 						mParse->readCloseTag();
-					} else if (temp == "connection") {
+					} else if(temp == "connection") {
 						// connection tags contain GID tag and name tag, one of each
 						unsigned long GID; string hsName;
-						for (int ct = 0; ct < 2; ct++) {
+						for(int ct = 0; ct < 2; ct++) {
 							temp = mParse->readTag();
-							if (temp == "GID") {
-								istringstream iss( mParse->readTagValue("GID") );
+							if(temp == "GID") {
+								istringstream iss(mParse->readTagValue("GID"));
 								iss >> GID;
 								mParse->readCloseTag();
-							} else if (temp == "name") {
+							} else if(temp == "name") {
 								hsName = mParse->readTagValue("name");
 								mParse->readCloseTag();
 							}
 						}
 						wireConnection nwc; nwc.gid = GID; nwc.connection = hsName;
-						nwc.cGate = (*(gCanvas->getCircuit()->getGates()))[GID];
-						newSeg.connections.push_back( nwc );
+						nwc.cGate =(*(gCanvas->getCircuit()->getGates()))[GID];
+						newSeg.connections.push_back(nwc);
 						mParse->readCloseTag();
-					} else if (temp == "intersection") {
+					} else if(temp == "intersection") {
 						// intersections have intersection point and id
-						istringstream iss( mParse->readTagValue("intersection") );
+						istringstream iss(mParse->readTagValue("intersection"));
 						GLfloat isectPoint; long isectSegID;
 						iss >> isectPoint >> isectSegID;
-						newSeg.intersects[isectPoint].push_back( isectSegID );
+						newSeg.intersects[isectPoint].push_back(isectSegID);
 						mParse->readCloseTag();
 					}
-				} while (!mParse->isCloseTag(mParse->getCurrentIndex())); // !closesegment
+				} while(!mParse->isCloseTag(mParse->getCurrentIndex())); // !closesegment
 				mParse->readCloseTag(); // >segment
 				wireShape[newSeg.id] = newSeg;
-			} while (!mParse->isCloseTag(mParse->getCurrentIndex())); // !closeshape
+			} while(!mParse->isCloseTag(mParse->getCurrentIndex())); // !closeshape
 			mParse->readCloseTag(); // >shape
 		}
-	} while (!mParse->isCloseTag(mParse->getCurrentIndex())); // !closewire
+	} while(!mParse->isCloseTag(mParse->getCurrentIndex())); // !closewire
 	mParse->readCloseTag(); // >wire
 	// Check to make sure the wire exists before we do things to it
-	if ((gCanvas->getCircuit()->getWires())->find(id) == (gCanvas->getCircuit()->getWires())->end()) return;
-	(*(gCanvas->getCircuit()->getWires()))[id]->setSegmentMap( wireShape );
+	if((gCanvas->getCircuit()->getWires())->find(id) == (gCanvas->getCircuit()->getWires())->end()) return;
+	(*(gCanvas->getCircuit()->getWires()))[id]->setSegmentMap(wireShape);
 }
 
 void CircuitParse::saveCircuit(string filename, vector< GUICanvas* > glc, unsigned int currPage) {
@@ -325,7 +325,7 @@ void CircuitParse::saveCircuit(string filename, vector< GUICanvas* > glc, unsign
 	mParse->writeTag("CurrentPage", oss.str());
 	mParse->closeTag("CurrentPage");
 
-	for (unsigned int i = 0; i < glc.size(); i++) {
+	for(unsigned int i = 0; i < glc.size(); i++) {
 		ostringstream oss;
 		oss << "page " << i;
 		string pageNumber = oss.str();
@@ -344,13 +344,13 @@ void CircuitParse::saveCircuit(string filename, vector< GUICanvas* > glc, unsign
 		gateList = glc[i]->getGateList();
 		wireList = glc[i]->getWireList();
 		hash_map< unsigned long, guiGate* >::iterator thisGate = gateList->begin();
-		while (thisGate != gateList->end()) {
+		while(thisGate != gateList->end()) {
 			(thisGate->second)->saveGate(mParse);
 			thisGate++;
 		}
 		
 		hash_map< unsigned long, guiWire* >::iterator thisWire = wireList->begin();
-		while (thisWire != wireList->end()) {
+		while(thisWire != wireList->end()) {
 			(thisWire->second)->saveWire(mParse);
 			thisWire++;
 		}

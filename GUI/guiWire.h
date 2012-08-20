@@ -34,7 +34,7 @@ struct glWireRenderInfo {
 	vector< GLLine2f > lineSegments;
 };
 
-float distanceToLine( GLPoint2f p, GLPoint2f l1, GLPoint2f l2 );
+float distanceToLine(GLPoint2f p, GLPoint2f l1, GLPoint2f l2);
 bool operator==(const GLPoint2f& p1, const GLPoint2f& p2);
 class guiGate;
 
@@ -53,30 +53,30 @@ struct wireConnection {
 
 // Class wireSegment:
 //	All segments are defined by a begin and end point, plus orientation.  Begin always is
-//		less than end along the oriented line (bottom to top, left to right)
+//		less than end along the oriented line(bottom to top, left to right)
 // 	Vertical/horizontal is a flag in the segment rather than determinate on endpoints
 //		i.e. the wire, once declared vertical will always be vertical
 class wireSegment : public klsCollisionObject {
 public:
 	// Create the bbox for this wire segment:
-	void calcBBox( void ) {
+	void calcBBox(void) {
 		klsBBox newBBox;
-		newBBox.addPoint( begin );
-		newBBox.addPoint( end );
+		newBBox.addPoint(begin);
+		newBBox.addPoint(end);
 
-		if( isHorizontal() ) {
-			newBBox.extendTop( WIRE_BBOX_THICKNESS / 2.0 );
-			newBBox.extendBottom( WIRE_BBOX_THICKNESS / 2.0 );
+		if(isHorizontal()) {
+			newBBox.extendTop(WIRE_BBOX_THICKNESS / 2.0);
+			newBBox.extendBottom(WIRE_BBOX_THICKNESS / 2.0);
 		} else {
-			newBBox.extendLeft( WIRE_BBOX_THICKNESS / 2.0 );
-			newBBox.extendRight( WIRE_BBOX_THICKNESS / 2.0 );
+			newBBox.extendLeft(WIRE_BBOX_THICKNESS / 2.0);
+			newBBox.extendRight(WIRE_BBOX_THICKNESS / 2.0);
 		}
 
-		this->setBBox( newBBox );
+		this->setBBox(newBBox);
 	};
 
-	bool isHorizontal( void ) { return !verticalSeg; };
-	bool isVertical( void ) { return verticalSeg; };
+	bool isHorizontal(void) { return !verticalSeg; };
+	bool isVertical(void) { return verticalSeg; };
 
 	// Hold the orientation of the wire segment.  Once it is initialized,
 	//	the orientation does not change.
@@ -86,26 +86,28 @@ public:
 	// to re-build the bounding box.
 	GLPoint2f begin, end;
 	// All segments must know their relative position, in this case to the
-	//	first segment's (initial vertical bar) begin point
+	//	first segment's(initial vertical bar) begin point
 	GLPoint2f diffBegin, diffEnd;
 	
 	// Keep a list of the connections that are on this segment
 	vector < wireConnection > connections;
 	
 	// Keeps a sorted list of intersections with other segments
-	//		For horizontal segments the key is the x value (since all y's are the same)
+	//		For horizontal segments the key is the x value(since all y's are the same)
 	//		vice versa for vertical segments, holds the id of the intersected seg
-	map < GLfloat, vector < long > > intersects;
+	typedef map<GLfloat, vector<long> > imap;
+	typedef pair<GLfloat, vector<long> > imap_pair;
+	imap intersects;
 	
 	// ID for this seg in its parent map
 	long id;
 	
 	// pretty print
 	void printme(string lineBegin = "");
-	wireSegment( ) : klsCollisionObject(COLL_WIRE_SEG) {};
+	wireSegment() : klsCollisionObject(COLL_WIRE_SEG) {};
 	
 	// Give the segment initial values - begin and end points, and orientation
-	wireSegment( GLPoint2f nB, GLPoint2f nE, bool nisVertical, unsigned long nid ) : klsCollisionObject(COLL_WIRE_SEG), verticalSeg(nisVertical), begin(nB), end(nE), id(nid) {
+	wireSegment(GLPoint2f nB, GLPoint2f nE, bool nisVertical, unsigned long nid) : klsCollisionObject(COLL_WIRE_SEG), verticalSeg(nisVertical), begin(nB), end(nE), id(nid) {
 		calcBBox();
 	};
 };
@@ -119,87 +121,93 @@ public:
 
 	// Connection functions
 	//		addConnection: if openMode is true, then no shape is calculated; waiting for setSegmentMap call.
-	void addConnection( guiGate* iGate, string connection, bool openMode = false );
-	void removeConnection( guiGate* iGate, string connection);
-	long numConnections( void ) { return connectPoints.size(); };
-	vector < wireConnection > getConnections( void ) { return connectPoints; };	
+	void addConnection(guiGate* iGate, string connection, bool openMode = false);
+	void removeConnection(guiGate* iGate, string connection);
+	long numConnections(void) { return connectPoints.size(); };
+	vector < wireConnection > getConnections(void) { return connectPoints; };	
 	// Update the placement of a connection by extending/moving its
 	//	segment.  Will set up a mouse coord from the current position
 	//	and another one from the new position to pass to updateSegDrag
-	void updateConnectionPos( unsigned long gid, string connection );
+	void updateConnectionPos(unsigned long gid, string connection);
 	
-	void draw( bool color = true );
-	bool hover( float cx, float cy, float delta );
-	long getHoverSegmentID( void ) { return hoverSegmentID; };
+	void draw(bool color = true);
+	bool hover(float cx, float cy, float delta);
+	long getHoverSegmentID(void) { return hoverSegmentID; };
 	
-	bool isWithinBox( float x1, float y1, float x2, float y2 );
-	GLPoint2f getCenter( void );
+	bool isWithinBox(float x1, float y1, float x2, float y2);
+	GLPoint2f getCenter(void);
 	
 	// Moving functions
-	void move( GLPoint2f origin, GLPoint2f delta );
+	void move(GLPoint2f origin, GLPoint2f delta);
 	
 	// Create the bbox for this wire, based on
 	// the bboxes of the wire segments. Also,
 	// add the wire segments into the subObjs list:
-	void calcBBox( void );
+	void calcBBox(void);
 
 	// Selection functions
-	bool isSelected( void ) { return selected; };
-	void select( void ) { selected = true; };
-	void unselect( void ) { selected = false; };
+	bool isSelected(void) { return selected; };
+	void select(void) { selected = true; };
+	void unselect(void) { selected = false; };
 
 	// ID functions
 	void setID(long nid) { id = nid; };
-	unsigned long getID( void ) { return id; };
+	unsigned long getID(void) { return id; };
 
 	// State functions
 	void setState(StateType ns) { state = ns; };
-	StateType getState( void ) { return state; };
+	StateType getState(void) { return state; };
 	
 	// Give directions for XML tag definition of wire
-	void saveWire ( XMLParser* xparse );
+	void saveWire(XMLParser* xparse);
 	
 	// Get the list of pointers to segments that constitute the wire shape
 	// Get the mapping of ID to segment that is the wire shape
 	//	NOTE: To do anything with the returned map via intersections of segs
 	//			you must set the segments' parent map pointer
-	map < long, wireSegment > getSegmentMap( void ) { return segMap; };
+	typedef map<long, wireSegment> wseg_map;
+	typedef pair<long, wireSegment> wseg_map_pair;
+	wseg_map getSegmentMap(void) {
+		return segMap;
+	};
 	// Set the map/tree from which the wire will generate its shape.
 	//	Tree must contain valid wireConnection information.
 	//	IMPORTANT: Also must set nextSegID to be a valid ID
-	void setSegmentMap( map < long, wireSegment > newSegMap) {
+	void setSegmentMap(wseg_map newSegMap) {
 		this->deleteSubObjects(); // prevent coll checker pointers from invalidating
 		segMap = newSegMap; 
 		calcBBox(); 
-		headSegment = ((segMap.begin())->first);
-		nextSegID = ((segMap.rbegin())->first)+1;
+		headSegment =((segMap.begin())->first);
+		nextSegID =((segMap.rbegin())->first)+1;
 		endSegDrag();
 	};
 	
 	// We need to hold an initial seg map for undo/redo functionality.
-	map < long, wireSegment > getOldSegmentMap( void ) { return oldSegMap; };
+	wseg_map getOldSegmentMap(void) {
+		return oldSegMap;
+	};
 
 	// Generates segList, all segments being generated
 	//	from the coordinates of the connection point vertices.
 	//	As segments are created, they are merged with segments
 	//	following the same path, and duplicates are removed.
-	void calcShape( void );
+	void calcShape(void);
 
 	// Manual wire routing functionality
 	//	Takes a mouse pointer and finds the segment in question.
 	//	The segment is isolated between its nearest intersections
 	//	and set as the dragging segment.
-	bool startSegDrag( klsCollisionObject* mouse );
+	bool startSegDrag(klsCollisionObject* mouse);
 	//	The current dragging segment is moved to a new position
 	//	while the associated segments are added/modified to keep
 	//	our drag segment connected in the tree
-	void updateSegDrag( klsCollisionObject* mouse );
+	void updateSegDrag(klsCollisionObject* mouse);
 	//	The current dragging segment is dropped, clean up
-	void endSegDrag( void );
+	void endSegDrag(void);
 	
 	// pretty print
 	void printme(string lineBegin = "");
-	void debugStatement( int lineBegin, string descriptor );
+	void debugStatement(int lineBegin, string descriptor);
 private:
 	// Take existing segment connections and update their map keys
 	bool refreshIntersections(bool removeBadSegs = false);
@@ -212,8 +220,8 @@ private:
 	void generateRenderInfo();
 	
 	// Store the tree in a non-pointered way for easy copy
-	map < long, wireSegment > segMap;
-	map < long, wireSegment > oldSegMap;
+	wseg_map segMap;
+	wseg_map oldSegMap;
 	long nextSegID;
 	
 	// What is the whole wire connected to?

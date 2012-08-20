@@ -14,10 +14,10 @@ class guiGateADC;
 
 class ADCPopupDialog : public wxDialog{
 public:
-	ADCPopupDialog( guiGateADC* newguiGateADC, GUICircuit* newGUICircuit );
+	ADCPopupDialog(guiGateADC* newguiGateADC, GUICircuit* newGUICircuit);
 	
 	//event which is called when the slider is changed
-	void OnSliderChanged( wxScrollEvent& event );
+	void OnSliderChanged(wxScrollEvent& event);
 	
 	//this is called by the ADCGuiGate when the value
 	//property changes.

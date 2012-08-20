@@ -21,35 +21,35 @@ BEGIN_EVENT_TABLE(PaletteFrame, wxPanel)
 END_EVENT_TABLE()
 
 
-PaletteFrame::PaletteFrame( wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size ) 
-	: wxPanel( parent, id, pos, size, wxNO_BORDER ) {
-	paletteSizer = new wxBoxSizer( wxVERTICAL );
+PaletteFrame::PaletteFrame(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size) 
+	: wxPanel(parent, id, pos, size, wxNO_BORDER) {
+	paletteSizer = new wxBoxSizer(wxVERTICAL);
 	map < string, map < string, LibraryGate > >::iterator libWalk = wxGetApp().libraries.begin();
-	while (libWalk != wxGetApp().libraries.end()) {
+	while(libWalk != wxGetApp().libraries.end()) {
 		strings.Add(std2wx(libWalk->first));
 		libWalk++;
 	}
 	listBox = new wxListBox(this, ID_LISTBOX, wxDefaultPosition, wxSize(0,strings.GetCount()*32), strings, wxLB_SINGLE);
-	paletteSizer->Add( listBox, wxSizerFlags(0).Expand().Border(wxALL, 0) );
-	paletteSizer->Show( listBox );
-	for (unsigned int i = 0; i < strings.GetCount(); i++) {
-		PaletteCanvas* paletteCanvas = new PaletteCanvas( this, wxID_ANY, strings[i], wxDefaultPosition, wxDefaultSize );
-		paletteSizer->Add( paletteCanvas, wxSizerFlags(1).Expand().Border(wxALL, 0) );
-		paletteSizer->Hide( paletteCanvas );
+	paletteSizer->Add(listBox, wxSizerFlags(0).Expand().Border(wxALL, 0));
+	paletteSizer->Show(listBox);
+	for(unsigned int i = 0; i < strings.GetCount(); i++) {
+		PaletteCanvas* paletteCanvas = new PaletteCanvas(this, wxID_ANY, strings[i], wxDefaultPosition, wxDefaultSize);
+		paletteSizer->Add(paletteCanvas, wxSizerFlags(1).Expand().Border(wxALL, 0));
+		paletteSizer->Hide(paletteCanvas);
 		pcanvases[strings[i]] = paletteCanvas;
 	}
 	listBox->SetFirstItem(0);
 	currentPalette = pcanvases.begin()->second;
 	paletteSizer->Show(currentPalette);
-	this->SetSizer( paletteSizer );
+	this->SetSizer(paletteSizer);
 }
 
-void PaletteFrame::OnListSelect( wxCommandEvent& evt ) {
-	for (unsigned int i = 0; i < strings.GetCount(); i++) {
-		if (listBox->IsSelected(i)) {
-			paletteSizer->Hide( currentPalette );
+void PaletteFrame::OnListSelect(wxCommandEvent& evt) {
+	for(unsigned int i = 0; i < strings.GetCount(); i++) {
+		if(listBox->IsSelected(i)) {
+			paletteSizer->Hide(currentPalette);
 			currentPalette = pcanvases[strings[i]];
-			paletteSizer->Show( currentPalette );
+			paletteSizer->Show(currentPalette);
 			paletteSizer->Layout();
 			currentPalette->Activate();
 			break;
@@ -59,7 +59,7 @@ void PaletteFrame::OnListSelect( wxCommandEvent& evt ) {
 
 PaletteFrame::~PaletteFrame() {
 	map < wxString, PaletteCanvas* >::iterator canvasWalk = pcanvases.begin();
-	while (canvasWalk != pcanvases.end()) {
+	while(canvasWalk != pcanvases.end()) {
 		delete canvasWalk->second;
 		canvasWalk++;
 	}

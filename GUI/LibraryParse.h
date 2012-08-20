@@ -24,7 +24,7 @@
 using namespace std;
 
 struct lgHotspot {
-	lgHotspot( string nName = "", bool nIsInput = true, float nX = 0, float nY = 0, bool nIsInverted = false, string nEInput = "" ) : name(nName), isInput(nIsInput), x(nX), y(nY), isInverted(nIsInverted), logicEInput(nEInput) {};
+	lgHotspot(string nName = "", bool nIsInput = true, float nX = 0, float nY = 0, bool nIsInverted = false, string nEInput = "") : name(nName), isInput(nIsInput), x(nX), y(nY), isInverted(nIsInverted), logicEInput(nEInput) {};
 	string name;
 	bool isInput;
 	float x, y;
@@ -33,20 +33,20 @@ struct lgHotspot {
 };
 
 struct lgLine {
-	lgLine( float nX1 = 0, float nY1 = 0, float nX2 = 0, float nY2 = 0 ) : x1(nX1), x2(nX2), y1(nY1), y2(nY2) {}
+	lgLine(float nX1 = 0, float nY1 = 0, float nX2 = 0, float nY2 = 0) : x1(nX1), x2(nX2), y1(nY1), y2(nY2) {}
 	float x1, x2, y1, y2;
 };
 
 struct lgDlgParam {
 	string textLabel; // The label shown to the user when the widget is drawn. The "Visible Name" of the param.
 
-	string name; // The "invisible name" of the param (either GUI or Logic).
+	string name; // The "invisible name" of the param(either GUI or Logic).
 	bool isGui; // True if the param is a gui type. False if it is a logic param.
 	
 	string type; // The "type" of this parameter. Type can be: STRING, INT, BOOL, FLOAT, FILE_IN, FILE_OUT.
 	float Rmin, Rmax; // Number types can specify a min and max range for the variable.
 
-	lgDlgParam( string ntextLabel = "", string nname = "", string ntype = "STRING", bool nisGui = true, float nRmin = -FLT_MAX, float nRmax = FLT_MAX ) : textLabel(ntextLabel), name(nname), isGui(nisGui), type(ntype), Rmin(nRmin), Rmax(nRmax) {};
+	lgDlgParam(string ntextLabel = "", string nname = "", string ntype = "STRING", bool nisGui = true, float nRmin = -FLT_MAX, float nRmax = FLT_MAX) : textLabel(ntextLabel), name(nname), isGui(nisGui), type(ntype), Rmin(nRmin), Rmax(nRmax) {};
 };
 
 struct LibraryGate {
@@ -75,10 +75,10 @@ public:
 	bool getGate(string gateName, LibraryGate &lgGate);
 	
 	// Return the logic type of a particular gate:
-	string getGateLogicType( string gateName );
+	string getGateLogicType(string gateName);
 	
 	// Return the gui type of a particular gate type:
-	string getGateGUIType( string gateName );
+	string getGateGUIType(string gateName);
 	
 	string getName() { return libName; };
 	

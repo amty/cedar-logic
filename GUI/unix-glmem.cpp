@@ -71,7 +71,7 @@ struct _GdkX11Display
 
   /* If the SECURITY extension is in place, whether this client holds
    * a trusted authorization and so is allowed to make various requests
-   * (grabs, properties etc.) Otherwise always TRUE.
+   *(grabs, properties etc.) Otherwise always TRUE.
    */
   gboolean trusted_client;
 
@@ -125,7 +125,7 @@ struct _GdkX11Display
   guint have_input_shapes : 1;
   gint shape_event_base;
 
-  /* The offscreen window that has the pointer in it (if any) */
+  /* The offscreen window that has the pointer in it(if any) */
   GdkWindow *active_offscreen_window;
 
   GSList *error_traps;
@@ -133,7 +133,7 @@ struct _GdkX11Display
 Display* get_display_from_gdk()
 {
 	GdkDisplay *d = gdk_display_get_default();
-	return ((struct _GdkX11Display*)d)->xdisplay;
+	return((struct _GdkX11Display*)d)->xdisplay;
 }
 
 bool with_ogl_to_mem::ensure_x11()

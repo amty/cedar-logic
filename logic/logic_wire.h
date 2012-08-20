@@ -29,7 +29,7 @@ class Circuit;
 // enabling disconnecting wires to work correctly.
 class WireInput {
 public:
-	WireInput( IDType gateID, string gateOutputID, StateType inputState = UNKNOWN ) {
+	WireInput(IDType gateID, string gateOutputID, StateType inputState = UNKNOWN) {
 		this->gateID = gateID;
 		this->gateOutputID = gateOutputID;
 		this->inputState = inputState;
@@ -41,13 +41,13 @@ public:
 	StateType inputState;
 };
 
-// Operator for WireInput (Allows it to be stored in maps).
-bool operator < (const WireInput &left, const WireInput &right);
+// Operator for WireInput(Allows it to be stored in maps).
+bool operator <(const WireInput &left, const WireInput &right);
 
 // Wire outputs, which connect a gate and a gateInput together:
 class WireOutput {
 public:
-	WireOutput( IDType gateID, string gateInputID ) {
+	WireOutput(IDType gateID, string gateInputID) {
 		this->gateID = gateID;
 		this->gateInputID = gateInputID;
 	}
@@ -56,12 +56,12 @@ public:
 	string gateInputID;
 };
 
-// Operator for WireOutput (Allows it to be stored in maps).
-bool operator < (const WireOutput &left, const WireOutput &right);
+// Operator for WireOutput(Allows it to be stored in maps).
+bool operator <(const WireOutput &left, const WireOutput &right);
 
 
 // Operator for WIRE_PTRs, to allow it to be stored in sets and maps.
-bool operator < (const WIRE_PTR &left, const WIRE_PTR &right);
+bool operator <(const WIRE_PTR &left, const WIRE_PTR &right);
 
 
 class Wire  
@@ -74,36 +74,36 @@ public:
 
 	// Update the internal state of the wire.
 	// Return the new state.
-	StateType calculateState( set< WIRE_PTR > wireGroup );
+	StateType calculateState(set< WIRE_PTR > wireGroup);
 	
-	// Force the wire to change state (used when a wire is in a junction group):
-	void forceState( StateType newState );
+	// Force the wire to change state(used when a wire is in a junction group):
+	void forceState(StateType newState);
 
 	// Returns a list of output gates that this wire affects.
-	vector< IDType > getOutputGates( void );
+	vector< IDType > getOutputGates(void);
 
 	// Return the current state of the wire:
-	StateType getState( void );
+	StateType getState(void);
 
 	// Connect a gate output to this wire:
-	void connectInput( IDType gateID, string gateOutputID );
+	void connectInput(IDType gateID, string gateOutputID);
 
 	// Connect this wire to a gate input:
-	void connectOutput( IDType gateID, string gateInputID );
+	void connectOutput(IDType gateID, string gateInputID);
 
 	// Disconnect a gate output from this wire's input.
-	void disconnectInput( IDType gateID, string gateOutputID );
+	void disconnectInput(IDType gateID, string gateOutputID);
 
 	// Disconnect a gate input from this wire's output:
-	void disconnectOutput( IDType gateID, string gateInputID );
+	void disconnectOutput(IDType gateID, string gateInputID);
 
 	// Get the first non-external input of the wire:
 	// If there are no non-external inputs, then it returns a WireInput with gateID == ID_NONE;
-	WireInput getFirstInput( void );
+	WireInput getFirstInput(void);
 
 	// Get the first output of the wire:
 	// If there are no outputs, then it returns a WireOutput with gateID == ID_NONE;
-	WireOutput getFirstOutput( void );
+	WireOutput getFirstOutput(void);
 
 	Wire();
 	virtual ~Wire();
@@ -112,31 +112,31 @@ protected:
 // To be used only by the Junction and Circuit classes:
 
 	// Return the junctions connected to this wire:
-	ID_SET< IDType > getJunctions( void ) {
+	ID_SET< IDType > getJunctions(void) {
 		return junctionList;
 	};
 
 	// Connect this wire to a new junction:
-	// (Don't do anything fancy - just add the ID to this wire's list.)
-	void addJunction( IDType theJunction ) {
-		junctionList.insert( theJunction );
+	//(Don't do anything fancy - just add the ID to this wire's list.)
+	void addJunction(IDType theJunction) {
+		junctionList.insert(theJunction);
 	};
 
 	// Disconnect this wire from a junction:
-	// (Just remove the ID from this wire's list.)
-	void removeJunction( IDType theJunction ) {
-		junctionList.erase( theJunction );
+	//(Just remove the ID from this wire's list.)
+	void removeJunction(IDType theJunction) {
+		junctionList.erase(theJunction);
 	};
 
 protected:
 	StateType wireState; // The current state of this wire.
 
 	// A list of the wire input states, associated by wire input ID:
-	// (It's a "set" so that there are no duplicates).
+	//(It's a "set" so that there are no duplicates).
 	ID_SET< WireInput > inputList;
 
 	// A set containing all of the output gates that this wire affects:
-	// (It's a "set" so that there are no duplicates).
+	//(It's a "set" so that there are no duplicates).
 	ID_SET< WireOutput > outputList;
 	
 	// A list of junctions that this wire connects to.

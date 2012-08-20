@@ -50,16 +50,16 @@ public:
 	void UpdateData(void);
 	void UpdateMenu(void);
 	
-	void OnToggleButton( wxCommandEvent& event );
-	void OnExport( wxCommandEvent& event );
-	void OnLoad( wxCommandEvent& event );
-	void OnSave( wxCommandEvent& event );
+	void OnToggleButton(wxCommandEvent& event);
+	void OnExport(wxCommandEvent& event);
+	void OnLoad(wxCommandEvent& event);
+	void OnSave(wxCommandEvent& event);
 	
 	// Hide, but don't close the frame:
-	void OnClose( wxCloseEvent& event );
+	void OnClose(wxCloseEvent& event);
 	
 	//Function used to update menu when comboBox is changed
-	void OnComboUpdate( wxCommandEvent& event );
+	void OnComboUpdate(wxCommandEvent& event);
 	
 	//*******************************
 	//Edit by Joshua Lansford 3/11/06
@@ -78,32 +78,32 @@ public:
 	
 	//creates a new feed by the specified name
 	//and appends it to the end.
-	void appendNewFeed( string newName );
+	void appendNewFeed(string newName);
 	
 	//this renames an existing feed
-	void setFeedName( int i, string newName );
+	void setFeedName(int i, string newName);
 	
 	//Returns how many active feeds there are in the
 	//Oscope. i.e. how many combo boxes there are
 	unsigned int numberOfFeeds();
 	
 	//takes a feed out with the combo box it was in
-	void removeFeed( int i );
+	void removeFeed(int i);
 	
 	//Returns the name of feed i.  i.e. the current
 	//contents in the ith combo box
-	string getFeedName( int i );
+	string getFeedName(int i);
 	
 	//sets the name of a feed to none
-	void cancelFeed( int i );
+	void cancelFeed(int i);
 	
 	//returns the y location of this feed in
 	//the canves
-	int getFeedYPos( int i );
+	int getFeedYPos(int i);
 	
 	//This will cause the OscopeFrame
 	//to update the list of
-	void updatePossableFeeds( vector< string >* newPossabilities );
+	void updatePossableFeeds(vector< string >* newPossabilities);
 	
 
 	
@@ -114,15 +114,15 @@ private:
 	//(a name with more spaces on the end)
 	//so that this name will be unique
 	//from any other name despice case difference
-	string encodeFeedName( string name );
+	string encodeFeedName(string name);
 	
 	//This undoes the encoding done in encodeFeed
-	string decodeFeedName( string name );
+	string decodeFeedName(string name);
 	
 	//this is used by encodeFeedName to check
 	//if two names are the same if you
 	//disregard the case
-	string toUpperCase( string name );
+	string toUpperCase(string name);
 
 	//this allows a lookup of an encoded name
 	//to determine the real name that it had

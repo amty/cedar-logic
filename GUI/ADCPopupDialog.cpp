@@ -26,7 +26,7 @@ BEGIN_EVENT_TABLE(ADCPopupDialog, wxDialog)
 	EVT_SCROLL(ADCPopupDialog::OnSliderChanged)
 END_EVENT_TABLE()
 
-ADCPopupDialog::ADCPopupDialog( guiGateADC* newguiGateADC, GUICircuit* newGUICircuit )
+ADCPopupDialog::ADCPopupDialog(guiGateADC* newguiGateADC, GUICircuit* newGUICircuit)
 	:wxDialog(wxGetApp().GetTopWindow(), -1, ADC_TITLE, 
 	    wxPoint(ADC_X_POS, ADC_Y_POS), 
 	    wxSize(ADC_WIDTH, ADC_HEIGHT),
@@ -50,7 +50,7 @@ ADCPopupDialog::ADCPopupDialog( guiGateADC* newguiGateADC, GUICircuit* newGUICir
 }
 
 //event which is called when the slider is changed
-void ADCPopupDialog::OnSliderChanged( wxScrollEvent& event )
+void ADCPopupDialog::OnSliderChanged(wxScrollEvent& event)
 {
 	//here we send the command to the core.  The label gets updated
 	//when the change gets poped back up to us
@@ -61,7 +61,7 @@ void ADCPopupDialog::OnSliderChanged( wxScrollEvent& event )
 //this is so we can update the pop-up about the current value
 void ADCPopupDialog::notifyValueChanged()
 {
-	string currentValueAsString = m_guiGateADC->getLogicParam( "VALUE" );
+	string currentValueAsString = m_guiGateADC->getLogicParam("VALUE");
 	if(currentValueAsString == "")
 		currentValueAsString = ADC_INIT_VALUE_STR;
 
@@ -69,7 +69,7 @@ void ADCPopupDialog::notifyValueChanged()
 	istringstream valueReader(currentValueAsString);
 	valueReader >> currentValue;
 	label->SetLabel(std2wx(currentValueAsString));
-	if( slider->GetValue() != currentValue ){
-		slider->SetValue( currentValue );
+	if(slider->GetValue() != currentValue){
+		slider->SetValue(currentValue);
 	}
 }

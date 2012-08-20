@@ -22,20 +22,20 @@ class GUICircuit;
 class RamPopupDialog : public wxDialog{
 public:
  	/** Constructor. Creates a new RamPopupDialog */
-	RamPopupDialog( guiGateRAM* newM_ramGuiGate, unsigned long bitsInAddress,
-	                GUICircuit* newGUICircuit );
+	RamPopupDialog(guiGateRAM* newM_ramGuiGate, unsigned long bitsInAddress,
+	                GUICircuit* newGUICircuit);
 
 
-	void OnBtnClose( wxCommandEvent& event );
-	void OnBtnLoad( wxCommandEvent& event );
-	void OnBtnSave( wxCommandEvent& event );
-	void OnBtnEdit( wxCommandEvent& event );
-	void OnChkBox( wxCommandEvent& event );
+	void OnBtnClose(wxCommandEvent& event);
+	void OnBtnLoad(wxCommandEvent& event);
+	void OnBtnSave(wxCommandEvent& event);
+	void OnBtnEdit(wxCommandEvent& event);
+	void OnChkBox(wxCommandEvent& event);
 	void OnSize();
 	wxString OnGetItemText(long item, long column) const;
 	
 	//This is called by the guiGateRAM when an item changes
-	void updateGridDisplay( );
+	void updateGridDisplay();
 	void notifyAllChanged();
 
 protected:
@@ -58,20 +58,20 @@ private:
 class virtualGrid : public wxGridTableBase {
 public:
 	
-	virtualGrid (int addressSize, int dataSize, guiGateRAM* newM_ramGuiGate, GUICircuit* newGUICircuit, wxCheckBox* hexOrDecCBArg);
+	virtualGrid(int addressSize, int dataSize, guiGateRAM* newM_ramGuiGate, GUICircuit* newGUICircuit, wxCheckBox* hexOrDecCBArg);
 	
-	virtual int GetNumberRows ();
-	virtual int GetNumberCols ();
-	virtual bool IsEmptyCell (int row, int col);
-	virtual wxString GetValue (int row, int col);
-	virtual void SetValue (int row, int col, const wxString& value);
+	virtual int GetNumberRows();
+	virtual int GetNumberCols();
+	virtual bool IsEmptyCell(int row, int col);
+	virtual wxString GetValue(int row, int col);
+	virtual void SetValue(int row, int col, const wxString& value);
 	virtual wxGridCellAttr* GetAttr(int row, int col, wxGridCellAttr::wxAttrKind kind);
 	virtual void SetAttr(wxGridCellAttr* attr, int row, int col);
 	virtual wxString GetRowLabelValue(int row);
 	virtual wxString GetColLabelValue(int col);
 	
-	void SetNumRows (int numRows);
-	void SetNumCols (int numCols);
+	void SetNumRows(int numRows);
+	void SetNumCols(int numCols);
 	
 private:
 	

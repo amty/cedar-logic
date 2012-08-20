@@ -1,6 +1,6 @@
 //*******************************************************************
 //glfont2.cpp -- glFont Version 2.0 implementation
-//Copyright (c) 1998-2002 Brad Fish
+//Copyright(c) 1998-2002 Brad Fish
 //See glfont.html for terms of use
 //May 14, 2002
 //*******************************************************************
@@ -25,7 +25,7 @@ using namespace glfont;
 //*******************************************************************
 //GLFont Class Implementation
 //*******************************************************************
-GLFont::GLFont ()
+GLFont::GLFont()
 {
 	//Initialize header to safe state
 	header.tex = -1;
@@ -36,13 +36,13 @@ GLFont::GLFont ()
 	header.chars = NULL;
 }
 //*******************************************************************
-GLFont::~GLFont ()
+GLFont::~GLFont()
 {
 	//Destroy the font
 	Destroy();
 }
 //*******************************************************************
-bool GLFont::Create (const char *file_name, int tex)
+bool GLFont::Create(const char *file_name, int tex)
 {
 	ifstream input;
 	int num_chars, num_tex_bytes;
@@ -53,7 +53,7 @@ bool GLFont::Create (const char *file_name, int tex)
 
 	//Open input file
 	input.open(file_name, ios::in | ios::binary);
-	if (!input)
+	if(!input)
 		return false;
 
 	//Read the header from file
@@ -62,7 +62,7 @@ bool GLFont::Create (const char *file_name, int tex)
 
 	//Allocate space for character array
 	num_chars = header.end_char - header.start_char + 1;
-	if ((header.chars = new GLFontChar[num_chars]) == NULL)
+	if((header.chars = new GLFontChar[num_chars]) == NULL)
 		return false;
 
 	//Read character array
@@ -95,63 +95,63 @@ bool GLFont::Create (const char *file_name, int tex)
 	return true;
 }
 //*******************************************************************
-bool GLFont::Create (const std::string &file_name, int tex)
+bool GLFont::Create(const std::string &file_name, int tex)
 {
 	return Create(file_name.c_str(), tex);
 }
 //*******************************************************************
-void GLFont::Destroy (void)
+void GLFont::Destroy(void)
 {
 	//Delete the character array if necessary
-	if (header.chars)
+	if(header.chars)
 	{
 		delete[] header.chars;
 		header.chars = NULL;
 	}
 }
 //*******************************************************************
-void GLFont::GetTexSize (std::pair<int, int> *size)
+void GLFont::GetTexSize(std::pair<int, int> *size)
 {
 	//Retrieve texture size
 	size->first = header.tex_width;
 	size->second = header.tex_height;
 }
 //*******************************************************************
-int GLFont::GetTexWidth (void)
+int GLFont::GetTexWidth(void)
 {
 	//Return texture width
 	return header.tex_width;
 }
 //*******************************************************************
-int GLFont::GetTexHeight (void)
+int GLFont::GetTexHeight(void)
 {
 	//Return texture height
 	return header.tex_height;
 }
 //*******************************************************************
-void GLFont::GetCharInterval (std::pair<int, int> *interval)
+void GLFont::GetCharInterval(std::pair<int, int> *interval)
 {
 	//Retrieve character interval
 	interval->first = header.start_char;
 	interval->second = header.end_char;
 }
 //*******************************************************************
-int GLFont::GetStartChar (void)
+int GLFont::GetStartChar(void)
 {
 	//Return start character
 	return header.start_char;
 }
 //*******************************************************************
-int GLFont::GetEndChar (void)
+int GLFont::GetEndChar(void)
 {
 	//Return end character
 	return header.end_char;
 }
 //*******************************************************************
-void GLFont::GetCharSize (int c, std::pair<int, int> *size)
+void GLFont::GetCharSize(int c, std::pair<int, int> *size)
 {
 	//Make sure character is in range
-	if (c < header.start_char || c > header.end_char)
+	if(c < header.start_char || c > header.end_char)
 	{
 		//Not a valid character, so it obviously has no size
 		size->first = 0;
@@ -163,16 +163,16 @@ void GLFont::GetCharSize (int c, std::pair<int, int> *size)
 
 		//Retrieve character size
 		glfont_char = &header.chars[c - header.start_char];
-		size->first = (int)(glfont_char->dx * header.tex_width);
-		size->second = (int)(glfont_char->dy *
+		size->first =(int)(glfont_char->dx * header.tex_width);
+		size->second =(int)(glfont_char->dy *
 			header.tex_height);
 	}
 }
 //*******************************************************************
-int GLFont::GetCharWidth (int c)
+int GLFont::GetCharWidth(int c)
 {
 	//Make sure in range
-	if (c < header.start_char || c > header.end_char)
+	if(c < header.start_char || c > header.end_char)
 		return 0;
 	else
 	{
@@ -180,14 +180,14 @@ int GLFont::GetCharWidth (int c)
 		
 		//Retrieve character width
 		glfont_char = &header.chars[c - header.start_char];
-		return (int)(glfont_char->dx * header.tex_width);
+		return(int)(glfont_char->dx * header.tex_width);
 	}
 }
 //*******************************************************************
-int GLFont::GetCharHeight (int c)
+int GLFont::GetCharHeight(int c)
 {
 	//Make sure in range
-	if (c < header.start_char || c > header.end_char)
+	if(c < header.start_char || c > header.end_char)
 		return 0;
 	else
 	{
@@ -195,11 +195,11 @@ int GLFont::GetCharHeight (int c)
 
 		//Retrieve character height
 		glfont_char = &header.chars[c - header.start_char];
-		return (int)(glfont_char->dy * header.tex_height);
+		return(int)(glfont_char->dy * header.tex_height);
 	}
 }
 //*******************************************************************
-void GLFont::Begin (void)
+void GLFont::Begin(void)
 {
 	//Bind to font texture
 	glBindTexture(GL_TEXTURE_2D, header.tex);

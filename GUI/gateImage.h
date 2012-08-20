@@ -29,19 +29,19 @@ using namespace std;
 
 class gateImage : public wxWindow {
 public:
-    gateImage( string gateName, wxWindow *parent, wxWindowID id = wxID_ANY,
+    gateImage(string gateName, wxWindow *parent, wxWindowID id = wxID_ANY,
         const wxPoint& pos = wxDefaultPosition,
         const wxSize& size = wxDefaultSize,
-        long style = 0, const wxString& name = _T("") );
+        long style = 0, const wxString& name = _T(""));
 
     ~gateImage();
 
     void OnPaint(wxPaintEvent& event);
     void mouseCallback(wxMouseEvent& event);
-    void OnEnterWindow(wxMouseEvent& event) { if (!(event.LeftIsDown())) inImage = true; Refresh(); };
+    void OnEnterWindow(wxMouseEvent& event) { if(!(event.LeftIsDown())) inImage = true; Refresh(); };
     void OnLeaveWindow(wxMouseEvent& event) { inImage = false; Refresh(); };
 
-	void OnEraseBackground( wxEraseEvent& event );
+	void OnEraseBackground(wxEraseEvent& event);
 
 	string getGateName() { return gateName; };
 

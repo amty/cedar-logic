@@ -57,7 +57,7 @@ typedef unsigned long long TimeType;
 // The type used for internal wire and gate and input IDs:
 // Note that we also don't worry about IDType running out of spaces, because an
 // unsigned long can memory reference the entire memory space anyhow. ,'o)
-//WARNING: (Unless of course, a loaded file gives you an ID that is near the
+//WARNING:(Unless of course, a loaded file gives you an ID that is near the
 // top of unsigned long's range to begin with!)
 typedef unsigned long IDType;
 

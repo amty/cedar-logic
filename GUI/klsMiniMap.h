@@ -31,13 +31,13 @@ public:
         long style = 0, const wxString& name = _T("klsMiniMap"));
 	~klsMiniMap() { return; };
 	
-	void setLists( hash_map< unsigned long, guiGate* >* gateList, hash_map< unsigned long, guiWire* >* wireList ) {
+	void setLists(hash_map< unsigned long, guiGate* >* gateList, hash_map< unsigned long, guiWire* >* wireList) {
 		this->gateList = gateList;
 		this->wireList = wireList;
 	};
 	
 	void update(GLPoint2f origin = GLPoint2f(0,0), GLPoint2f endpoint = GLPoint2f(0,0));
-	void setCanvas( klsGLCanvas* kcanvas ) { currentCanvas = kcanvas; };
+	void setCanvas(klsGLCanvas* kcanvas) { currentCanvas = kcanvas; };
 	void OnPaint(wxPaintEvent& evt);
 	void OnMouseEvent(wxMouseEvent& evt);
 	
