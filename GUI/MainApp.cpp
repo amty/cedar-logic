@@ -109,7 +109,15 @@ void MainApp::loadSettings() {
 		pathToExe += (char)arg0[i];
 	}
 	appSettings.init(pathToExe);
-		
+	timeStepMod = appSettings.timePerStep; /* если меня не гючит, то в
+						* оригинале, timeStepMod
+						* инициализировался
+						* исключительно в случае если
+						* settings.ini был не
+						* найден. Если это так, то
+						* скорее всего это был баг, но
+						* на всякий случай, я оставлю
+						* эту заметку. */
 		// check screen coords
 		wxScreenDC sdc;
 		if ( appSettings.mainFrameLeft + (signed int)(appSettings.mainFrameWidth) > (signed int)(sdc.GetSize().GetWidth()) ||

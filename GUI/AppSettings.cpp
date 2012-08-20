@@ -268,12 +268,13 @@ void ApplicationSettings::init(const string& exe_prefix)
 		if(settings_ini != "")
 			parse_ini(user_settings_ini);
 	}
+	write_ini("./tmp.xml");
 }
 
-int main()
-{
-	ApplicationSettings s;
-	s.init("./");
-	s.save();
-	return 0;
-}
+// int main()
+// {
+// 	ApplicationSettings s;
+// 	s.init("./");
+// 	s.save();
+// 	return 0;
+// }
