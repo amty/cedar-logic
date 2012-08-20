@@ -24,6 +24,7 @@
 #include "product.h"
 #include "gl_defs.h"
 #include "klsMessage.h"
+#include "AppSettings.h"
 #include <deque>
 #include <string>
 #include <fstream>
@@ -32,22 +33,6 @@
 class MainFrame;
 
 //using namespace std;
-
-struct ApplicationSettings {
-	string gateLibFile;
-	string textFontFile;
-	string helpFile;
-	string lastDir;
-	unsigned int mainFrameWidth;
-	unsigned int mainFrameHeight;
-	int mainFrameLeft;
-	int mainFrameTop;
-	unsigned int timePerStep;
-	int refreshRate;
-    float wireConnRadius;
-    bool wireConnVisible;
-    bool gridlineVisible;
-};
 
 class MainApp : public wxApp {
 public:

@@ -72,7 +72,8 @@ wxPrintData *g_printData = (wxPrintData*) NULL;
 
 
 MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
-       : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(600,600))
+	: wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(600,600)),
+	  currentCanvas(NULL)
 {
     // set the frame icon
     //SetIcon(wxICON(sample));
@@ -144,12 +145,7 @@ MainFrame::MainFrame(const wxString& title, wxString cmdFilename)
 	//////////////////////////////////////////////////////////////////////////
     // parse a gate library
 	//////////////////////////////////////////////////////////////////////////
-#ifndef _PRODUCTION_
-	string libPath = wxGetApp().pathToExe + "../GUI/cl_gatedefs.lib";
-#else
-	string libPath(wxGetApp().appSettings.gateLibFile);
-#endif
-	LibraryParse newLib(libPath);
+	LibraryParse newLib(wxGetApp().appSettings.gateLibFile);
 	wxGetApp().libParser = newLib;
 	
 	create_toolbar();
@@ -824,35 +820,13 @@ void MainFrame::OnTimeStepModSlider(wxScrollEvent& event) {
 
 
 void MainFrame::saveSettings() {
-	//Edit by Joshua Lansford 2/15/07
-	//making the execution of cedarls indipendent of were
-	//it was executed from.  However the settings.ini file still
-	//needs to be relative.
-	//adding substring on the end of the relative paths to knock
-	//of the part I put on.
-	int numCharAbsolute = wxGetApp().pathToExe.length();
-	
-	#ifdef _PRODUCTION_
-		string settingsIni = wxGetApp().pathToExe + "./settings.ini";
-	#else
-		string settingsIni = wxGetApp().pathToExe + "../settings.ini";
-	#endif
-	
-	ofstream iniFile(settingsIni.c_str(), ios::out);
-	iniFile << "GateLib=" << wxGetApp().appSettings.gateLibFile.substr(numCharAbsolute) << endl;
-	iniFile << "HelpFile=" << wxGetApp().appSettings.helpFile.substr(numCharAbsolute) << endl;
-	iniFile << "TextFont=" << wxGetApp().appSettings.textFontFile.substr(numCharAbsolute) << endl;
-	iniFile << "FrameWidth=" << this->GetSize().GetWidth() << endl;
-	iniFile << "FrameHeight=" << this->GetSize().GetHeight() << endl;
-	iniFile << "FrameLeft=" << this->GetPosition().x << endl;
-	iniFile << "FrameTop=" << this->GetPosition().y << endl;
-	iniFile << "TimeStep=" << wxGetApp().timeStepMod << endl;
-	iniFile << "RefreshRate=" << wxGetApp().appSettings.refreshRate << endl;
-	iniFile << "LastDirectory=" << lastDirectory.c_str() << endl;
-	iniFile << "WireConnRadius=" << wxGetApp().appSettings.wireConnRadius << endl;
-	iniFile << "WireConnVisible=" << wxGetApp().appSettings.wireConnVisible << endl;
-	iniFile << "GridlineVisible=" << wxGetApp().appSettings.gridlineVisible << endl;
-	iniFile.close();
+	ApplicationSettings &s = wxGetApp().appSettings;
+	s.mainFrameWidth = this->GetSize().GetWidth();
+	s.mainFrameHeight = this->GetSize().GetHeight();
+	s.mainFrameLeft = this->GetPosition().x;
+	s.mainFrameTop = this->GetPosition().y;
+	s.lastDir = wx2std(lastDirectory);
+	s.save();
 }
 
 void MainFrame::ResumeExecution() {

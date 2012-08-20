@@ -2,7 +2,7 @@
 CXXFLAGS=$(shell wx-config-2.8 --cflags) -Wall -ggdb3
 
 LDLIBS=$(shell wx-config-2.8 --libs core,base,gl,html,adv)
-LDLIBS+=-lGL -lGLU
+LDLIBS+=-lGL -lGLU -lboost_filesystem $(shell pkg-config libxml++-2.6 --libs)
 
 all: tinyxml2/tinyxml2.o
 	make -C logic
