@@ -56,8 +56,13 @@ void *threadLogic::Entry() {
 }
 
 void threadLogic::checkMessages() {
-	wxCriticalSectionLocker locker(wxGetApp().m_critsect);
-	while (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY) wxYield();
+	bool locked = false;
+	do {
+		wxCriticalSectionLocker locker(wxGetApp().m_critsect);
+		locked = (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY);
+		if(!locked)
+			wxYield();
+	} while (!locked);
 	while (wxGetApp().dGUItoLOGIC.size() > 0) {
 		parseMessage(wxGetApp().dGUItoLOGIC.front());
 		wxGetApp().dGUItoLOGIC.pop_front();

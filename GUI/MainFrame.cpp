@@ -602,8 +602,10 @@ void MainFrame::OnTimer(wxTimerEvent& event) {
 }
 
 void MainFrame::OnIdle(wxTimerEvent& event) {
-	wxCriticalSectionLocker locker(wxGetApp().m_critsect);
-	while (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY) wxYield();
+	bool locked = false;
+	locked = (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY);
+	if(!locked)
+		return;
 	while (wxGetApp().dLOGICtoGUI.size() > 0) {
 		gCircuit->parseMessage(wxGetApp().dLOGICtoGUI.front());
 		wxGetApp().dLOGICtoGUI.pop_front();

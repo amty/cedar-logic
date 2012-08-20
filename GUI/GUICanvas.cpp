@@ -522,11 +522,19 @@ void GUICanvas::OnMouseMove( GLdouble glX, GLdouble glY, bool ShiftDown, bool Ct
 	if (wxGetApp().appSystemTime.Time() > wxGetApp().appSettings.refreshRate) {
 		wxGetApp().appSystemTime.Pause();
 		if (gCircuit->panic) return;
-		wxCriticalSectionLocker locker(wxGetApp().m_critsect);
-		while (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY) wxYield();
-		while (wxGetApp().dLOGICtoGUI.size() > 0) {
-			gCircuit->parseMessage(wxGetApp().dLOGICtoGUI.front());
-			wxGetApp().dLOGICtoGUI.pop_front();
+		{
+			wxCriticalSectionLocker locker(wxGetApp().m_critsect);
+			while (wxGetApp().dLOGICtoGUI.size() > 0) {
+				bool locked = false;
+				locked = (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY);
+				if(locked) {
+					klsMessage::Message msg = wxGetApp().dLOGICtoGUI.front();
+					wxGetApp().dLOGICtoGUI.pop_front();
+					wxGetApp().mexMessages.Unlock();
+					gCircuit->parseMessage(msg);
+				} else
+					break; /* the better if we'll not process all messages at once, than we'll deadlock on it */
+			}
 		}
 		wxGetApp().mexMessages.Unlock();
 
@@ -1294,8 +1302,13 @@ void GUICanvas::Update() {
 	if (wxGetApp().appSystemTime.Time() > wxGetApp().appSettings.refreshRate) {
 		wxGetApp().appSystemTime.Pause();
 		if (gCircuit->panic) return;
-		wxCriticalSectionLocker locker(wxGetApp().m_critsect);
-		while (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY) wxYield();
+		bool locked = false;
+		do {
+			wxCriticalSectionLocker locker(wxGetApp().m_critsect);
+			locked = (wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY);
+			if(!locked)
+				wxYield();
+		} while (!locked);
 		while (wxGetApp().dLOGICtoGUI.size() > 0) {
 			gCircuit->parseMessage(wxGetApp().dLOGICtoGUI.front());
 			wxGetApp().dLOGICtoGUI.pop_front();
