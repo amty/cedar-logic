@@ -26,104 +26,137 @@ using namespace __gnu_cxx;
 #include "wx/cmdproc.h"
 
 // Holds pointers to all of a gate's parameters
-struct paramSet {
-	map < string, string >* gParams;
-	map < string, string >* lParams;
-	paramSet( map < string, string >* g, map < string, string >* l ) { gParams = g; lParams = l; };
+struct paramSet
+{
+	map<string, string>* gParams;
+	map<string, string>* lParams;
+	paramSet(map<string, string>* g, map<string, string>* l) {
+		gParams = g; lParams = l;
+	};
 };
 
 // klsCommand - class that contains essential items for each command
-class klsCommand : public wxCommand {
+class klsCommand : public wxCommand
+{
 protected:
 	GUICircuit* gCircuit;
 	GUICanvas* gCanvas;
 	bool fromString;
 public:
-	klsCommand( bool canUndo = false, const wxString& name = NULL ) : wxCommand(canUndo, name) {};
-	virtual ~klsCommand( void ) { return; };
-	virtual string toString() { return ""; };
-	virtual void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids ) { this->gCircuit = gCircuit; this->gCanvas = gCanvas; };
+	klsCommand(bool canUndo = false, const wxString& name = NULL,
+		   GUICircuit *circ = NULL, GUICanvas *canv = NULL,
+		   bool fromString = false) :
+		wxCommand(canUndo, name), gCircuit(circ), gCanvas(canv),
+		fromString(fromString)
+		{};
+	virtual ~klsCommand(void)
+		{ return; };
+	virtual string toString()
+		{ return ""; };
+	virtual void setPointers(GUICircuit* gCircuit, GUICanvas* gCanvas,
+				 hash_map<unsigned long, unsigned long> &gateids,
+				 hash_map<unsigned long, unsigned long> &wireids)
+		{ this->gCircuit = gCircuit; this->gCanvas = gCanvas; };
 };
 
 // cmdMoveGate - moving a gate from point a(x,y) to point b(x,y)
-class cmdMoveGate : public klsCommand {
+class cmdMoveGate : public klsCommand
+{
 protected:
 	unsigned long gid;
 	float startX, startY, endX, endY;
 	bool noUpdateWires;
 	
 public:
-	cmdMoveGate( GUICircuit* gCircuit, unsigned long gid, float startX, float startY, float endX, float endY, bool uW = false );
-	~cmdMoveGate( void ) { return; };
-	
-	bool Do( void );
-	bool Undo( void );
+	cmdMoveGate(GUICircuit* gCircuit, unsigned long gid,
+		    float startX, float startY, float endX, float endY,
+		    bool uW = false);
+	~cmdMoveGate(void)
+		{ return; };
+	bool Do(void);
+	bool Undo(void);
 	string toString();
 };
 
-// cmdMoveWire - moving a wire and storing it's segment maps (old and new)
-class cmdMoveWire : public klsCommand {
+// cmdMoveWire - moving a wire and storing it's segment maps(old and new)
+class cmdMoveWire : public klsCommand
+{
 protected:
 	unsigned long wid;
-	map < long, wireSegment > oldSegList;
-	map < long, wireSegment > newSegList;
+	guiWire::wseg_map oldSegList;
+	guiWire::wseg_map newSegList;
 	GLPoint2f delta;
 	
 public:
-	cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, wireSegment > oldList, map < long, wireSegment > newList );
-	cmdMoveWire( GUICircuit* gCircuit, unsigned long wid, map < long, wireSegment > oldList, GLPoint2f delta );
-	cmdMoveWire( string def );
-	~cmdMoveWire( void ) { return; };
+	cmdMoveWire(GUICircuit* gCircuit, unsigned long wid,
+		    guiWire::wseg_map oldList, guiWire::wseg_map newList);
+	cmdMoveWire(GUICircuit* gCircuit, unsigned long wid,
+		    guiWire::wseg_map oldList,
+		    GLPoint2f delta);
+	cmdMoveWire(string def);
+	~cmdMoveWire(void) { return; };
 	
-	bool Do( void );
-	bool Undo( void );
-	void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids );
+	bool Do(void);
+	bool Undo(void);
+	void setPointers(GUICircuit* gCircuit, GUICanvas* gCanvas,
+			 hash_map<unsigned long, unsigned long> &gateids,
+			 hash_map<unsigned long, unsigned long> &wireids);
 	string toString();
 };
 
 // cmdMoveSelection - move passed gates and wires
-class cmdMoveSelection : public klsCommand {
+class cmdMoveSelection : public klsCommand
+{
 protected:
-	vector < unsigned long > gateList;
-	vector < unsigned long > wireList;
-	map < unsigned long, map < long, wireSegment > > oldSegMaps;
-	map < unsigned long, map < long, wireSegment > > newSegMaps;		
+	vector<unsigned long> gateList;
+	vector<unsigned long> wireList;
+	map<unsigned long, guiWire::wseg_map> oldSegMaps;
+	map<unsigned long, guiWire::wseg_map> newSegMaps;		
 	float startX, startY, endX, endY;
 	int wireMove;
-	vector < klsCommand* > proxconnects;
+	vector<klsCommand*> proxconnects;
 public:
-	cmdMoveSelection( GUICircuit* gCircuit, vector < GateState > &preMove, vector < WireState > &preMoveWire, float startX, float startY, float endX, float endY );
-	~cmdMoveSelection( void ) { return; };
+	cmdMoveSelection(GUICircuit* gCircuit, vector<GateState> &preMove,
+			 vector<WireState> &preMoveWire,
+			 float startX, float startY, float endX, float endY);
+	~cmdMoveSelection(void)
+		{ return; };
+	bool Do(void);
+	bool Undo(void);
 	
-	bool Do( void );
-	bool Undo( void );
-	
-	vector < klsCommand* >* getConnections() { return &proxconnects; };
+	vector<klsCommand*>* getConnections()
+		{ return &proxconnects; };
 };
 
-// cmdCreateGate - creates a gate on a given canvas at position (x,y)
-class cmdCreateGate : public klsCommand {
+// cmdCreateGate - creates a gate on a given canvas at position(x,y)
+class cmdCreateGate : public klsCommand
+{
 protected:
 	float x, y;
 	string gateType;
 	unsigned long gid;
-	vector < klsCommand* > proxconnects;
+	vector<klsCommand*> proxconnects;
 	
 public:
-	cmdCreateGate( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long gid, string gateType, float x, float y);
-	cmdCreateGate( string def );
-	~cmdCreateGate( void ) { return; };
+	cmdCreateGate(GUICanvas* gCanvas, GUICircuit* gCircuit,
+		      unsigned long gid, string gateType, float x, float y);
+	cmdCreateGate(string def);
+	~cmdCreateGate(void)
+		{ return; };
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 	string toString();
-	void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids );
-	
-	vector < klsCommand* >* getConnections() { return &proxconnects; };
+	void setPointers(GUICircuit* gCircuit, GUICanvas* gCanvas,
+			 hash_map<unsigned long, unsigned long> &gateids,
+			 hash_map<unsigned long, unsigned long> &wireids);
+	vector<klsCommand*>* getConnections()
+		{ return &proxconnects; };
 };
 
 // cmdConnectWire - connects a wire to a gate hotspot
-class cmdConnectWire : public klsCommand {
+class cmdConnectWire : public klsCommand
+{
 protected:
 	unsigned long gid;
 	unsigned long wid;
@@ -139,157 +172,187 @@ protected:
 	string hotspotPal;
 	
 public:
-	cmdConnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape = false );
-	cmdConnectWire( string def );
-	~cmdConnectWire( void ) { return; };
+	cmdConnectWire(GUICircuit* gCircuit, unsigned long wid,
+		       unsigned long gid, string hotspot,
+		       bool noCalcShape = false);
+	cmdConnectWire(string def);
+	~cmdConnectWire(void) { return; };
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 	string toString();
-	void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids );
+	void setPointers(GUICircuit* gCircuit, GUICanvas* gCanvas,
+			 hash_map<unsigned long, unsigned long> &gateids,
+			 hash_map<unsigned long, unsigned long> &wireids);
 };
 
 // cmdCreateWire - creates a wire
-class cmdCreateWire : public klsCommand {
+class cmdCreateWire : public klsCommand
+{
 protected:
 	unsigned long wid;
 	cmdConnectWire* conn1;
 	cmdConnectWire* conn2;
 public:
-	cmdCreateWire( GUICanvas* gCanvas, GUICircuit* gCircuit, unsigned long wid, cmdConnectWire* conn1, cmdConnectWire* conn2 );
-	cmdCreateWire( string def );
-	~cmdCreateWire( void );
+	cmdCreateWire(GUICanvas* gCanvas, GUICircuit* gCircuit,
+		      unsigned long wid, cmdConnectWire* conn1,
+		      cmdConnectWire* conn2);
+	cmdCreateWire(string def);
+	~cmdCreateWire(void);
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 	string toString();
-	void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids );
+	void setPointers(GUICircuit* gCircuit, GUICanvas* gCanvas,
+			 hash_map<unsigned long, unsigned long> &gateids,
+			 hash_map<unsigned long, unsigned long> &wireids);
 };
 
 // cmdDisconnectWire - disconnects a wire from a gate hotspot
-class cmdDisconnectWire : public klsCommand {
+class cmdDisconnectWire : public klsCommand
+{
 protected:
 	unsigned long gid;
 	unsigned long wid;
 	string hotspot;
 	bool noCalcShape;
 public:
-	cmdDisconnectWire( GUICircuit* gCircuit, unsigned long wid, unsigned long gid, string hotspot, bool noCalcShape = false );
-	~cmdDisconnectWire( void ) { return; };
-	
-	bool Do( void );
-	bool Undo( void );
+	cmdDisconnectWire(GUICircuit* gCircuit, unsigned long wid,
+			  unsigned long gid, string hotspot,
+			  bool noCalcShape = false);
+	~cmdDisconnectWire(void)
+		{ return; };
+	bool Do(void);
+	bool Undo(void);
 	string toString();
 };
 
 // cmdMergeWire - connects a wire another wire
-class cmdMergeWire : public klsCommand {
+class cmdMergeWire : public klsCommand
+{
 protected:
 	unsigned long wid1;
 	unsigned long wid2;
 	long wire2seg;
-	stack < klsCommand* > cmdList;
+	stack<klsCommand*> cmdList;
 	GLPoint2f searchPoint;
 	
 public:
-	cmdMergeWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid1, unsigned long wid2, GLPoint2f mc );
-	~cmdMergeWire( void );
+	cmdMergeWire(GUICircuit* gCircuit, GUICanvas* gCanvas,
+		     unsigned long wid1, unsigned long wid2, GLPoint2f mc);
+	~cmdMergeWire(void);
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 };
 
 // cmdDeleteWire - Deletes a wire
-class cmdDeleteWire : public klsCommand {
+class cmdDeleteWire : public klsCommand
+{
 protected:
 	unsigned long wid;
-	stack < klsCommand* > cmdList;
+	stack<klsCommand*> cmdList;
 	
 public:
-	cmdDeleteWire( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wid);
-	~cmdDeleteWire( void );
+	cmdDeleteWire(GUICircuit* gCircuit, GUICanvas* gCanvas,
+		      unsigned long wid);
+	~cmdDeleteWire(void);
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 };
 
 // cmdDeleteGate - Deletes a gate
-class cmdDeleteGate : public klsCommand {
+class cmdDeleteGate : public klsCommand
+{
 protected:
 	unsigned long gid;
-	stack < klsCommand* > cmdList;
+	stack<klsCommand*> cmdList;
 	string gateType;
 	
 public:
-	cmdDeleteGate( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long gid);
-	~cmdDeleteGate( void );
+	cmdDeleteGate(GUICircuit* gCircuit, GUICanvas* gCanvas,
+		      unsigned long gid);
+	~cmdDeleteGate(void);
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 };
 
 // cmdDeleteSelection - Deletes a selection of gates/wires
-class cmdDeleteSelection : public klsCommand {
+class cmdDeleteSelection : public klsCommand
+{
 protected:
-	vector < unsigned long > gates;
-	vector < unsigned long > wires;
-	stack < klsCommand* > cmdList;
+	vector<unsigned long> gates;
+	vector<unsigned long> wires;
+	stack<klsCommand*> cmdList;
 	
 public:
-	cmdDeleteSelection( GUICircuit* gCircuit, GUICanvas* gCanvas, vector < unsigned long > &gates, vector < unsigned long > &wires);
-	~cmdDeleteSelection( void );
+	cmdDeleteSelection(GUICircuit* gCircuit, GUICanvas* gCanvas,
+			   vector<unsigned long> &gates,
+			   vector<unsigned long> &wires);
+	~cmdDeleteSelection(void);
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 };
 
 // cmdSetParams - Sets a gate's parameters
-class cmdSetParams : public klsCommand {
+class cmdSetParams : public klsCommand
+{
 protected:
 	unsigned long gid;
-	map < string, string > oldGUIParamList;
-	map < string, string > newGUIParamList;
-	map < string, string > oldLogicParamList;
-	map < string, string > newLogicParamList;
+	map<string, string> oldGUIParamList;
+	map<string, string> newGUIParamList;
+	map<string, string> oldLogicParamList;
+	map<string, string> newLogicParamList;
 	
 public:
-	cmdSetParams( GUICircuit* gCircuit, unsigned long gid, paramSet pSet, bool setMode = false );
-	cmdSetParams( string def );
-	~cmdSetParams( void ) { return; };
-	
-	bool Do( void );
-	bool Undo( void );
+	cmdSetParams(GUICircuit* gCircuit, unsigned long gid,
+		     paramSet pSet, bool setMode = false);
+	cmdSetParams(string def);
+	~cmdSetParams(void)
+		{ return; };
+	bool Do(void);
+	bool Undo(void);
 	string toString();
-	void setPointers( GUICircuit* gCircuit, GUICanvas* gCanvas, hash_map < unsigned long, unsigned long > &gateids, hash_map < unsigned long, unsigned long > &wireids );
+	void setPointers(GUICircuit* gCircuit, GUICanvas* gCanvas,
+			 hash_map<unsigned long, unsigned long> &gateids,
+			 hash_map<unsigned long, unsigned long> &wireids);
 };
 
 
 // cmdPasteBlock - Paste's a block of gates/wires
-class cmdPasteBlock : public klsCommand {
+class cmdPasteBlock : public klsCommand
+{
 protected:
-	vector < klsCommand* > cmdList;
+	vector<klsCommand*> cmdList;
 	bool m_init;
 public:
-	cmdPasteBlock( vector < klsCommand* > &cmdList );
-	~cmdPasteBlock( void ) { return; };
+	cmdPasteBlock(vector<klsCommand*> &cmdList);
+	~cmdPasteBlock(void)
+		{ return; };
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 	
-	void addCommand ( klsCommand* cmd ) { cmdList.push_back( cmd ); };
+	void addCommand(klsCommand* cmd)
+		{ cmdList.push_back(cmd); };
 };
 
 // cmdWireSegDrag - Set's a wire's tree after dragging a segment
-class cmdWireSegDrag : public klsCommand {
+class cmdWireSegDrag : public klsCommand
+{
 protected:
-	map < long, wireSegment > oldSegMap;
-	map < long, wireSegment > newSegMap;
+	guiWire::wseg_map oldSegMap;
+	guiWire::wseg_map newSegMap;
 	unsigned long wireID;
 public:
-	cmdWireSegDrag( GUICircuit* gCircuit, GUICanvas* gCanvas, unsigned long wireID );
+	cmdWireSegDrag(GUICircuit* gCircuit, GUICanvas* gCanvas,
+		       unsigned long wireID);
 	
-	bool Do( void );
-	bool Undo( void );
+	bool Do(void);
+	bool Undo(void);
 };
 
 #endif /*COMMANDS_H_*/
