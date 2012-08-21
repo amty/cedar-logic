@@ -603,14 +603,20 @@ void MainFrame::OnTimer(wxTimerEvent& event) {
 
 void MainFrame::OnIdle(wxTimerEvent& event) {
 	bool locked = false;
+	deque<klsMessage::Message> &dLOGICtoGUI = wxGetApp().dLOGICtoGUI;
+	deque<klsMessage::Message> msg_buf;
 	locked =(wxGetApp().mexMessages.TryLock() == wxMUTEX_BUSY);
 	if(!locked)
 		return;
 	while(wxGetApp().dLOGICtoGUI.size() > 0) {
-		gCircuit->parseMessage(wxGetApp().dLOGICtoGUI.front());
-		wxGetApp().dLOGICtoGUI.pop_front();
+		msg_buf.push_back(dLOGICtoGUI.front());
+		dLOGICtoGUI.pop_front();
 	}
 	wxGetApp().mexMessages.Unlock();
+	while(msg_buf.size() > 0) {
+		gCircuit->parseMessage(msg_buf.front());
+		msg_buf.pop_front();
+	}
 
 	if(mainSizer == NULL) return;
 	
